@@ -6,7 +6,7 @@ using KSP;
 
 namespace RealSolarSystem
 {
-	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
+	[KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class RealSolarSystem : MonoBehaviour
     {
         public static void DumpBody(CelestialBody body)
@@ -128,9 +128,20 @@ namespace RealSolarSystem
                 print("****************************************");
             }
         }
+        public static bool done = false;
 
+        public static void dumpSST(Transform t)
+        {
+            print("Transform  = " + t.name);
+            print("Scale = " + t.localScale + "; lossyScale = " + t.lossyScale);
+            print("Pos = " + t.position + "; lPos = " + t.localPosition);
+        }
         public void Start()
         {
+            if (!HighLogic.LoadedScene.Equals(GameScenes.MAINMENU) || done)
+                return;
+            done = true;
+
             print("*RSS* Dumping bodies");
             foreach (CelestialBody body in FlightGlobals.fetch.bodies)
             {
@@ -190,22 +201,46 @@ namespace RealSolarSystem
                 print("tgtname = " + b.tgtBody.name);
                 print("scale = " + b.transform.localScale);
             }
-
+            print("SS Transforms");
+            i = 0;
+            if (ScaledSpace.Instance != null)
+            {
+                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                {
+                    dumpSST(t);
+                    float scale = 0.1f * 6371.0f / 600.0f;
+                    if (t.name.Equals("Kerbin"))
+                        t.localScale = new Vector3(scale, scale, scale);
+                }
+            }
         }
-        public static bool done = false;
+        public static bool redone = false;
+        public static CelestialBody tgtbody = null;
         void OnGUI()
         {
-            if (HighLogic.LoadedScene.Equals(GameScenes.TRACKSTATION) && !done)
+            if (HighLogic.LoadedScene.Equals(GameScenes.TRACKSTATION) && !redone)
             {
-                print("++++++++++++++++++++++++++++++++++++++++++++++++++");
-                foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+                if (tgtbody != (MapView.MapCamera.target).celestialBody)
                 {
-                    if (body == null)
-                        continue;
-                    if (body.bodyName.Equals("Kerbin"))
-                        DumpBody(body);
+                    tgtbody = (MapView.MapCamera.target).celestialBody;
+                    print("++++++++++++++++++++++++++++++++++++++++++++++++++");
+                    foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+                    {
+                        if (body == null)
+                            continue;
+                        if (body.bodyName.Equals("Kerbin"))
+                            DumpBody(body);
+                    }
+                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+                    if (ScaledSpace.Instance != null)
+                    {
+                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                        {
+                            dumpSST(t);
+                        }
+                    }
                 }
-                done = true;
+                //redone = true;
             }
         }
     }
