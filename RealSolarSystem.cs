@@ -162,7 +162,7 @@ namespace RealSolarSystem
                     body.GeeASL = 1;
                     body.gravParameter = 6.673 * mass;
                     body.gMagnitudeAtCenter = 9.81 * radius * radius;
-                    body.maxAtmosphereAltitude = 105;
+                    body.maxAtmosphereAltitude = 135;
                     body.sphereOfInfluence = 84159286.4796305 * 35; // guessing at scale factor?
                     
 
