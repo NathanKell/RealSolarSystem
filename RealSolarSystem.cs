@@ -159,6 +159,7 @@ namespace RealSolarSystem
                     double rotPeriod = 86164.1; // 23hr, 56min, and 4.1s
                     double mass = 5.97219e24;
                     double radius = 6371000;
+                    double sma = 147098290000;
                     body.Radius = radius;
                     body.atmosphereScaleHeight = 7.5;
                     body.rotationPeriod = rotPeriod;
@@ -168,7 +169,7 @@ namespace RealSolarSystem
                     body.gravParameter = 6.673 * mass;
                     body.gMagnitudeAtCenter = 9.81 * radius * radius;
                     body.maxAtmosphereAltitude = 135;
-                    //body.sphereOfInfluence = 84159286.4796305 * 35; // guessing at scale factor?
+                    body.sphereOfInfluence = sma * Math.Pow(3.00246E-06, 0.4);
 
                     foreach (PQS p in PQS.FindObjectsOfTypeAll(typeof(PQS)))
                     {
@@ -193,7 +194,7 @@ namespace RealSolarSystem
 
                     //body.orbit.semiMajorAxis = 147098290000;
                     //Vessel v;
-                    body.orbitDriver.orbit.semiMajorAxis = 147098290000;
+                    body.orbitDriver.orbit.semiMajorAxis = sma;
                     body.orbitDriver.orbit.eccentricity = 0.01671123;
                     body.orbitDriver.orbit.meanAnomaly = 357.51716;
                     //body.orbitDriver.orbit.inclination = 1.57869;
@@ -213,6 +214,7 @@ namespace RealSolarSystem
                     double rotPeriod = 27.321582*24*60*60; // 23hr, 56min, and 4.1s
                     double mass = 7.3477e22;
                     double radius = 1737100;
+                    double sma = 384399000;
                     body.Radius = radius;
                     //body.atmosphereScaleHeight = 7.5;
                     body.rotationPeriod = rotPeriod;
@@ -222,7 +224,7 @@ namespace RealSolarSystem
                     body.gravParameter = 6.673 * mass;
                     body.gMagnitudeAtCenter = 9.81 * body.GeeASL * radius * radius;
                     //body.maxAtmosphereAltitude = 135;
-                    //body.sphereOfInfluence = 84159286.4796305 * 35; // guessing at scale factor?
+                    body.sphereOfInfluence = sma * Math.Pow(0.012303192, 0.4);
 
                     foreach (PQS p in PQS.FindObjectsOfTypeAll(typeof(PQS)))
                     {
@@ -241,7 +243,7 @@ namespace RealSolarSystem
 
                     //body.orbit.semiMajorAxis = 147098290000;
                     //Vessel v;
-                    body.orbitDriver.orbit.semiMajorAxis = 384399000 ;
+                    body.orbitDriver.orbit.semiMajorAxis = sma;
                     body.orbitDriver.orbit.eccentricity = 0.0549;
                     //body.orbitDriver.orbit.meanAnomaly = 357.51716;
                     body.orbitDriver.orbit.inclination = 5.145;
