@@ -76,10 +76,10 @@ namespace RealSolarSystem
                 print("waterLevel = " + body.terrainController.waterLevel);
                 print("waterThreshold = " + body.terrainController.waterThreshold);
             }*/
-            if (body.pqsController != null)
+            /*if (body.pqsController != null)
             {
                 DumpPQS(body.pqsController);
-            }
+            }*/
         }
         public static void DumpPQS(PQS pqs)
         {
@@ -156,10 +156,45 @@ namespace RealSolarSystem
                     print("key," + i + " = " + c.keys[i].time + " " + c.keys[i].value + " " + c.keys[i].inTangent + " " + c.keys[i].outTangent);
 
         }
+        public static bool MMyet = false;
+        public double lastTime = 0;
+        public double currentTime = 0;
+        public void Update()
+        {
+            if (!HighLogic.LoadedSceneIsFlight)
+                return;
+            currentTime = Planetarium.GetUniversalTime();
+            if(currentTime > lastTime + 1)
+            {
+                lastTime = currentTime;
+                print("**RSS* checking atmo");
+                print("Drag mult = " + FlightGlobals.DragMultiplier);
+                print("FG static plain = " + FlightGlobals.getStaticPressure());
+                print("FG static pos(" +  FlightGlobals.ship_position + "), altatpos " + FlightGlobals.getAltitudeAtPos(FlightGlobals.ship_position) + ", = " + FlightGlobals.getStaticPressure(FlightGlobals.ship_position));
+                print("FG static alt(" +  FlightGlobals.ship_altitude + ") = " + FlightGlobals.getStaticPressure(FlightGlobals.ship_altitude));
+                print("FG: current CB = " + FlightGlobals.currentMainBody);
+                CelestialBody body = FlightGlobals.currentMainBody;
+                if(body != null)
+                    print("Should be: " + Math.Pow(body.staticPressureASL * 2.71828183, -(FlightGlobals.ship_altitude / 1000.0 / body.atmosphereScaleHeight)));
+                if(FlightGlobals.ActiveVessel != null)
+                {
+                    foreach(Part p in FlightGlobals.ActiveVessel.Parts)
+                    {
+                        print("Part " + p.name + " has static " + p.staticPressureAtm + " dyn " + p.dynamicPressureAtm);
+                    }
+                }
+                print("--------------------------------");
+            }
+        }
         public void Start()
         {
-            //if (!HighLogic.LoadedScene.Equals(GameScenes.MAINMENU) || done)
-              //  return;
+            if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
+            {
+                MMyet = true;
+                done = false;
+            }
+            if (!MMyet)
+                return;
 
             print("*RSS* fixing bodies");
             print("SS Transforms");
@@ -178,22 +213,14 @@ namespace RealSolarSystem
                     continue;
                 if(!done) DumpBody(body);
                 
-                if(body.bodyName.Equals("Kerbin"))
+                if(body.bodyName.Equals("Kerbin")) //&& HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
                 {
-
+                    print("Fixing Kerbin");
                     double rotPeriod = 86164.1; // 23hr, 56min, and 4.1s
                     double mass = 5.97219e24;
                     double radius = 6371000;
                     double sma = 147098290000;
-                    if (ScaledSpace.Instance != null)
-                    {
-                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                        {
-                            float scale = 0.1f * (float)radius / (float)body.Radius;
-                            if (t.name.Equals("Kerbin"))
-                                t.localScale = new Vector3(scale, scale, scale);
-                        }
-                    }
+                    float SSscale = 0.1f * (float)radius / 600000f;
 
                     body.Radius = radius;
                     body.atmosphereScaleHeight = 7.5;
@@ -207,16 +234,34 @@ namespace RealSolarSystem
                     body.gMagnitudeAtCenter = 9.81 * radius * radius;
                     body.maxAtmosphereAltitude = 105; //doesn't work to have it not be scale height. 135;
                     body.sphereOfInfluence = sma * Math.Pow(3.00246E-06, 0.4);
-                    body.orbitDriver.orbit.semiMajorAxis = sma;
-                    body.orbitDriver.orbit.eccentricity = 0.01671123;
-                    body.orbitDriver.orbit.meanAnomaly = 357.51716;
-                    //body.orbitDriver.orbit.inclination = 1.57869;
-                    body.orbitDriver.orbit.LAN = 348.73936;
-                    body.orbitDriver.orbit.argumentOfPeriapsis = 114.20783;
-                    body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(3.00246E-06, 1.0 / 3.0);
-                    body.orbitDriver.QueuedUpdate = true;
-                    body.CBUpdate();
-                    foreach (PQS p in PQS.FindObjectsOfTypeAll(typeof(PQS)))
+                    if (body.orbitDriver != null && body.orbitDriver.orbit != null)
+                    {
+                        body.orbitDriver.orbit.semiMajorAxis = sma;
+                        body.orbitDriver.orbit.eccentricity = 0.01671123;
+                        body.orbitDriver.orbit.meanAnomaly = 357.51716;
+                        //body.orbitDriver.orbit.inclination = 1.57869;
+                        body.orbitDriver.orbit.LAN = 348.73936;
+                        body.orbitDriver.orbit.argumentOfPeriapsis = 114.20783;
+                        body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(3.00246E-06, 1.0 / 3.0);
+                        body.orbitDriver.QueuedUpdate = true;
+                    }
+                    try
+                    {
+                        body.CBUpdate();
+                    }
+                    catch
+                    {
+                    }
+                    if (ScaledSpace.Instance != null)
+                    {
+                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                        {
+
+                            if (t.name.Equals("Kerbin"))
+                                t.localScale = new Vector3(SSscale, SSscale, SSscale);
+                        }
+                    }
+                    foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                     {
                         if (p.name.Equals("Kerbin"))
                         {
@@ -238,18 +283,19 @@ namespace RealSolarSystem
                     }
                     foreach(AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
                     {
-                        if(ag.planet != null)
+                        if(ag != null && ag.planet != null)
                         {
                             if(ag.planet.name.Equals("Kerbin"))
                             {
                                 print("Found atmo for Kebin: " + ag.name);
-                                ag.outerRadius = (float)ag.planet.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                                ag.outerRadius = (float)radius * 1.025f * ScaledSpace.InverseScaleFactor;
                                 ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
                                 ag.innerRadius = ag.outerRadius * 0.975f;
                                 ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
                                 ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
                                 ag.scaleDepth = -0.25f;
                                 ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
+                                print("Atmo updated");
                             }
                         }
                     }
@@ -261,21 +307,14 @@ namespace RealSolarSystem
                                 cbt.deactivateAltitude) = cbt.deactivateAltitude * radius / 600; // thanks, Kragrathea!
                     }*/
                 }
-                if (body.bodyName.Equals("Mun"))
+                if (body.bodyName.Equals("Mun"))// && HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
                 {
+                    print("Fixing Mun");
                     double rotPeriod = 27.321582*24*60*60; // 23hr, 56min, and 4.1s
                     double mass = 7.3477e22;
                     double radius = 1737100;
                     double sma = 384399000;
-                    if (ScaledSpace.Instance != null)
-                    {
-                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                        {
-                            float scale = (float)radius * 0.1f / 600000f;
-                            if (t.name.Equals("Mun"))
-                                t.localScale = new Vector3(scale, scale, scale);
-                        }
-                    }
+                    float SSscale = 0.3f * (float)radius / 200000f; //(float)radius * 0.1f / 600000f;
 
                     body.Radius = radius;
                     //body.atmosphereScaleHeight = 7.5;
@@ -285,15 +324,34 @@ namespace RealSolarSystem
                     body.GeeASL = 0.1654;
                     body.gravParameter = 6.673 * mass;
                     body.gMagnitudeAtCenter = 9.81 * body.GeeASL * radius * radius;
+                    body.Mass = mass;
                     //body.maxAtmosphereAltitude = 135;
                     body.sphereOfInfluence = sma * Math.Pow(0.012303192, 0.4);
-                    body.orbitDriver.orbit.semiMajorAxis = sma;
-                    body.orbitDriver.orbit.eccentricity = 0.0549;
-                    body.orbitDriver.orbit.inclination = 5.145;
-                    body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(0.012303192, 1.0 / 3.0);
-                    body.orbitDriver.QueuedUpdate = true;
-                    body.CBUpdate();
-                    foreach (PQS p in PQS.FindObjectsOfTypeAll(typeof(PQS)))
+                    if (body.orbitDriver != null && body.orbitDriver.orbit != null)
+                    {
+                        body.orbitDriver.orbit.semiMajorAxis = sma;
+                        body.orbitDriver.orbit.eccentricity = 0.0549;
+                        body.orbitDriver.orbit.inclination = 5.145;
+                        body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(0.012303192, 1.0 / 3.0);
+                        body.orbitDriver.QueuedUpdate = true;
+                    }
+                    try
+                    {
+                        body.CBUpdate();
+                    }
+                    catch
+                    {
+                    }
+                    if (ScaledSpace.Instance != null)
+                    {
+                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                        {
+
+                            if (t.name.Equals("Mun"))
+                                t.localScale = new Vector3(SSscale, SSscale, SSscale);
+                        }
+                    }
+                    foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                     {
                         if (p.name.Equals("Mun"))
                         {
@@ -309,18 +367,19 @@ namespace RealSolarSystem
                     }
                     foreach(AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
                     {
-                        if(ag.planet != null)
+                        if(ag !=null && ag.planet != null)
                         {
-                            if(ag.planet.name.Equals("Mun"))
+                            if (ag.planet.name != null && ag.planet.name.Equals("Mun"))
                             {
                                 print("Found atmo for Mun: " + ag.name);
-                                ag.outerRadius = (float)ag.planet.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                                ag.outerRadius = (float)radius * 1.025f * ScaledSpace.InverseScaleFactor;
                                 ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
                                 ag.innerRadius = ag.outerRadius * 0.975f;
                                 ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
                                 ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
                                 ag.scaleDepth = -0.25f;
                                 ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
+                                print("Atmo updated");
                             }
                         }
                     }
@@ -333,6 +392,7 @@ namespace RealSolarSystem
                                 cbt.deactivateAltitude) = cbt.deactivateAltitude * radius / 600; // thanks, Kragrathea!
                     }*/
                 }
+
             }
             if(!done)
             {
@@ -349,7 +409,7 @@ namespace RealSolarSystem
                         print("AA " + aa.name + " attach " + aa.sphere.name + ", aD = " + aa.atmosphereDepth);
                 }*/
                 print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-                foreach (PQS p in PQS.FindObjectsOfTypeAll(typeof(PQS)))
+                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                 {
                     DumpPQS(p);
                 }
@@ -370,11 +430,8 @@ namespace RealSolarSystem
                 }*/
                 // Seems to be obsolete
                 int i = 0;
-
-                //UnityEngine.Object[] scbodies = Resources.FindObjectsOfTypeAll(typeof(ScaledCelestialBody));
-                ScaledCelestialBody[] scbodies = (ScaledCelestialBody[])ScaledCelestialBody.FindObjectsOfType(typeof(ScaledCelestialBody));
-                print("Num SCB = " + scbodies.Length);
-                foreach(ScaledCelestialBody b in scbodies)
+                print("ScaledCelestialBody");
+                foreach (ScaledCelestialBody b in Resources.FindObjectsOfTypeAll(typeof(ScaledCelestialBody)))
                 {
                     print("SCB " + i);
                     print("name = " + b.name);
@@ -393,6 +450,10 @@ namespace RealSolarSystem
                     print("height fallof = " + apm.heightFalloff);
                     i++;
                 }
+                i = 0;
+                //print("SGT_Skysphere");
+                //SGT_Monobehaviour
+
             }
             done = true;
         }
