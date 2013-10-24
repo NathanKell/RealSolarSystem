@@ -341,7 +341,6 @@ namespace RealSolarSystem
                     double mass = 7.3477e22;
                     double radius = 1737100;
                     double sma = 384399000;
-                    float SSscale = 0.3f * (float)radius / 200000f; //(float)radius * 0.1f / 600000f;
 
                     body.Radius = radius;
                     //body.atmosphereScaleHeight = 7.5;
@@ -371,6 +370,7 @@ namespace RealSolarSystem
                     }
                     if (ScaledSpace.Instance != null)
                     {
+                        float SSscale = 0.1f * (float)radius / 600000f; // trying same as Kerbin.
                         foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                         {
 
