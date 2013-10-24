@@ -209,6 +209,45 @@ namespace RealSolarSystem
                 print("--------------------------------");
             }
         }*/
+
+        public void BodyUpdate(CelestialBody body)
+        {
+            body.gMagnitudeAtCenter = body.GeeASL * 9.81 * Math.Pow(body.Radius, 2.0);
+	        body.Mass = body.Radius * body.Radius * (body.GeeASL * 9.81) / 6.674E-11;
+	        body.gravParameter = body.Mass * 6.674E-11;
+	        if (body.rotates)
+	        {
+		        if (body.rotationPeriod != 0.0)
+		        {
+			        if (body.tidallyLocked && body.orbitDriver)
+				        body.rotationPeriod = body.orbitDriver.orbit.period;
+
+				    body.angularVelocity = Vector3d.down * (Math.PI * 2 / body.rotationPeriod);
+				    body.zUpAngularVelocity = Vector3d.back * (Math.PI * 2 / body.rotationPeriod);
+			        
+			        body.rotationAngle = (body.initialRotation + 360.0 / body.rotationPeriod * Planetarium.GetUniversalTime()) % 360.0;
+			        body.angularV = body.angularVelocity.magnitude;
+                    if (!body.inverseRotation)
+                    {
+                        body.directRotAngle = (body.rotationAngle - Planetarium.InverseRotAngle) % 360.0;
+                        QuaternionD qAngle = QuaternionD.AngleAxis(body.directRotAngle, Vector3d.down);
+                        QuaternionD qUpAngle = QuaternionD.AngleAxis(body.directRotAngle, Vector3d.back);
+                        base.transform.rotation = qAngle;
+                        body.rotation = qUpAngle;
+                    }
+                    else
+                    {
+                        Planetarium.InverseRotAngle = (body.rotationAngle - body.directRotAngle) % 360.0;
+                        QuaternionD qAngle = QuaternionD.AngleAxis(Planetarium.InverseRotAngle, Vector3d.down);
+                        QuaternionD qUpAngle = QuaternionD.AngleAxis(Planetarium.InverseRotAngle, Vector3d.back);
+                        Planetarium.Rotation = Quaternion.Inverse(qAngle);
+                        Planetarium.ZupRotation = qUpAngle;
+                    }
+                }
+	        }
+	        if (body.orbitDriver)
+		        body.orbitDriver.UpdateOrbit();
+        }
         public void Start()
         {
             if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
@@ -270,13 +309,14 @@ namespace RealSolarSystem
                         body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(3.00246E-06, 1.0 / 3.0);
                         body.orbitDriver.QueuedUpdate = true;
                     }
-                    try
+                    /*try
                     {
                         body.CBUpdate();
                     }
                     catch
                     {
-                    }
+                    }*/
+                    BodyUpdate(body);
                     if (ScaledSpace.Instance != null)
                     {
                         foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
@@ -361,13 +401,14 @@ namespace RealSolarSystem
                         body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(0.012303192, 1.0 / 3.0);
                         body.orbitDriver.QueuedUpdate = true;
                     }
-                    try
+                    /*try
                     {
                         body.CBUpdate();
                     }
                     catch
                     {
-                    }
+                    }*/
+                    BodyUpdate(body);
                     if (ScaledSpace.Instance != null)
                     {
                         float SSscale = 0.1f * (float)radius / 600000f; // trying same as Kerbin.
