@@ -172,7 +172,7 @@ namespace RealSolarSystem
             }
             print("/////////////////////////////");
             print("BODIES");
-            foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))//in FlightGlobals.fetch.bodies)
+            foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
             {
                 if (body == null)
                     continue;
