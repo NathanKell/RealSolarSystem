@@ -6,7 +6,29 @@ using KSP;
 
 namespace RealSolarSystem
 {
-	[KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    public class SSTChecker : MonoBehaviour
+    {
+        public double lastTime = 0;
+        public double currentTime = 0;
+        public void Update()
+        {
+            if(ScaledSpace.Instance == null)
+                return;
+            //currentTime = Planetarium.GetUniversalTime();
+            //if(currentTime > lastTime + 1)
+            if (Input.GetKeyDown(KeyCode.S) && Input.GetKey(KeyCode.LeftAlt))
+            {
+                print("*SST* Printing Scaled Space transforms");
+                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                {
+                    print("For " + t.name + ", scale = " + t.localScale);
+                }
+            }
+        }
+    }
+	//[KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class RealSolarSystem : MonoBehaviour
     {
         public static void DumpBody(CelestialBody body)
@@ -159,7 +181,7 @@ namespace RealSolarSystem
         public static bool MMyet = false;
         public double lastTime = 0;
         public double currentTime = 0;
-        public void Update()
+        /*public void Update()
         {
             if (!HighLogic.LoadedSceneIsFlight)
                 return;
@@ -169,6 +191,7 @@ namespace RealSolarSystem
                 lastTime = currentTime;
                 print("**RSS* checking atmo");
                 print("Drag mult = " + FlightGlobals.DragMultiplier);
+                FlightGlobals.fetch.drag_multiplier = 1.0f;
                 print("FG static plain = " + FlightGlobals.getStaticPressure());
                 print("FG static pos(" +  FlightGlobals.ship_position + "), altatpos " + FlightGlobals.getAltitudeAtPos(FlightGlobals.ship_position) + ", = " + FlightGlobals.getStaticPressure(FlightGlobals.ship_position));
                 print("FG static alt(" +  FlightGlobals.ship_altitude + ") = " + FlightGlobals.getStaticPressure(FlightGlobals.ship_altitude));
@@ -185,7 +208,7 @@ namespace RealSolarSystem
                 }
                 print("--------------------------------");
             }
-        }
+        }*/
         public void Start()
         {
             if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
@@ -202,7 +225,8 @@ namespace RealSolarSystem
             {
                 foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                 {
-                    if(!done) DumpSST(t);
+                    if(!done)
+                        DumpSST(t);
                 }
             }
             print("/////////////////////////////");
@@ -211,7 +235,8 @@ namespace RealSolarSystem
             {
                 if (body == null)
                     continue;
-                if(!done) DumpBody(body);
+                if(!done)
+                    DumpBody(body);
                 
                 if(body.bodyName.Equals("Kerbin")) //&& HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
                 {
@@ -232,7 +257,7 @@ namespace RealSolarSystem
                     body.gravParameter = 6.673 * mass;
                     body.Mass = mass;
                     body.gMagnitudeAtCenter = 9.81 * radius * radius;
-                    body.maxAtmosphereAltitude = 105; //doesn't work to have it not be scale height. 135;
+                    body.maxAtmosphereAltitude = 135000; //doesn't work to have it not be scale height. 135;
                     body.sphereOfInfluence = sma * Math.Pow(3.00246E-06, 0.4);
                     if (body.orbitDriver != null && body.orbitDriver.orbit != null)
                     {
@@ -265,7 +290,8 @@ namespace RealSolarSystem
                     {
                         if (p.name.Equals("Kerbin"))
                         {
-                            if(!done) DumpPQS(p);
+                            if(!done)
+                                DumpPQS(p);
                             p.circumference = radius * 2 * Math.PI + 0.17;
                             p.radiusMax = p.radiusMax - p.radius + radius;
                             p.radiusMin = p.radiusMin - p.radius + radius;
@@ -275,7 +301,8 @@ namespace RealSolarSystem
                         }
                         else if (p.name.Equals("KerbinOcean"))
                         {
-                            if(!done) DumpPQS(p);
+                            if(!done)
+                                DumpPQS(p);
                             p.radius = radius;
                             p.RebuildSphere();
                         }
@@ -355,7 +382,8 @@ namespace RealSolarSystem
                     {
                         if (p.name.Equals("Mun"))
                         {
-                            if(!done) DumpPQS(p);
+                            if(!done)
+                                DumpPQS(p);
                             p.circumference = radius * 2 * Math.PI;
                             p.radiusMax = p.radiusMax - p.radius + radius;
                             p.radiusMin = p.radiusMin - p.radius + radius;
