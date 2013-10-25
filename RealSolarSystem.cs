@@ -233,7 +233,7 @@ namespace RealSolarSystem
                         QuaternionD qAngle = QuaternionD.AngleAxis(body.directRotAngle, Vector3d.down);
                         QuaternionD qUpAngle = QuaternionD.AngleAxis(body.directRotAngle, Vector3d.back);
                         base.transform.rotation = qAngle;
-                        body.rotation = qUpAngle;
+                        body.rotation = qAngle;
                     }
                     else
                     {
@@ -304,6 +304,7 @@ namespace RealSolarSystem
                         body.orbitDriver.orbit.eccentricity = 0.01671123;
                         body.orbitDriver.orbit.meanAnomaly = 357.51716;
                         //body.orbitDriver.orbit.inclination = 1.57869;
+                        body.orbitDriver.orbit.period = 365.256363004 * 24 * 60 * 60;
                         body.orbitDriver.orbit.LAN = 348.73936;
                         body.orbitDriver.orbit.argumentOfPeriapsis = 114.20783;
                         body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(3.00246E-06, 1.0 / 3.0);
@@ -344,7 +345,13 @@ namespace RealSolarSystem
                             if(!done)
                                 DumpPQS(p);
                             p.radius = radius;
-                            p.RebuildSphere();
+                            try
+                            {
+                                p.RebuildSphere();
+                            }
+                            catch
+                            {
+                            }
                         }
 
                     }
@@ -398,6 +405,7 @@ namespace RealSolarSystem
                         body.orbitDriver.orbit.semiMajorAxis = sma;
                         body.orbitDriver.orbit.eccentricity = 0.0549;
                         body.orbitDriver.orbit.inclination = 5.145;
+                        body.orbitDriver.orbit.period = rotPeriod;
                         body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(0.012303192, 1.0 / 3.0);
                         body.orbitDriver.QueuedUpdate = true;
                     }
@@ -430,7 +438,17 @@ namespace RealSolarSystem
                             p.radiusMin = p.radiusMin - p.radius + radius;
                             p.radius = radius;
                             p.radiusSquared = radius * radius;
-                            p.RebuildSphere();
+                            try
+                            {
+                                p.RebuildSphere();
+                            }
+                            catch
+                            {
+                            }
+                            /*bool started = p.isStarted;
+                            p.ResetSphere();
+                            if (started)
+                                p.RebuildSphere();*/
                         }
 
                     }
