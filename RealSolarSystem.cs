@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using KSP;
 
@@ -245,9 +246,16 @@ namespace RealSolarSystem
                     }
                 }
 	        }
-	        if (body.orbitDriver)
-		        body.orbitDriver.UpdateOrbit();
+            /*if (body.orbitDriver)
+            {
+                body.orbitDriver.UpdateOrbit();
+                body.sphereOfInfluence = body.orbitDriver.orbit.semiMajorAxis * Math.Pow(body.Mass / body.referenceBody.Mass, 0.4);
+            }*/
         }
+        public static bool kerbinMapDecalsDone = false;
+        private const float KerbinToEarthCoefficientF = 6371000.0f / 600000.0f;
+        private const double KerbinToEarthCoefficientD = 6371000.0 / 600000.0;
+
         public void Start()
         {
             if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
@@ -257,6 +265,17 @@ namespace RealSolarSystem
             }
             if (!MMyet)
                 return;
+
+            if(!kerbinMapDecalsDone)
+            {
+                var mapDecals = FindObjectsOfType(typeof(PQSMod_MapDecalTangent)).OfType<PQSMod_MapDecalTangent>();
+                foreach (var mapDecal in mapDecals)
+                {
+                    mapDecal.position *= KerbinToEarthCoefficientF;
+                    mapDecal.radius *= KerbinToEarthCoefficientD;
+                }
+                kerbinMapDecalsDone = true;
+            }
 
             print("*RSS* fixing bodies");
             print("SS Transforms");
@@ -270,7 +289,8 @@ namespace RealSolarSystem
             }
             print("/////////////////////////////");
             print("BODIES");
-            foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
+            //trying: do we need to do this more than once? I think maybe not.
+            if(!done) foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
             {
                 if (body == null)
                     continue;
@@ -296,7 +316,7 @@ namespace RealSolarSystem
                     body.gravParameter = 6.673 * mass;
                     body.Mass = mass;
                     body.gMagnitudeAtCenter = 9.81 * radius * radius;
-                    body.maxAtmosphereAltitude = 135000; //doesn't work to have it not be scale height. 135;
+                    body.maxAtmosphereAltitude = 105000; //static pressure appears clamped to 1e-6 so it doesn't work to have this above where scale height says :(
                     body.sphereOfInfluence = sma * Math.Pow(3.00246E-06, 0.4);
                     if (body.orbitDriver != null && body.orbitDriver.orbit != null)
                     {
@@ -334,8 +354,11 @@ namespace RealSolarSystem
                             if(!done)
                                 DumpPQS(p);
                             p.circumference = radius * 2 * Math.PI + 0.17;
-                            p.radiusMax = p.radiusMax - p.radius + radius;
-                            p.radiusMin = p.radiusMin - p.radius + radius;
+                            if (p.radius != radius)
+                            {
+                                p.radiusMax = (p.radiusMax - p.radius)*1.31 + radius;
+                                p.radiusMin = (p.radiusMin - p.radius)*1.31 + radius;
+                            }
                             p.radius = radius;
                             p.radiusSquared = radius * radius;
                             p.RebuildSphere();
@@ -381,6 +404,9 @@ namespace RealSolarSystem
                                 cbt.deactivateAltitude) = cbt.deactivateAltitude * radius / 600; // thanks, Kragrathea!
                     }*/
                 }
+            }
+            if(!done) foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
+            {
                 if (body.bodyName.Equals("Mun"))// && HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
                 {
                     print("Fixing Mun");
@@ -417,7 +443,8 @@ namespace RealSolarSystem
                     {
                     }*/
                     BodyUpdate(body);
-                    if (ScaledSpace.Instance != null)
+                    // changing this seems unnecessary - it starts at 0.0!
+                    /*if (ScaledSpace.Instance != null)
                     {
                         float SSscale = 0.1f * (float)radius / 600000f; // trying same as Kerbin.
                         foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
@@ -426,7 +453,7 @@ namespace RealSolarSystem
                             if (t.name.Equals("Mun"))
                                 t.localScale = new Vector3(SSscale, SSscale, SSscale);
                         }
-                    }
+                    }*/
                     foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                     {
                         if (p.name.Equals("Mun"))
@@ -479,7 +506,23 @@ namespace RealSolarSystem
                                 cbt.deactivateAltitude) = cbt.deactivateAltitude * radius / 600; // thanks, Kragrathea!
                     }*/
                 }
-
+            }
+            if(!done) foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
+            {
+                if (body.name.Equals("Minmus"))
+                {
+                    double sma = 180000000;
+                    body.sphereOfInfluence = sma * Math.Pow(body.Mass / body.referenceBody.Mass, 0.4);
+                    if (body.orbitDriver != null && body.orbitDriver.orbit != null)
+                    {
+                        body.orbitDriver.orbit.semiMajorAxis = sma;
+                        body.orbitDriver.orbit.eccentricity = 0.75;
+                        body.orbitDriver.orbit.inclination = 52;
+                        body.orbitDriver.orbit.period = 759919; //2 * Math.PI * Math.Sqrt(sma*sma*sma / (6.673 * (body.Mass + body.referenceBody.Mass)));
+                        body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(body.Mass / body.referenceBody.Mass, 1.0 / 3.0);
+                        body.orbitDriver.QueuedUpdate = true;
+                    }
+                }
             }
             if(!done)
             {
@@ -499,6 +542,27 @@ namespace RealSolarSystem
                 foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                 {
                     DumpPQS(p);
+                }
+                print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
+                foreach (PQSCity c in Resources.FindObjectsOfTypeAll(typeof(PQSCity)))
+                {
+                    print("PQSCity " + c.name);
+                    if (c.sphere)
+                    {
+                        print("Parent sphere: " + c.sphere.name);
+                    }
+                    else
+                        print("Parent sphere NULL");
+
+                    print("order = " + c.order);
+                    print("reorientToSphere = " + c.reorientToSphere);
+                    print("repositionRadial = " + c.repositionRadial);
+                    print("repositionRadiusOffset = " + c.repositionRadiusOffset);
+                    print("repositionToSphere = " + c.repositionToSphere);
+                    print("repositionToSphereSurface = " + c.repositionToSphereSurface);
+                    print("transform = " + c.transform + "P: " + c.transform.localPosition + ", R: " + c.transform.localRotation + ", S: " + c.transform.localScale);
+                    //foreach(PQSCity.LODRange
+                    print("^^^^^^^^^^^^^^^^^^");
                 }
                 print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                 foreach (var g in Resources.FindObjectsOfTypeAll(typeof(GameObject)))
