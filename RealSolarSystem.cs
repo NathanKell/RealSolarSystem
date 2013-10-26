@@ -430,7 +430,8 @@ namespace RealSolarSystem
                     {
                         body.orbitDriver.orbit.semiMajorAxis = sma;
                         body.orbitDriver.orbit.eccentricity = 0.0549;
-                        body.orbitDriver.orbit.inclination = 5.145;
+                        body.orbitDriver.orbit.inclination = 23.435; // 5.145 to ecliptic; 23.435 avg to Earth's equator (+-5.145)
+                        // since we can't tilt Kerbin's axis yet, we tilt its reference space.
                         body.orbitDriver.orbit.period = rotPeriod;
                         body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(0.012303192, 1.0 / 3.0);
                         body.orbitDriver.QueuedUpdate = true;
@@ -444,16 +445,16 @@ namespace RealSolarSystem
                     }*/
                     BodyUpdate(body);
                     // changing this seems unnecessary - it starts at 0.0!
-                    /*if (ScaledSpace.Instance != null)
+                    if (ScaledSpace.Instance != null)
                     {
-                        float SSscale = 0.1f * (float)radius / 600000f; // trying same as Kerbin.
+                        float SSscale = (0.1f * (float)radius / 600000f) * 0.999f; // trying same as Kerbin, times scalar.
                         foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                         {
 
                             if (t.name.Equals("Mun"))
                                 t.localScale = new Vector3(SSscale, SSscale, SSscale);
                         }
-                    }*/
+                    }
                     foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                     {
                         if (p.name.Equals("Mun"))
@@ -511,12 +512,12 @@ namespace RealSolarSystem
             {
                 if (body.name.Equals("Minmus"))
                 {
-                    double sma = 180000000;
+                    double sma = 645000000;
                     body.sphereOfInfluence = sma * Math.Pow(body.Mass / body.referenceBody.Mass, 0.4);
                     if (body.orbitDriver != null && body.orbitDriver.orbit != null)
                     {
                         body.orbitDriver.orbit.semiMajorAxis = sma;
-                        body.orbitDriver.orbit.eccentricity = 0.75;
+                        body.orbitDriver.orbit.eccentricity = 0.39;
                         body.orbitDriver.orbit.inclination = 52;
                         body.orbitDriver.orbit.period = 759919; //2 * Math.PI * Math.Sqrt(sma*sma*sma / (6.673 * (body.Mass + body.referenceBody.Mass)));
                         body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(body.Mass / body.referenceBody.Mass, 1.0 / 3.0);
