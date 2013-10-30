@@ -12,6 +12,56 @@ namespace RealSolarSystem
     {
         public double lastTime = 0;
         public double currentTime = 0;
+        public static bool fixedSolar = false;
+
+        public void Start()
+        {
+            if(!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
+            {
+                fixedSolar = true;
+                print("*RSS* Fixing Solar Panels");
+                if (PartLoader.LoadedPartsList != null)
+                {
+                    foreach (AvailablePart ap in PartLoader.LoadedPartsList)
+                    {
+                        try
+                        {
+                            if (ap.partPrefab != null)
+                            {
+                                if (ap.partPrefab.Modules.Contains("ModuleDeployableSolarPanel"))
+                                {
+                                    ModuleDeployableSolarPanel sp = (ModuleDeployableSolarPanel)(ap.partPrefab.Modules["ModuleDeployableSolarPanel"]);
+                                    ConfigNode node = new ConfigNode();
+                                    sp.powerCurve.Save(node);
+                                    foreach (ConfigNode.Value k in node.values)
+                                    {
+                                        string[] val = k.value.Split(' ');
+                                        val[0] = (double.Parse(val[0]) * 11).ToString();
+                                        string retval = "";
+                                        foreach (string s in val)
+                                            retval += s + " ";
+                                        k.value = retval;
+                                    }
+                                    sp.powerCurve = new FloatCurve();
+                                    sp.powerCurve.Load(node);
+                                    print("Fixed " + ap.name + " (" + ap.title + ")");
+                                }
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+                    try
+                    {
+                        EditorPartList.Instance.Refresh();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
         public void Update()
         {
             if(ScaledSpace.Instance == null)
@@ -252,6 +302,7 @@ namespace RealSolarSystem
                 body.sphereOfInfluence = body.orbitDriver.orbit.semiMajorAxis * Math.Pow(body.Mass / body.referenceBody.Mass, 0.4);
             }*/
         }
+        // thanks to asmi for this!
         public static bool kerbinMapDecalsDone = false;
         private const float KerbinToEarthCoefficientF = 6371000.0f / 600000.0f;
         private const double KerbinToEarthCoefficientD = 6371000.0 / 600000.0;
@@ -266,6 +317,7 @@ namespace RealSolarSystem
             if (!MMyet)
                 return;
 
+            // thanks to asmi for this!
             if(!kerbinMapDecalsDone)
             {
                 var mapDecals = FindObjectsOfType(typeof(PQSMod_MapDecalTangent)).OfType<PQSMod_MapDecalTangent>();
@@ -303,7 +355,7 @@ namespace RealSolarSystem
                     double rotPeriod = 86164.1; // 23hr, 56min, and 4.1s
                     double mass = 5.97219e24;
                     double radius = 6371000;
-                    double sma = 147098290000;
+                    double sma = 149598261000;
                     float SSscale = 0.1f * (float)radius / 600000f;
 
                     body.Radius = radius;
@@ -313,7 +365,7 @@ namespace RealSolarSystem
                     body.angularV = 2 * Math.PI / rotPeriod;
                     body.angularVelocity = new Vector3d(0, -body.angularV, 0);
                     body.GeeASL = 1;
-                    body.gravParameter = 6.673 * mass;
+                    //body.gravParameter = 6.673 * mass;
                     body.Mass = mass;
                     body.gMagnitudeAtCenter = 9.81 * radius * radius;
                     body.maxAtmosphereAltitude = 105000; //static pressure appears clamped to 1e-6 so it doesn't work to have this above where scale height says :(
@@ -421,7 +473,7 @@ namespace RealSolarSystem
                     body.angularV = 2 * Math.PI / rotPeriod;
                     body.angularVelocity = new Vector3d(0, -body.angularV, 0);
                     body.GeeASL = 0.1654;
-                    body.gravParameter = 6.673 * mass;
+                    //body.gravParameter = 6.673 * mass;
                     body.gMagnitudeAtCenter = 9.81 * body.GeeASL * radius * radius;
                     body.Mass = mass;
                     //body.maxAtmosphereAltitude = 135;
