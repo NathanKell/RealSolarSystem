@@ -51,6 +51,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>del *.pdb
+del "System.Core.dll"
 rd /s /q RealSolarSystem\bin
 rd /s /q RealSolarSystem\obj</PostBuildEvent>
   </PropertyGroup>

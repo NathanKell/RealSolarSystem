@@ -7,16 +7,13 @@ using KSP;
 
 namespace RealSolarSystem
 {
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
-    public class SSTChecker : MonoBehaviour
+    [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+    public class SolarPanelFixer : MonoBehaviour
     {
-        public double lastTime = 0;
-        public double currentTime = 0;
         public static bool fixedSolar = false;
-
         public void Start()
         {
-            if(!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
+            if (!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
             {
                 fixedSolar = true;
                 print("*RSS* Fixing Solar Panels");
@@ -31,7 +28,7 @@ namespace RealSolarSystem
                                 if (ap.partPrefab.Modules.Contains("ModuleDeployableSolarPanel"))
                                 {
                                     ModuleDeployableSolarPanel sp = (ModuleDeployableSolarPanel)(ap.partPrefab.Modules["ModuleDeployableSolarPanel"]);
-                                    ConfigNode node = new ConfigNode();
+                                    /*ConfigNode node = new ConfigNode();
                                     sp.powerCurve.Save(node);
                                     foreach (ConfigNode.Value k in node.values)
                                     {
@@ -41,7 +38,16 @@ namespace RealSolarSystem
                                         foreach (string s in val)
                                             retval += s + " ";
                                         k.value = retval;
-                                    }
+                                    }*/
+                                    ConfigNode node = new ConfigNode("powerCurve");
+                                    node.AddValue("key", "0 223.8 0 -.5");
+                                    node.AddValue("key", "5.79e10 6.6736 -0.5 -0.5");
+                                    node.AddValue("key", "1.08e11 1.9113 -0.5 -0.5");
+                                    node.AddValue("key", "1.49e11 1.0 -0.1 -0.1");
+                                    node.AddValue("key", "2.28e11 0.431 -.03 -.03");
+                                    node.AddValue("key", "7.79e11 0.037 -.01 -.001");
+                                    node.AddValue("key", "5.87e12 0 -0.001 0");
+
                                     sp.powerCurve = new FloatCurve();
                                     sp.powerCurve.Load(node);
                                     print("Fixed " + ap.name + " (" + ap.title + ")");
@@ -62,6 +68,14 @@ namespace RealSolarSystem
                 }
             }
         }
+    }
+
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    public class SSTChecker : MonoBehaviour
+    {
+        public double lastTime = 0;
+        public double currentTime = 0;
+        
         public void Update()
         {
             if(ScaledSpace.Instance == null)
@@ -78,7 +92,8 @@ namespace RealSolarSystem
             }
         }
     }
-	//[KSPAddon(KSPAddon.Startup.EveryScene, false)]
+
+
     [KSPAddon(KSPAddon.Startup.MainMenu, false)]
     public class RealSolarSystem : MonoBehaviour
     {
@@ -228,38 +243,7 @@ namespace RealSolarSystem
                 for (int i = 0; i < c.keys.Length; i++)
                     print("key," + i + " = " + c.keys[i].time + " " + c.keys[i].value + " " + c.keys[i].inTangent + " " + c.keys[i].outTangent);
 
-        }
-        public static bool MMyet = false;
-        public double lastTime = 0;
-        public double currentTime = 0;
-        /*public void Update()
-        {
-            if (!HighLogic.LoadedSceneIsFlight)
-                return;
-            currentTime = Planetarium.GetUniversalTime();
-            if(currentTime > lastTime + 1)
-            {
-                lastTime = currentTime;
-                print("**RSS* checking atmo");
-                print("Drag mult = " + FlightGlobals.DragMultiplier);
-                FlightGlobals.fetch.drag_multiplier = 1.0f;
-                print("FG static plain = " + FlightGlobals.getStaticPressure());
-                print("FG static pos(" +  FlightGlobals.ship_position + "), altatpos " + FlightGlobals.getAltitudeAtPos(FlightGlobals.ship_position) + ", = " + FlightGlobals.getStaticPressure(FlightGlobals.ship_position));
-                print("FG static alt(" +  FlightGlobals.ship_altitude + ") = " + FlightGlobals.getStaticPressure(FlightGlobals.ship_altitude));
-                print("FG: current CB = " + FlightGlobals.currentMainBody);
-                CelestialBody body = FlightGlobals.currentMainBody;
-                if(body != null)
-                    print("Should be: " + Math.Pow(body.staticPressureASL * 2.71828183, -(FlightGlobals.ship_altitude / 1000.0 / body.atmosphereScaleHeight)));
-                if(FlightGlobals.ActiveVessel != null)
-                {
-                    foreach(Part p in FlightGlobals.ActiveVessel.Parts)
-                    {
-                        print("Part " + p.name + " has static " + p.staticPressureAtm + " dyn " + p.dynamicPressureAtm);
-                    }
-                }
-                print("--------------------------------");
-            }
-        }*/
+        }        
 
         public void BodyUpdate(CelestialBody body)
         {
@@ -306,6 +290,9 @@ namespace RealSolarSystem
         public static bool kerbinMapDecalsDone = false;
         private const float KerbinToEarthCoefficientF = 6371000.0f / 600000.0f;
         private const double KerbinToEarthCoefficientD = 6371000.0 / 600000.0;
+
+
+        public static bool MMyet = false;
 
         public void Start()
         {
