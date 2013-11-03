@@ -7,6 +7,20 @@ using KSP;
 
 namespace RealSolarSystem
 {
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    public class PlanetariumCameraFixer : MonoBehaviour
+    {
+        public void Start()
+        {
+            if (HighLogic.LoadedSceneHasPlanetarium && PlanetariumCamera.fetch)
+            {
+                print("*RSS* Fixing PCam. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
+                PlanetariumCamera.fetch.maxDistance = 1e10f;
+                print("Fixed. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
+            }
+        }
+    }
+
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class SolarPanelFixer : MonoBehaviour
     {
@@ -87,16 +101,25 @@ namespace RealSolarSystem
                 print("*SST* Printing Scaled Space transforms");
                 foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                 {
-                    print("For " + t.name + ", scale = " + t.localScale);
+                    Utils.DumpSST(t);
                 }
+                foreach (ScaledSpaceFader ssf in Resources.FindObjectsOfTypeAll(typeof(ScaledSpaceFader)))
+                    Utils.DumpSSF(ssf);
             }
+            /*if(HighLogic.LoadedSceneHasPlanetarium && PlanetariumCamera.fetch)
+                PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
         }
     }
 
-
-    [KSPAddon(KSPAddon.Startup.MainMenu, false)]
-    public class RealSolarSystem : MonoBehaviour
+    public class Utils : MonoBehaviour
     {
+        public static void DumpSSF(ScaledSpaceFader ssf)
+        {
+            print("SSF BODY NAME: " + ssf.celestialBody.name);
+            print("floatName = " + ssf.floatName);
+            print("fadeStart = " + ssf.fadeStart);
+            print("fadeEnd = " + ssf.fadeEnd);
+        }
         public static void DumpBody(CelestialBody body)
         {
             print("BODY NAME: " + body.name);
@@ -224,12 +247,33 @@ namespace RealSolarSystem
             print("parentSphere = " + pqs.parentSphere);
             print("****************************************");
         }
-        public static bool done = false;
+
+        public static void DumpCBT(PQSMod_CelestialBodyTransform c)
+        {
+            print("PQSM_CBT " + c.name + "(" + c.body.name + ")");
+            print("deactivateAltitude = " + c.deactivateAltitude);
+            print("planetFade.fadeStart = " + c.planetFade.fadeStart);
+            print("planetFade.fadeEnd = " + c.planetFade.fadeEnd);
+            print("planetFade.valueStart = " + c.planetFade.valueStart);
+            print("planetFade.valueEnd = " + c.planetFade.valueEnd);
+            int i = 0;
+            if (c.secondaryFades != null)
+            {
+                foreach (PQSMod_CelestialBodyTransform.AltitudeFade af in c.secondaryFades)
+                {
+                    print("Secondary" + i + ".fadeStart = " + af.fadeStart);
+                    print("Secondary" + i + ".fadeEnd = " + af.fadeEnd);
+                    i++;
+                }
+            }
+        }
+
+
 
         public static void DumpSST(Transform t)
         {
             print("Transform  = " + t.name);
-            print("Scale = " + t.localScale + "; lossyScale = " + t.lossyScale);
+            print("Scale = " + t.localScale.x + ", " + t.localScale.y + ", " + t.localScale.z);
             print("Pos = " + t.position + "; lPos = " + t.localPosition);
         }
 
@@ -243,438 +287,474 @@ namespace RealSolarSystem
                 for (int i = 0; i < c.keys.Length; i++)
                     print("key," + i + " = " + c.keys[i].time + " " + c.keys[i].value + " " + c.keys[i].inTangent + " " + c.keys[i].outTangent);
 
-        }        
-
-        public void BodyUpdate(CelestialBody body)
-        {
-            body.gMagnitudeAtCenter = body.GeeASL * 9.81 * Math.Pow(body.Radius, 2.0);
-	        body.Mass = body.Radius * body.Radius * (body.GeeASL * 9.81) / 6.674E-11;
-	        body.gravParameter = body.Mass * 6.674E-11;
-	        if (body.rotates)
-	        {
-		        if (body.rotationPeriod != 0.0)
-		        {
-			        if (body.tidallyLocked && body.orbitDriver)
-				        body.rotationPeriod = body.orbitDriver.orbit.period;
-
-				    body.angularVelocity = Vector3d.down * (Math.PI * 2 / body.rotationPeriod);
-				    body.zUpAngularVelocity = Vector3d.back * (Math.PI * 2 / body.rotationPeriod);
-			        
-			        body.rotationAngle = (body.initialRotation + 360.0 / body.rotationPeriod * Planetarium.GetUniversalTime()) % 360.0;
-			        body.angularV = body.angularVelocity.magnitude;
-                    if (!body.inverseRotation)
-                    {
-                        body.directRotAngle = (body.rotationAngle - Planetarium.InverseRotAngle) % 360.0;
-                        QuaternionD qAngle = QuaternionD.AngleAxis(body.directRotAngle, Vector3d.down);
-                        QuaternionD qUpAngle = QuaternionD.AngleAxis(body.directRotAngle, Vector3d.back);
-                        base.transform.rotation = qAngle;
-                        body.rotation = qAngle;
-                    }
-                    else
-                    {
-                        Planetarium.InverseRotAngle = (body.rotationAngle - body.directRotAngle) % 360.0;
-                        QuaternionD qAngle = QuaternionD.AngleAxis(Planetarium.InverseRotAngle, Vector3d.down);
-                        QuaternionD qUpAngle = QuaternionD.AngleAxis(Planetarium.InverseRotAngle, Vector3d.back);
-                        Planetarium.Rotation = Quaternion.Inverse(qAngle);
-                        Planetarium.ZupRotation = qUpAngle;
-                    }
-                }
-	        }
-            /*if (body.orbitDriver)
-            {
-                body.orbitDriver.UpdateOrbit();
-                body.sphereOfInfluence = body.orbitDriver.orbit.semiMajorAxis * Math.Pow(body.Mass / body.referenceBody.Mass, 0.4);
-            }*/
         }
+    }
+
+    public class CBRotation
+    {
+        string name;
+        double axialTilt;
+        double rotationPeriod;
+        double initialRotation;
+
+        public CBRotation(string newName, double newTilt, double newRotPeriod, double newInitialRot)
+        {
+            MonoBehaviour.print("*RSS* Adding override rotation for " + newName + ": Axial tilt " + newTilt + ", period " + newRotPeriod + ", initial " + newInitialRot);
+            name = newName;
+            axialTilt = newTilt;
+            rotationPeriod = newRotPeriod;
+            initialRotation = newInitialRot;
+        }
+        public QuaternionD Tilt()
+        {
+            return QuaternionD.AngleAxis(-axialTilt, Vector3d.back);
+        }
+        public double AngleAtTime(double time)
+        {
+            return (initialRotation + 360.0 / rotationPeriod * time) % 360.0;
+        }
+        public QuaternionD TiltedAngleAtTime(double time)
+        {
+            return TiltedAngle(AngleAtTime(time));
+        }
+        public QuaternionD TiltedAngle(double angle)
+        {
+            QuaternionD qAngle = QuaternionD.AngleAxis(angle, Vector3d.down);
+            return Tilt() * qAngle;
+        }
+        public Vector3d AngularVelocity()
+        {
+            return Tilt() * Vector3d.down * (Math.PI * 2 / rotationPeriod);
+        }
+        public Vector3d zUpAngularVelocity()
+        {
+            return Tilt() * Vector3d.back * (Math.PI * 2 / rotationPeriod);
+        }
+    }
+
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    public class CBRotationFixer : MonoBehaviour
+    {
+        public static Dictionary<string, CBRotation> CBRotations = new Dictionary<string, CBRotation>();
+
+        // call this on the sun. Will update recursively all children
+        // only touches planets with rotations defined in CBRotations
+        // and ignores others. Does not support inverseRotation.
+        public void UpdateBody(CelestialBody body)
+        {
+            if (CBRotations.ContainsKey(body.name))
+            {
+                //print("*RSS CBBR* Updating " + body.name);
+                CBRotation rot = CBRotations[body.name];
+                body.angularVelocity = rot.AngularVelocity();
+                body.zUpAngularVelocity = rot.zUpAngularVelocity();
+
+                body.rotationAngle = rot.AngleAtTime(Planetarium.GetUniversalTime());
+                body.directRotAngle = (body.rotationAngle - Planetarium.InverseRotAngle) % 360.0;
+                body.angularV = body.angularVelocity.magnitude;
+                QuaternionD qAngle = rot.TiltedAngle(body.directRotAngle);
+                ((MonoBehaviour)body).transform.rotation = qAngle;
+                body.rotation = qAngle;
+            }
+            if (body.orbitDriver)
+                body.orbitDriver.UpdateOrbit();
+
+            foreach (CelestialBody child in body.orbitingBodies)
+                UpdateBody(child);
+        }
+
+        public void FixedUpdate()
+        {
+            //print("*RSSCBR* Running FixedUpdate");
+            if (HighLogic.LoadedSceneHasPlanetarium || HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
+            {
+                //print("*RSSCBR* Correct Scene");
+                if (Planetarium.fetch.Sun)
+                    UpdateBody(Planetarium.fetch.Sun);
+            }
+        }
+    }
+
+    [KSPAddon(KSPAddon.Startup.MainMenu, false)]
+    public class RealSolarSystem : MonoBehaviour
+    {
+        public void UpdateMass(CelestialBody body)
+        {
+            double rsq = body.Radius * body.Radius;
+            body.gMagnitudeAtCenter = body.GeeASL * 9.81 * rsq;
+            body.gravParameter = rsq * body.GeeASL * 9.81;
+            body.Mass = body.gravParameter * (1 / 6.674E-11);
+        }
+
+        // converts mass to Gee ASL using a body's radius.
+        public static double MassToGeeASL(double mass, double radius)
+        {
+            return mass * (6.674E-11 / 9.81) / (radius * radius);
+        }
+
         // thanks to asmi for this!
         public static bool kerbinMapDecalsDone = false;
-        private const float KerbinToEarthCoefficientF = 6371000.0f / 600000.0f;
-        private const double KerbinToEarthCoefficientD = 6371000.0 / 600000.0;
 
 
-        public static bool MMyet = false;
-
+        public static bool done = false;
         public void Start()
         {
-            if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
-            {
-                MMyet = true;
-                done = false;
-            }
-            if (!MMyet)
-                return;
+            ConfigNode RSSSettings = null;
+            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
+                    RSSSettings = node;
+
+            if(RSSSettings == null)
+                throw new UnityException("*RSS* REALSOLARSYSTEM node not found!");
+
+            print("*RSS* Printing CBTs");
+            /*foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
+                Utils.DumpCBT(c);*/
 
             // thanks to asmi for this!
-            if(!kerbinMapDecalsDone)
+            print("*RSS* fixing Kerbin mapdecals");
+            // HARDCODED FOR NOW
+            // For now does only Kerbin, and rescales ALL mapdecals.
+            if(!kerbinMapDecalsDone && RSSSettings.GetNode("Kerbin") != null)
             {
                 var mapDecals = FindObjectsOfType(typeof(PQSMod_MapDecalTangent)).OfType<PQSMod_MapDecalTangent>();
                 foreach (var mapDecal in mapDecals)
                 {
-                    mapDecal.position *= KerbinToEarthCoefficientF;
-                    mapDecal.radius *= KerbinToEarthCoefficientD;
+                    foreach (CelestialBody b in FlightGlobals.Bodies)
+                        if (b.name.Equals("Kerbin"))
+                        {
+                            ConfigNode knode = RSSSettings.GetNode("Kerbin");
+                            double radius;
+                            if (knode.HasValue("Radius") && double.TryParse(knode.GetValue("Radius"), out radius))
+                            {
+                                mapDecal.position *= (float)(radius / b.Radius);
+                                mapDecal.radius *= (radius / b.Radius);
+                            }
+                            break;
+                        }
                 }
                 kerbinMapDecalsDone = true;
             }
 
             print("*RSS* fixing bodies");
-            print("SS Transforms");
-            if (ScaledSpace.Instance != null)
+            foreach (ConfigNode node in RSSSettings.nodes)
             {
-                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
                 {
-                    if(!done)
-                        DumpSST(t);
-                }
-            }
-            print("/////////////////////////////");
-            print("BODIES");
-            //trying: do we need to do this more than once? I think maybe not.
-            if(!done) foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
-            {
-                if (body == null)
-                    continue;
-                if(!done)
-                    DumpBody(body);
-                
-                if(body.bodyName.Equals("Kerbin")) //&& HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
-                {
-                    print("Fixing Kerbin");
-                    double rotPeriod = 86164.1; // 23hr, 56min, and 4.1s
-                    double mass = 5.97219e24;
-                    double radius = 6371000;
-                    double sma = 149598261000;
-                    float SSscale = 0.1f * (float)radius / 600000f;
+                    if (body == null)
+                        continue;
 
-                    body.Radius = radius;
-                    body.atmosphereScaleHeight = 7.5;
-                    body.rotationPeriod = rotPeriod;
-                    //body.atmosphereMultiplier = body.atmosphereMultiplier * (float)radius / 600000f;
-                    body.angularV = 2 * Math.PI / rotPeriod;
-                    body.angularVelocity = new Vector3d(0, -body.angularV, 0);
-                    body.GeeASL = 1;
-                    //body.gravParameter = 6.673 * mass;
-                    body.Mass = mass;
-                    body.gMagnitudeAtCenter = 9.81 * radius * radius;
-                    body.maxAtmosphereAltitude = 105000; //static pressure appears clamped to 1e-6 so it doesn't work to have this above where scale height says :(
-                    body.sphereOfInfluence = sma * Math.Pow(3.00246E-06, 0.4);
-                    if (body.orbitDriver != null && body.orbitDriver.orbit != null)
+                    if (body.bodyName.Equals(node.name))
                     {
-                        body.orbitDriver.orbit.semiMajorAxis = sma;
-                        body.orbitDriver.orbit.eccentricity = 0.01671123;
-                        body.orbitDriver.orbit.meanAnomaly = 357.51716;
-                        //body.orbitDriver.orbit.inclination = 1.57869;
-                        body.orbitDriver.orbit.period = 365.256363004 * 24 * 60 * 60;
-                        body.orbitDriver.orbit.LAN = 348.73936;
-                        body.orbitDriver.orbit.argumentOfPeriapsis = 114.20783;
-                        body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(3.00246E-06, 1.0 / 3.0);
-                        body.orbitDriver.QueuedUpdate = true;
-                    }
-                    /*try
-                    {
+                        print("Fixing CB " + node.name);
+                        double dtmp;
+                        float ftmp;
+                        double origRadius = body.Radius;
+                        if(node.HasValue("Radius"))
+                        {
+                            if (double.TryParse(node.GetValue("Radius"), out dtmp))
+                                body.Radius = dtmp;
+
+                        }
+                        if (node.HasValue("Mass"))
+                        {
+                            if (double.TryParse(node.GetValue("Mass"), out dtmp))
+                            {
+                                body.Mass = dtmp;
+                                body.GeeASL = MassToGeeASL(dtmp, body.Radius);
+                            }
+                        }
+                        if (node.HasValue("atmosphereScaleHeight"))
+                        {
+                            if (double.TryParse(node.GetValue("atmosphereScaleHeight"), out dtmp))
+                                body.atmosphereScaleHeight = dtmp;
+                        }
+                        if (node.HasValue("atmosphereMultiplier"))
+                        {
+                            if (float.TryParse(node.GetValue("atmosphereMultiplier"), out ftmp))
+                                body.atmosphereMultiplier = ftmp;
+                        }
+                        if (node.HasValue("maxAtmosphereAltitude"))
+                        {
+                            if (float.TryParse(node.GetValue("maxAtmosphereAltitude"), out ftmp))
+                                body.maxAtmosphereAltitude = ftmp;
+                        }
+                        if (node.HasValue("staticPressureASL"))
+                        {
+                            if (double.TryParse(node.GetValue("maxAtmosphereAltitude"), out dtmp))
+                                body.staticPressureASL = dtmp;
+                        }
+                        if (node.HasValue("rotationPeriod"))
+                        {
+                            if (double.TryParse(node.GetValue("rotationPeriod"), out dtmp))
+                                body.rotationPeriod = dtmp;
+                        }
+                        if (node.HasValue("initialRotation"))
+                        {
+                            if (double.TryParse(node.GetValue("initialRotation"), out dtmp))
+                                body.initialRotation = dtmp;
+                        }
+                        if (node.HasValue("inverseRotation"))
+                        {
+                            bool btmp;
+                            if (bool.TryParse(node.GetValue("inverseRotation"), out btmp))
+                                body.inverseRotation = btmp;
+                        }
+                        UpdateMass(body);
+
+                        /*if (node.HasValue("axialTilt"))
+                        {
+                            if (!body.inverseRotation && double.TryParse(node.GetValue("axialTilt"), out dtmp))
+                            {
+                                CBRotationFixer.CBRotations.Add(body.name, new CBRotation(body.name, dtmp, body.rotationPeriod, body.initialRotation));
+                                body.rotationPeriod = 0;
+                            }
+                        }*/
+
+
+                        ConfigNode onode = node.GetNode("Orbit");
+                        if (body.orbitDriver != null && body.orbit != null && onode != null)
+                        {
+                            if (onode.HasValue("semiMajorAxis"))
+                            {
+                                if (double.TryParse(onode.GetValue("semiMajorAxis"), out dtmp))
+                                    body.orbit.semiMajorAxis = dtmp;
+                            }
+                            if (onode.HasValue("eccentricity"))
+                            {
+                                if (double.TryParse(onode.GetValue("eccentricity"), out dtmp))
+                                    body.orbit.eccentricity = dtmp;
+                            }
+                            if (onode.HasValue("meanAnomaly"))
+                            {
+                                if (double.TryParse(onode.GetValue("meanAnomaly"), out dtmp))
+                                    body.orbit.meanAnomaly = dtmp;
+                            }
+
+                            if (onode.HasValue("inclination"))
+                            {
+                                if (double.TryParse(onode.GetValue("inclination"), out dtmp))
+                                    body.orbit.inclination = dtmp;
+                            }
+                            if (onode.HasValue("period"))
+                            {
+                                if (double.TryParse(onode.GetValue("period"), out dtmp))
+                                    body.orbit.period = dtmp;
+                            }
+                            if (onode.HasValue("LAN"))
+                            {
+                                if (double.TryParse(onode.GetValue("LAN"), out dtmp))
+                                    body.orbit.LAN = dtmp;
+                            }
+                            if (onode.HasValue("argumentOfPeriapsis"))
+                            {
+                                if (double.TryParse(onode.GetValue("argumentOfPeriapsis"), out dtmp))
+                                    body.orbit.argumentOfPeriapsis = dtmp;
+                            }
+                            if (onode.HasValue("referenceBody"))
+                            {
+                                string bodyname = onode.GetValue("referenceBody");
+                                if (body.orbit.referenceBody == null || !body.orbit.referenceBody.Equals(bodyname))
+                                {
+                                    foreach (CelestialBody b in FlightGlobals.Bodies)
+                                    {
+                                        if (b.name.Equals(bodyname))
+                                        {
+                                            if (body.orbit.referenceBody)
+                                            {
+                                                body.orbit.referenceBody.orbitingBodies.Remove(body);
+                                            }
+                                            b.orbitingBodies.Add(body);
+                                            body.orbit.referenceBody = b;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        if (body.orbitDriver != null)
+                        {
+                            if(body.referenceBody != null)
+                            {
+                                body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1/3);
+                                body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                            }   
+	                        else
+	                        {
+		                        body.sphereOfInfluence = double.PositiveInfinity;
+		                        body.hillSphere = double.PositiveInfinity;
+	                        }
+                            body.orbitDriver.QueuedUpdate = true;
+                        }
                         body.CBUpdate();
-                    }
-                    catch
-                    {
-                    }*/
-                    BodyUpdate(body);
-                    if (ScaledSpace.Instance != null)
-                    {
-                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                        {
 
-                            if (t.name.Equals("Kerbin"))
-                                t.localScale = new Vector3(SSscale, SSscale, SSscale);
-                        }
-                    }
-                    foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
-                    {
-                        if (p.name.Equals("Kerbin"))
+                        if (body.Radius != origRadius)
                         {
-                            if(!done)
-                                DumpPQS(p);
-                            p.circumference = radius * 2 * Math.PI + 0.17;
-                            if (p.radius != radius)
+                            // Scaled space
+                            if (ScaledSpace.Instance != null)
                             {
-                                p.radiusMax = (p.radiusMax - p.radius)*1.31 + radius;
-                                p.radiusMin = (p.radiusMin - p.radius)*1.31 + radius;
+                                float SSTScale = 1.0f;
+                                if(node.HasValue("SSTScale"))
+                                    float.TryParse(node.GetValue("SSTScale"), out SSTScale);
+                                SSTScale *= (float)(body.Radius / origRadius);
+                                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                                {
+                                    if (t.name.Equals(node.name))
+                                        t.localScale = new Vector3(t.localScale.x * SSTScale, t.localScale.y * SSTScale, t.localScale.z * SSTScale);
+                                }
                             }
-                            p.radius = radius;
-                            p.radiusSquared = radius * radius;
-                            p.RebuildSphere();
-                        }
-                        else if (p.name.Equals("KerbinOcean"))
-                        {
-                            if(!done)
-                                DumpPQS(p);
-                            p.radius = radius;
-                            try
+
+                            // Scaled space fader
+                            float SSFMult = (float)(body.Radius / origRadius);
+                            float SSFStart = -1, SSFEnd = -1;
+                            if (node.HasValue("SSFStart"))
                             {
-                                p.RebuildSphere();
+                                if (float.TryParse(node.GetValue("SSFStart"), out ftmp))
+                                    SSFStart = ftmp;
                             }
-                            catch
+                            if (node.HasValue("SSFEnd"))
                             {
+                                if (float.TryParse(node.GetValue("SSFEnd"), out ftmp))
+                                    SSFEnd = ftmp;
                             }
-                        }
-
-                    }
-                    foreach(AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
-                    {
-                        if(ag != null && ag.planet != null)
-                        {
-                            if(ag.planet.name.Equals("Kerbin"))
+                            if (node.HasValue("SSFMult"))
                             {
-                                print("Found atmo for Kebin: " + ag.name);
-                                ag.outerRadius = (float)radius * 1.025f * ScaledSpace.InverseScaleFactor;
-                                ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
-                                ag.innerRadius = ag.outerRadius * 0.975f;
-                                ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
-                                ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
-                                ag.scaleDepth = -0.25f;
-                                ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
-                                print("Atmo updated");
+                                if (float.TryParse(node.GetValue("SSFMult"), out ftmp))
+                                    SSFMult = ftmp;
                             }
-                        }
-                    }
-                   
-                    /*foreach (PQSMod_CelestialBodyTransform cbt in PQSMod_CelestialBodyTransform.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
-                    {
-                        if (cbt.body != null)
-                            if (cbt.body.name.Equals("Kerbin"))
-                                cbt.deactivateAltitude) = cbt.deactivateAltitude * radius / 600; // thanks, Kragrathea!
-                    }*/
-                }
-            }
-            if(!done) foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
-            {
-                if (body.bodyName.Equals("Mun"))// && HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
-                {
-                    print("Fixing Mun");
-                    double rotPeriod = 27.321582*24*60*60; // 23hr, 56min, and 4.1s
-                    double mass = 7.3477e22;
-                    double radius = 1737100;
-                    double sma = 384399000;
 
-                    body.Radius = radius;
-                    //body.atmosphereScaleHeight = 7.5;
-                    body.rotationPeriod = rotPeriod;
-                    body.angularV = 2 * Math.PI / rotPeriod;
-                    body.angularVelocity = new Vector3d(0, -body.angularV, 0);
-                    body.GeeASL = 0.1654;
-                    //body.gravParameter = 6.673 * mass;
-                    body.gMagnitudeAtCenter = 9.81 * body.GeeASL * radius * radius;
-                    body.Mass = mass;
-                    //body.maxAtmosphereAltitude = 135;
-                    body.sphereOfInfluence = sma * Math.Pow(0.012303192, 0.4);
-                    if (body.orbitDriver != null && body.orbitDriver.orbit != null)
-                    {
-                        body.orbitDriver.orbit.semiMajorAxis = sma;
-                        body.orbitDriver.orbit.eccentricity = 0.0549;
-                        body.orbitDriver.orbit.inclination = 23.435; // 5.145 to ecliptic; 23.435 avg to Earth's equator (+-5.145)
-                        // since we can't tilt Kerbin's axis yet, we tilt its reference space.
-                        body.orbitDriver.orbit.period = rotPeriod;
-                        body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(0.012303192, 1.0 / 3.0);
-                        body.orbitDriver.QueuedUpdate = true;
-                    }
-                    /*try
-                    {
-                        body.CBUpdate();
-                    }
-                    catch
-                    {
-                    }*/
-                    BodyUpdate(body);
-                    // changing this seems unnecessary - it starts at 0.0!
-                    if (ScaledSpace.Instance != null)
-                    {
-                        float SSscale = (0.1f * (float)radius / 600000f) * 0.999f; // trying same as Kerbin, times scalar.
-                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                        {
-
-                            if (t.name.Equals("Mun"))
-                                t.localScale = new Vector3(SSscale, SSscale, SSscale);
-                        }
-                    }
-                    foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
-                    {
-                        if (p.name.Equals("Mun"))
-                        {
-                            if(!done)
-                                DumpPQS(p);
-                            p.circumference = radius * 2 * Math.PI;
-                            p.radiusMax = p.radiusMax - p.radius + radius;
-                            p.radiusMin = p.radiusMin - p.radius + radius;
-                            p.radius = radius;
-                            p.radiusSquared = radius * radius;
-                            try
+                            foreach (ScaledSpaceFader ssf in Resources.FindObjectsOfTypeAll(typeof(ScaledSpaceFader)))
                             {
-                                p.RebuildSphere();
+                                if (ssf.celestialBody != null)
+                                {
+                                    if (ssf.celestialBody.name.Equals(node.name))
+                                    {
+                                        if (SSFStart > 0)
+                                            ssf.fadeStart = SSFStart;
+                                        else
+                                            ssf.fadeStart *= SSFMult;
+
+                                        if (SSFEnd > 0)
+                                            ssf.fadeEnd = SSFEnd;
+                                        else
+                                            ssf.fadeEnd *= SSFMult;
+                                    }
+                                }
                             }
-                            catch
+                            // The CBT that fades out the PQS
+                            foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                             {
+                                try
+                                {
+                                    if (c.body != null)
+                                    {
+                                        if (c.body.name.Equals(node.name))
+                                        {
+                                            if (node.HasValue("PQSdeactivateAltitude"))
+                                            {
+                                                if (double.TryParse(node.GetValue("PQSdeactivateAltitude"), out dtmp))
+                                                    c.deactivateAltitude = dtmp;
+                                            }
+                                            if (c.planetFade != null)
+                                            {
+                                                if (node.HasValue("PQSfadeStart"))
+                                                {
+                                                    if (float.TryParse(node.GetValue("PQSfadeStart"), out ftmp))
+                                                        c.planetFade.fadeStart = ftmp;
+                                                }
+                                                if (node.HasValue("PQSfadeEnd"))
+                                                {
+                                                    if (float.TryParse(node.GetValue("PQSfadeEnd"), out ftmp))
+                                                        c.planetFade.fadeEnd = ftmp;
+                                                }
+                                                if (c.secondaryFades != null)
+                                                {
+                                                    foreach (PQSMod_CelestialBodyTransform.AltitudeFade af in c.secondaryFades)
+                                                    {
+                                                        if (node.HasValue("PQSSecfadeStart"))
+                                                        {
+                                                            if (float.TryParse(node.GetValue("PQSSecfadeStart"), out ftmp))
+                                                                af.fadeStart = ftmp;
+                                                        }
+                                                        if (node.HasValue("PQSSecfadeEnd"))
+                                                        {
+                                                            if (float.TryParse(node.GetValue("PQSSecfadeEnd"), out ftmp))
+                                                                af.fadeEnd = ftmp;
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                catch
+                                {
+                                }
                             }
-                            /*bool started = p.isStarted;
-                            p.ResetSphere();
-                            if (started)
-                                p.RebuildSphere();*/
-                        }
 
-                    }
-                    foreach(AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
-                    {
-                        if(ag !=null && ag.planet != null)
-                        {
-                            if (ag.planet.name != null && ag.planet.name.Equals("Mun"))
+                            // the Planet Quadtree Sphere
+                            double PQSScaleFactor = 1.0;
+                            // does nothing :(
+                            // have to edit the PQSMods.
+                            /*if (node.HasValue("PQSScaleFactor"))
                             {
-                                print("Found atmo for Mun: " + ag.name);
-                                ag.outerRadius = (float)radius * 1.025f * ScaledSpace.InverseScaleFactor;
-                                ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
-                                ag.innerRadius = ag.outerRadius * 0.975f;
-                                ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
-                                ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
-                                ag.scaleDepth = -0.25f;
-                                ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
-                                print("Atmo updated");
+                                if (double.TryParse(node.GetValue("PQSScaleFactor"), out dtmp))
+                                    PQSScaleFactor = dtmp;
+                            }*/
+                            foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
+                            {
+                                if (p.name.Equals(node.name))
+                                {
+                                    p.circumference = body.Radius * 2 * Math.PI;
+                                    /*if (p.radius != body.Radius) // already tested above!
+                                    {*/
+                                    p.radiusMax = (p.radiusMax - p.radius) * PQSScaleFactor + body.Radius;
+                                    p.radiusMin = (p.radiusMin - p.radius) * PQSScaleFactor + body.Radius;
+                                    //p.radiusDelta = p.radiusMax - p.radiusMin;
+                                    p.radiusDelta *= PQSScaleFactor;
+                                    //}
+                                    p.radius = body.Radius;
+                                    p.radiusSquared = body.Radius * body.Radius;
+                                    try
+                                    {
+                                        p.RebuildSphere();
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+                                else if (p.name.Equals(node.name + "Ocean"))
+                                {
+                                    p.radius = body.Radius;
+                                    try
+                                    {
+                                        p.RebuildSphere();
+                                    }
+                                    catch
+                                    {
+                                    }
+                                }
+                            }
+                            foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
+                            {
+                                if (ag != null && ag.planet != null)
+                                {
+                                    if (ag.planet.name.Equals(node.name))
+                                    {
+                                        print("Found atmo for " + node.name + ": " + ag.name);
+                                        ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                                        ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
+                                        ag.innerRadius = ag.outerRadius * 0.975f;
+                                        ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
+                                        ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
+                                        ag.scaleDepth = -0.25f;
+                                        ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
+                                        print("Atmo updated");
+                                    }
+                                }
                             }
                         }
                     }
-
-
-                    /*foreach (PQSMod_CelestialBodyTransform cbt in PQSMod_CelestialBodyTransform.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
-                    {
-                        if (cbt.body != null)
-                            if (cbt.body.name.Equals("Kerbin"))
-                                cbt.deactivateAltitude) = cbt.deactivateAltitude * radius / 600; // thanks, Kragrathea!
-                    }*/
                 }
-            }
-            if(!done) foreach (CelestialBody body in Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
-            {
-                if (body.name.Equals("Minmus"))
-                {
-                    double sma = 645000000;
-                    body.sphereOfInfluence = sma * Math.Pow(body.Mass / body.referenceBody.Mass, 0.4);
-                    if (body.orbitDriver != null && body.orbitDriver.orbit != null)
-                    {
-                        body.orbitDriver.orbit.semiMajorAxis = sma;
-                        body.orbitDriver.orbit.eccentricity = 0.39;
-                        body.orbitDriver.orbit.inclination = 52;
-                        body.orbitDriver.orbit.period = 759919; //2 * Math.PI * Math.Sqrt(sma*sma*sma / (6.673 * (body.Mass + body.referenceBody.Mass)));
-                        body.hillSphere = body.orbitDriver.orbit.semiMajorAxis * (1.0 - body.orbitDriver.orbit.eccentricity) * Math.Pow(body.Mass / body.referenceBody.Mass, 1.0 / 3.0);
-                        body.orbitDriver.QueuedUpdate = true;
-                    }
-                }
-            }
-            if(!done)
-            {
-                print("##############################################");
-                /*foreach (PQSMod_CelestialBodyTransform cbt in PQSMod_CelestialBodyTransform.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
-                {
-                    if (cbt.body != null)
-                        print("CBT " + cbt.body.name + " dA = " + cbt.deactivateAltitude);
-                }*/
-                /*foreach (PQSMod_AltitudeAlpha aa in PQSMod_AltitudeAlpha.FindObjectsOfTypeAll(typeof(PQSMod_AltitudeAlpha)))
-                {
-                    //if (aa.body != null)
-                    if(aa.sphere != null)
-                        print("AA " + aa.name + " attach " + aa.sphere.name + ", aD = " + aa.atmosphereDepth);
-                }*/
-                print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
-                {
-                    DumpPQS(p);
-                }
-                print("^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^");
-                foreach (PQSCity c in Resources.FindObjectsOfTypeAll(typeof(PQSCity)))
-                {
-                    print("PQSCity " + c.name);
-                    if (c.sphere)
-                    {
-                        print("Parent sphere: " + c.sphere.name);
-                    }
-                    else
-                        print("Parent sphere NULL");
-
-                    print("order = " + c.order);
-                    print("reorientToSphere = " + c.reorientToSphere);
-                    print("repositionRadial = " + c.repositionRadial);
-                    print("repositionRadiusOffset = " + c.repositionRadiusOffset);
-                    print("repositionToSphere = " + c.repositionToSphere);
-                    print("repositionToSphereSurface = " + c.repositionToSphereSurface);
-                    print("transform = " + c.transform + "P: " + c.transform.localPosition + ", R: " + c.transform.localRotation + ", S: " + c.transform.localScale);
-                    //foreach(PQSCity.LODRange
-                    print("^^^^^^^^^^^^^^^^^^");
-                }
-                print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-                foreach (var g in Resources.FindObjectsOfTypeAll(typeof(GameObject)))
-                {
-                    if (((GameObject)g).name.ToLower().Contains("sky") || ((GameObject)g).name.ToLower().Contains("atmo"))
-                        print("Found " + ((GameObject)g).name + ", type " + g.GetType());
-                }
-            
-                // Seems to be obsolete
-                /*int i = 0;
-                foreach(Planet p in Resources.FindObjectsOfTypeAll(typeof(Planet)))
-                {
-                    print("Planet " + i);
-                    print("radius = " + p.radius);
-                    print("planetariumRadius = " + p.planetariumRadius);
-                }*/
-                // Seems to be obsolete
-                int i = 0;
-                print("ScaledCelestialBody");
-                foreach (ScaledCelestialBody b in Resources.FindObjectsOfTypeAll(typeof(ScaledCelestialBody)))
-                {
-                    print("SCB " + i);
-                    print("name = " + b.name);
-                    print("tgtname = " + b.tgtBody.name);
-                    print("scale = " + b.transform.localScale);
-                    i++;
-                }
-                i = 0;
-                print("PQSMod_AerialPerspectiveMaterial");
-                foreach(PQSMod_AerialPerspectiveMaterial apm in Resources.FindObjectsOfTypeAll(typeof(PQSMod_AerialPerspectiveMaterial)))
-                {
-                    print("apm " + i);
-                    print("name = " + apm.name);
-                    print("Sphere = " + apm.sphere.name);
-                    print("Atmo Depth = " + apm.atmosphereDepth);
-                    print("height fallof = " + apm.heightFalloff);
-                    i++;
-                }
-                i = 0;
-                //print("SGT_Skysphere");
-                //SGT_Monobehaviour
-
-            }
-            done = true;
-        }
-        public static bool redone = false;
-        public static CelestialBody tgtbody = null;
-        void OnGUI()
-        {
-            if (HighLogic.LoadedScene.Equals(GameScenes.TRACKSTATION) && !redone)
-            {
-                if (tgtbody != (MapView.MapCamera.target).celestialBody)
-                {
-                    tgtbody = (MapView.MapCamera.target).celestialBody;
-                    print("++++++++++++++++++++++++++++++++++++++++++++++++++");
-                    foreach (CelestialBody body in FlightGlobals.fetch.bodies)
-                    {
-                        if (body == null)
-                            continue;
-                        if (body.bodyName.Equals("Kerbin"))
-                            DumpBody(body);
-                    }
-                    print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-                    if (ScaledSpace.Instance != null)
-                    {
-                        foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                        {
-                            DumpSST(t);
-                        }
-                    }
-                }
-                //redone = true;
             }
         }
     }
