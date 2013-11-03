@@ -440,9 +440,6 @@ namespace RealSolarSystem
             {
                 foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
                 {
-                    if (body == null)
-                        continue;
-
                     if (body.bodyName.Equals(node.name))
                     {
                         print("Fixing CB " + node.name);
@@ -755,6 +752,26 @@ namespace RealSolarSystem
                         }
                     }
                 }
+            }
+            // do final update for all SoIs and hillSpheres and periods
+            foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+            {
+                if (body.orbitDriver != null)
+                {
+                    if (body.referenceBody != null)
+                    {
+                        body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
+                        body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                        body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
+                    }
+                    else
+                    {
+                        body.sphereOfInfluence = double.PositiveInfinity;
+                        body.hillSphere = double.PositiveInfinity;
+                    }
+                    body.orbitDriver.QueuedUpdate = true;
+                }
+                body.CBUpdate();
             }
         }
     }
