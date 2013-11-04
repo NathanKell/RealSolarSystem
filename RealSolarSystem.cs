@@ -108,6 +108,38 @@ namespace RealSolarSystem
             }
             /*if(HighLogic.LoadedSceneHasPlanetarium && PlanetariumCamera.fetch)
                 PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
+
+            // Fix Timewarp
+            if (TimeWarp.fetch)
+            {
+                if (TimeWarp.fetch.warpRates[TimeWarp.fetch.warpRates.Count() - 1] < 1000000f)
+                {
+                    //print("*RSS* Adding new TimeWarp level");
+                    TimeWarp.fetch.warpRates[1] = 10f;
+                    TimeWarp.fetch.warpRates[2] = 100f;
+                    TimeWarp.fetch.warpRates[3] = 1000f;
+                    TimeWarp.fetch.warpRates[4] = 10000f;
+                    TimeWarp.fetch.warpRates[5] = 100000f;
+                    TimeWarp.fetch.warpRates[6] = 1000000f;
+                    TimeWarp.fetch.warpRates[7] = 10000000f;
+                    /*List<float> ltmp = TimeWarp.fetch.altitudeLimits.ToList();
+                    ltmp.Add(2f);
+                    TimeWarp.fetch.altitudeLimits = ltmp.ToArray();
+                    ltmp = TimeWarp.fetch.warpRates.ToList();
+                    ltmp.Add(1000000f);
+                    TimeWarp.fetch.warpRates = ltmp.ToArray();
+                    TimeWarp.fetch.warpHighButton.xFrames += 1;
+                    TimeWarp.fetch.warpHighButton.xSteps += 1;
+                    TimeWarp.fetch.warpHighButton.nStates += 1;*/
+
+                    // do final update for all SoIs and hillSpheres and periods
+                    /*foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+                    {
+                        //body.resetTimeWarpLimits();
+                        //body.timeWarpAltitudeLimits[6]
+                    }*/
+                }
+            }
         }
     }
 
@@ -352,9 +384,9 @@ namespace RealSolarSystem
                 body.rotationAngle = rot.AngleAtTime(Planetarium.GetUniversalTime());
                 body.directRotAngle = (body.rotationAngle - Planetarium.InverseRotAngle) % 360.0;
                 body.angularV = body.angularVelocity.magnitude;
-                QuaternionD qAngle = rot.TiltedAngle(body.directRotAngle);
-                ((MonoBehaviour)body).transform.rotation = qAngle;
-                body.rotation = qAngle;
+                body.rotation = rot.TiltedAngle(body.directRotAngle);
+                body.transform.rotation = body.rotation;
+                
             }
             if (body.orbitDriver)
                 body.orbitDriver.UpdateOrbit();
@@ -756,22 +788,34 @@ namespace RealSolarSystem
             // do final update for all SoIs and hillSpheres and periods
             foreach (CelestialBody body in FlightGlobals.fetch.bodies)
             {
-                if (body.orbitDriver != null)
+                try
                 {
-                    if (body.referenceBody != null)
+                    if (body.orbitDriver != null)
                     {
-                        body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
-                        body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
-                        body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
+                        if (body.referenceBody != null)
+                        {
+                            body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
+                            body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                            body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
+                        }
+                        else
+                        {
+                            body.sphereOfInfluence = double.PositiveInfinity;
+                            body.hillSphere = double.PositiveInfinity;
+                        }
+                        body.orbitDriver.QueuedUpdate = true;
                     }
-                    else
+                    try
                     {
-                        body.sphereOfInfluence = double.PositiveInfinity;
-                        body.hillSphere = double.PositiveInfinity;
+                        body.CBUpdate();
                     }
-                    body.orbitDriver.QueuedUpdate = true;
+                    catch
+                    {
+                    }
                 }
-                body.CBUpdate();
+                catch
+                {
+                }
             }
         }
     }
