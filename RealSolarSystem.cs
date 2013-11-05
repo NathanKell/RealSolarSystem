@@ -8,7 +8,7 @@ using KSP;
 namespace RealSolarSystem
 {
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
-    public class PlanetariumCameraFixer : MonoBehaviour
+    public class CameraFixer : MonoBehaviour
     {
         public void Start()
         {
@@ -18,6 +18,22 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1e10f;
                 print("Fixed. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
             }
+            if (HighLogic.LoadedSceneIsEditor)
+            {
+                foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
+                {
+                    //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
+                    c.maxHeight = 120; // 55
+                    c.maxDistance = 60; // 28
+                }
+
+                foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
+                {
+                    //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
+                    c.maxDistance = 60; // 35
+                }
+            }
+
         }
     }
 
@@ -133,11 +149,12 @@ namespace RealSolarSystem
                     TimeWarp.fetch.warpHighButton.nStates += 1;*/
 
                     // do final update for all SoIs and hillSpheres and periods
-                    /*foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+                    foreach (CelestialBody body in FlightGlobals.fetch.bodies)
                     {
-                        //body.resetTimeWarpLimits();
-                        //body.timeWarpAltitudeLimits[6]
-                    }*/
+                        /*body.resetTimeWarpLimits();
+                        body.timeWarpAltitudeLimits[6]*/
+                        body.timeWarpAltitudeLimits[7] = 1000000000;
+                    }
                 }
             }
         }
