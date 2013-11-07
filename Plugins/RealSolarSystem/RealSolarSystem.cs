@@ -532,6 +532,7 @@ namespace RealSolarSystem
                         print("Fixing CB " + node.name);
                         double dtmp;
                         float ftmp;
+                        int itmp;
                         bool btmp;
                         double origRadius = body.Radius;
                         if(node.HasValue("Radius"))
@@ -855,6 +856,16 @@ namespace RealSolarSystem
                                                             if (float.TryParse(modNode.GetValue("ridgedSubFrequency"), out ftmp))
                                                                 mod.ridgedSubFrequency = ftmp;
                                                         }
+                                                        if (modNode.HasValue("ridgedAddOctaves"))
+                                                        {
+                                                            if (int.TryParse(modNode.GetValue("ridgedAddOctaves"), out itmp))
+                                                                mod.ridgedAddOctaves = itmp;
+                                                        }
+                                                        if (modNode.HasValue("simplexHeightStart"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("simplexHeightStart"), out ftmp))
+                                                                mod.ridgedSubFrequency = ftmp;
+                                                        }
                                                         mod.OnSetup();
                                                     }
                                                 if(modNode.name.Equals("PQSMod_VertexRidgedAltitudeCurve"))
@@ -869,6 +880,11 @@ namespace RealSolarSystem
                                                         {
                                                             if (float.TryParse(modNode.GetValue("ridgedAddFrequency"), out ftmp))
                                                                 mod.ridgedAddFrequency = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("ridgedAddOctaves"))
+                                                        {
+                                                            if (int.TryParse(modNode.GetValue("ridgedAddOctaves"), out itmp))
+                                                                mod.ridgedAddOctaves = itmp;
                                                         }
                                                         mod.OnSetup();
                                                     }
