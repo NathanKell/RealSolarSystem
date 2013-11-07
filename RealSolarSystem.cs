@@ -20,17 +20,35 @@ namespace RealSolarSystem
             }
             if (HighLogic.LoadedSceneIsEditor)
             {
-                foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
+                ConfigNode camNode = null;
+                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                    camNode = node;
+                if (camNode != null)
                 {
-                    //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                    c.maxHeight = 120; // 55
-                    c.maxDistance = 60; // 28
-                }
+                    float ftmp;
+                    foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
+                    {
+                        //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
+                        if(camNode.HasValue("VABmaxHeight"))
+                            if(float.TryParse(camNode.GetValue("VABmaxHeight"), out ftmp))
+                                c.maxHeight = ftmp;
 
-                foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
-                {
-                    //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                    c.maxDistance = 60; // 35
+                        if(camNode.HasValue("VABmaxDistance"))
+                            if(float.TryParse(camNode.GetValue("VABmaxDistance"), out ftmp))
+                                c.maxDistance = ftmp;
+                    }
+
+                    foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
+                    {
+                        //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
+                        if(camNode.HasValue("SPHmaxDistance"))
+                            if(float.TryParse(camNode.GetValue("SPHmaxDistance"), out ftmp))
+                                c.maxDistance = ftmp;
+                    }
+                    if (camNode.HasValue("editorExtentsMult"))
+                        if (float.TryParse(camNode.GetValue("editorExtentsMult"), out ftmp))
+                            EditorLogic.fetch.editorBounds.extents *= ftmp; // thanks, asmi!
+                    
                 }
             }
 
@@ -49,43 +67,50 @@ namespace RealSolarSystem
                 print("*RSS* Fixing Solar Panels");
                 if (PartLoader.LoadedPartsList != null)
                 {
-                    foreach (AvailablePart ap in PartLoader.LoadedPartsList)
+                    ConfigNode curveNode = null;
+                    foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                        curveNode = node.GetNode("powerCurve");
+                    if(curveNode != null)
                     {
-                        try
+                        foreach (AvailablePart ap in PartLoader.LoadedPartsList)
                         {
-                            if (ap.partPrefab != null)
+                            try
                             {
-                                if (ap.partPrefab.Modules.Contains("ModuleDeployableSolarPanel"))
+                                if (ap.partPrefab != null)
                                 {
-                                    ModuleDeployableSolarPanel sp = (ModuleDeployableSolarPanel)(ap.partPrefab.Modules["ModuleDeployableSolarPanel"]);
-                                    /*ConfigNode node = new ConfigNode();
-                                    sp.powerCurve.Save(node);
-                                    foreach (ConfigNode.Value k in node.values)
+                                    if (ap.partPrefab.Modules.Contains("ModuleDeployableSolarPanel"))
                                     {
-                                        string[] val = k.value.Split(' ');
-                                        val[0] = (double.Parse(val[0]) * 11).ToString();
-                                        string retval = "";
-                                        foreach (string s in val)
-                                            retval += s + " ";
-                                        k.value = retval;
-                                    }*/
-                                    ConfigNode node = new ConfigNode("powerCurve");
-                                    node.AddValue("key", "0 223.8 0 -.5");
-                                    node.AddValue("key", "5.79e10 6.6736 -0.5 -0.5");
-                                    node.AddValue("key", "1.08e11 1.9113 -0.5 -0.5");
-                                    node.AddValue("key", "1.49e11 1.0 -0.1 -0.1");
-                                    node.AddValue("key", "2.28e11 0.431 -.03 -.03");
-                                    node.AddValue("key", "7.79e11 0.037 -.01 -.001");
-                                    node.AddValue("key", "5.87e12 0 -0.001 0");
+                                        ModuleDeployableSolarPanel sp = (ModuleDeployableSolarPanel)(ap.partPrefab.Modules["ModuleDeployableSolarPanel"]);
+                                        /*ConfigNode node = new ConfigNode();
+                                        sp.powerCurve.Save(node);
+                                        foreach (ConfigNode.Value k in node.values)
+                                        {
+                                            string[] val = k.value.Split(' ');
+                                            val[0] = (double.Parse(val[0]) * 11).ToString();
+                                            string retval = "";
+                                            foreach (string s in val)
+                                                retval += s + " ";
+                                            k.value = retval;
+                                        }*/
+                                        /*ConfigNode node = new ConfigNode("powerCurve");
+                                        node.AddValue("key", "0 223.8 0 -.5");
+                                        node.AddValue("key", "57909100000 6.6736 -0.5 -0.5");
+                                        node.AddValue("key", "108208000000 1.9113 -0.5 -0.5");
+                                        node.AddValue("key", "149598261000 1.0 -0.1 -0.1");
+                                        node.AddValue("key", "227939100000 0.431 -.03 -.03");
+                                        node.AddValue("key", "778547200000 0.037 -.01 -.001");
+                                        node.AddValue("key", "5874000000000 0 -0.001 0");
 
-                                    sp.powerCurve = new FloatCurve();
-                                    sp.powerCurve.Load(node);
-                                    print("Fixed " + ap.name + " (" + ap.title + ")");
+                                        sp.powerCurve = new FloatCurve();
+                                        sp.powerCurve.Load(node);*/
+                                        sp.powerCurve.Load(curveNode);
+                                        print("Fixed " + ap.name + " (" + ap.title + ")");
+                                    }
                                 }
                             }
-                        }
-                        catch
-                        {
+                            catch
+                            {
+                            }
                         }
                     }
                     try
@@ -105,6 +130,7 @@ namespace RealSolarSystem
     {
         public double lastTime = 0;
         public double currentTime = 0;
+        public static bool fixedTimeWarp = false;
         
         public void Update()
         {
@@ -126,19 +152,29 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
 
             // Fix Timewarp
-            if (TimeWarp.fetch)
+            if (!fixedTimeWarp && TimeWarp.fetch)
             {
-                if (TimeWarp.fetch.warpRates[TimeWarp.fetch.warpRates.Count() - 1] < 1000000f)
+                fixedTimeWarp = true;
+                ConfigNode twNode = null;
+                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                    twNode = node.GetNode("timeWarpRates");
+                float[] rates = new float[8];
+                rates[0] = TimeWarp.fetch.warpRates[0];
+                float ftmp;
+                if (twNode != null)
+                {
+                    for(int i = 1; i < 9; i++)
+                    {
+                        if(twNode.HasValue("rate"+i))
+                            if(float.TryParse(twNode.GetValue("rate"+i), out ftmp))
+                                TimeWarp.fetch.warpRates[i] = ftmp;
+                    }
+                }
+
+                /*if (twNode != null)
                 {
                     //print("*RSS* Adding new TimeWarp level");
-                    TimeWarp.fetch.warpRates[1] = 10f;
-                    TimeWarp.fetch.warpRates[2] = 100f;
-                    TimeWarp.fetch.warpRates[3] = 1000f;
-                    TimeWarp.fetch.warpRates[4] = 10000f;
-                    TimeWarp.fetch.warpRates[5] = 100000f;
-                    TimeWarp.fetch.warpRates[6] = 1000000f;
-                    TimeWarp.fetch.warpRates[7] = 10000000f;
-                    /*List<float> ltmp = TimeWarp.fetch.altitudeLimits.ToList();
+                    List<float> ltmp = TimeWarp.fetch.altitudeLimits.ToList();
                     ltmp.Add(2f);
                     TimeWarp.fetch.altitudeLimits = ltmp.ToArray();
                     ltmp = TimeWarp.fetch.warpRates.ToList();
@@ -146,16 +182,15 @@ namespace RealSolarSystem
                     TimeWarp.fetch.warpRates = ltmp.ToArray();
                     TimeWarp.fetch.warpHighButton.xFrames += 1;
                     TimeWarp.fetch.warpHighButton.xSteps += 1;
-                    TimeWarp.fetch.warpHighButton.nStates += 1;*/
+                    TimeWarp.fetch.warpHighButton.nStates += 1;
 
                     // do final update for all SoIs and hillSpheres and periods
                     foreach (CelestialBody body in FlightGlobals.fetch.bodies)
                     {
-                        /*body.resetTimeWarpLimits();
-                        body.timeWarpAltitudeLimits[6]*/
+                        //body.resetTimeWarpLimits();
                         body.timeWarpAltitudeLimits[7] = 1000000000;
                     }
-                }
+                }*/
             }
         }
     }
@@ -494,6 +529,7 @@ namespace RealSolarSystem
                         print("Fixing CB " + node.name);
                         double dtmp;
                         float ftmp;
+                        bool btmp;
                         double origRadius = body.Radius;
                         if(node.HasValue("Radius"))
                         {
@@ -508,6 +544,11 @@ namespace RealSolarSystem
                                 body.Mass = dtmp;
                                 body.GeeASL = MassToGeeASL(dtmp, body.Radius);
                             }
+                        }
+                        if (node.HasValue("GeeASL"))
+                        {
+                            if (double.TryParse(node.GetValue("GeeASL"), out dtmp))
+                                body.GeeASL = dtmp;
                         }
                         if (node.HasValue("atmosphereScaleHeight"))
                         {
@@ -534,6 +575,11 @@ namespace RealSolarSystem
                             if (double.TryParse(node.GetValue("rotationPeriod"), out dtmp))
                                 body.rotationPeriod = dtmp;
                         }
+                        if (node.HasValue("tidallyLocked"))
+                        {
+                            if (bool.TryParse(node.GetValue("rotationPeriod"), out btmp))
+                                body.tidallyLocked = btmp;
+                        }
                         if (node.HasValue("initialRotation"))
                         {
                             if (double.TryParse(node.GetValue("initialRotation"), out dtmp))
@@ -541,7 +587,6 @@ namespace RealSolarSystem
                         }
                         if (node.HasValue("inverseRotation"))
                         {
-                            bool btmp;
                             if (bool.TryParse(node.GetValue("inverseRotation"), out btmp))
                                 body.inverseRotation = btmp;
                         }
