@@ -737,6 +737,7 @@ namespace RealSolarSystem
                                 }
                             }
                             // The CBT that fades out the PQS
+                            // Should probably do this as just another PQSMod, actually.
                             foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                             {
                                 try
