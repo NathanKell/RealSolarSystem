@@ -20,35 +20,40 @@ namespace RealSolarSystem
             }
             if (HighLogic.LoadedSceneIsEditor)
             {
-                ConfigNode camNode = null;
-                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
-                    camNode = node;
-                if (camNode != null)
+                try
                 {
-                    float ftmp;
-                    foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
+                    ConfigNode camNode = null;
+                    foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                        camNode = node;
+                    if (camNode != null)
                     {
-                        //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                        if(camNode.HasValue("VABmaxHeight"))
-                            if(float.TryParse(camNode.GetValue("VABmaxHeight"), out ftmp))
-                                c.maxHeight = ftmp;
+                        float ftmp;
+                        foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
+                        {
+                            //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
+                            if (camNode.HasValue("VABmaxHeight"))
+                                if (float.TryParse(camNode.GetValue("VABmaxHeight"), out ftmp))
+                                    c.maxHeight = ftmp;
 
-                        if(camNode.HasValue("VABmaxDistance"))
-                            if(float.TryParse(camNode.GetValue("VABmaxDistance"), out ftmp))
-                                c.maxDistance = ftmp;
-                    }
+                            if (camNode.HasValue("VABmaxDistance"))
+                                if (float.TryParse(camNode.GetValue("VABmaxDistance"), out ftmp))
+                                    c.maxDistance = ftmp;
+                        }
 
-                    foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
-                    {
-                        //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                        if(camNode.HasValue("SPHmaxDistance"))
-                            if(float.TryParse(camNode.GetValue("SPHmaxDistance"), out ftmp))
-                                c.maxDistance = ftmp;
+                        foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
+                        {
+                            //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
+                            if (camNode.HasValue("SPHmaxDistance"))
+                                if (float.TryParse(camNode.GetValue("SPHmaxDistance"), out ftmp))
+                                    c.maxDistance = ftmp;
+                        }
+                        if (camNode.HasValue("editorExtentsMult"))
+                            if (float.TryParse(camNode.GetValue("editorExtentsMult"), out ftmp))
+                                EditorLogic.fetch.editorBounds.extents *= ftmp; // thanks, asmi!
                     }
-                    if (camNode.HasValue("editorExtentsMult"))
-                        if (float.TryParse(camNode.GetValue("editorExtentsMult"), out ftmp))
-                            EditorLogic.fetch.editorBounds.extents *= ftmp; // thanks, asmi!
-                    
+                }
+                catch
+                {
                 }
             }
 
@@ -152,18 +157,16 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
 
             // Fix Timewarp
-            if (!fixedTimeWarp && TimeWarp.fetch)
+            if (/*!fixedTimeWarp &&*/ TimeWarp.fetch)
             {
                 fixedTimeWarp = true;
                 ConfigNode twNode = null;
                 foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
                     twNode = node.GetNode("timeWarpRates");
-                float[] rates = new float[8];
-                rates[0] = TimeWarp.fetch.warpRates[0];
                 float ftmp;
                 if (twNode != null)
                 {
-                    for(int i = 1; i < 9; i++)
+                    for(int i = 1; i < 8; i++)
                     {
                         if(twNode.HasValue("rate"+i))
                             if(float.TryParse(twNode.GetValue("rate"+i), out ftmp))
@@ -668,6 +671,8 @@ namespace RealSolarSystem
                             {
                                 body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1/3);
                                 body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                                if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
+                                    body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
                             }   
 	                        else
 	                        {
@@ -783,45 +788,128 @@ namespace RealSolarSystem
                             }
 
                             // the Planet Quadtree Sphere
-                            double PQSScaleFactor = 1.0;
-                            // does nothing :(
-                            // have to edit the PQSMods.
-                            /*if (node.HasValue("PQSScaleFactor"))
+                            List<string> PQSs = new List<string>();
+                            bool custom = false;
+                            if (node.HasNode("PQS"))
                             {
-                                if (double.TryParse(node.GetValue("PQSScaleFactor"), out dtmp))
-                                    PQSScaleFactor = dtmp;
-                            }*/
-                            foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
+                                foreach (ConfigNode n in node.GetNode("PQS").nodes)
+                                    PQSs.Add(n.name);
+                                custom = true;
+                            }
+                            else
                             {
-                                if (p.name.Equals(node.name))
+                                PQSs.Add(node.name);
+                                PQSs.Add(node.name + "Ocean");
+                            }
+                            foreach (string pName in PQSs)
+                            {
+                                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                                 {
-                                    p.circumference = body.Radius * 2 * Math.PI;
-                                    /*if (p.radius != body.Radius) // already tested above!
-                                    {*/
-                                    p.radiusMax = (p.radiusMax - p.radius) * PQSScaleFactor + body.Radius;
-                                    p.radiusMin = (p.radiusMin - p.radius) * PQSScaleFactor + body.Radius;
-                                    //p.radiusDelta = p.radiusMax - p.radiusMin;
-                                    p.radiusDelta *= PQSScaleFactor;
-                                    //}
-                                    p.radius = body.Radius;
-                                    p.radiusSquared = body.Radius * body.Radius;
-                                    try
+                                    if (p.name.Equals(pName))
                                     {
-                                        p.RebuildSphere();
-                                    }
-                                    catch
-                                    {
-                                    }
-                                }
-                                else if (p.name.Equals(node.name + "Ocean"))
-                                {
-                                    p.radius = body.Radius;
-                                    try
-                                    {
-                                        p.RebuildSphere();
-                                    }
-                                    catch
-                                    {
+                                        p.radius = body.Radius;
+
+                                        if(custom) // YES, THIS IS SILLY
+                                            // I SHOULD JUST WRITE A REAL C# EXTENSIBLE LOADER
+                                            // Oh well. Hacks are quicker.
+                                        {
+                                            ConfigNode pqsNode = node.GetNode("PQS").GetNode(pName);
+                                            foreach(ConfigNode modNode in pqsNode.nodes)
+                                            {
+                                                if(modNode.name.Equals("PQSMod_VertexSimplexHeightAbsolute"))
+                                                    foreach(PQSMod_VertexSimplexHeightAbsolute mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexSimplexHeightAbsolute)))
+                                                    {
+                                                        if (modNode.HasValue("deformity"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("deformity"), out dtmp))
+                                                                mod.deformity = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("persistence"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("persistence"), out dtmp))
+                                                                mod.persistence = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("frequency"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("frequency"), out dtmp))
+                                                                mod.frequency = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                if(modNode.name.Equals("PQSMod_VertexHeightNoiseVertHeightCurve2"))
+                                                    foreach(PQSMod_VertexHeightNoiseVertHeightCurve2 mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexHeightNoiseVertHeightCurve2)))
+                                                    {
+                                                        if (modNode.HasValue("deformity"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("deformity"), out ftmp))
+                                                                mod.deformity = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("ridgedAddFrequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("ridgedAddFrequency"), out ftmp))
+                                                                mod.ridgedAddFrequency = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("ridgedSubFrequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("ridgedSubFrequency"), out ftmp))
+                                                                mod.ridgedSubFrequency = ftmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                if(modNode.name.Equals("PQSMod_VertexRidgedAltitudeCurve"))
+                                                    foreach(PQSMod_VertexRidgedAltitudeCurve mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexRidgedAltitudeCurve)))
+                                                    {
+                                                        if (modNode.HasValue("deformity"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("deformity"), out ftmp))
+                                                                mod.deformity = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("ridgedAddFrequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("ridgedAddFrequency"), out ftmp))
+                                                                mod.ridgedAddFrequency = ftmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                if(modNode.name.Equals("PQSMod_AltitudeAlpha"))
+                                                    foreach(PQSMod_AltitudeAlpha mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_AltitudeAlpha)))
+                                                    {
+                                                        if (modNode.HasValue("atmosphereDepth"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("atmosphereDepth"), out dtmp))
+                                                                mod.atmosphereDepth = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                if(modNode.name.Equals("PQSMod_VertexHeightMap"))
+                                                    foreach(PQSMod_VertexHeightMap mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexHeightMap)))
+                                                    {
+                                                        if (modNode.HasValue("heightMapDeformity"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("heightMapDeformity"), out dtmp))
+                                                                mod.heightMapDeformity = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                if(modNode.name.Equals("PQSMod_AerialPerspectiveMaterial"))
+                                                    foreach(PQSMod_AerialPerspectiveMaterial mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_AerialPerspectiveMaterial)))
+                                                    {
+                                                        if (modNode.HasValue("heightMapDeformity"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("heightMapDeformity"), out ftmp))
+                                                                mod.atmosphereDepth = ftmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                            }
+                                        }
+                                        try
+                                        {
+                                            p.RebuildSphere();
+                                        }
+                                        catch
+                                        {
+                                        }
                                     }
                                 }
                             }
