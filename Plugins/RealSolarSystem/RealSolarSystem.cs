@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using KSP;
+//using KSP.IO;
+using System.IO;
 
 
 namespace RealSolarSystem
@@ -75,7 +77,7 @@ namespace RealSolarSystem
                     ConfigNode curveNode = null;
                     foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
                         curveNode = node.GetNode("powerCurve");
-                    if(curveNode != null)
+                    if (curveNode != null)
                     {
                         foreach (AvailablePart ap in PartLoader.LoadedPartsList)
                         {
@@ -136,10 +138,10 @@ namespace RealSolarSystem
         public double lastTime = 0;
         public double currentTime = 0;
         public static bool fixedTimeWarp = false;
-        
+
         public void Update()
         {
-            if(ScaledSpace.Instance == null)
+            if (ScaledSpace.Instance == null)
                 return;
             //currentTime = Planetarium.GetUniversalTime();
             //if(currentTime > lastTime + 1)
@@ -166,10 +168,10 @@ namespace RealSolarSystem
                 float ftmp;
                 if (twNode != null)
                 {
-                    for(int i = 1; i < 8; i++)
+                    for (int i = 1; i < 8; i++)
                     {
-                        if(twNode.HasValue("rate"+i))
-                            if(float.TryParse(twNode.GetValue("rate"+i), out ftmp))
+                        if (twNode.HasValue("rate" + i))
+                            if (float.TryParse(twNode.GetValue("rate" + i), out ftmp))
                                 TimeWarp.fetch.warpRates[i] = ftmp;
                     }
                 }
@@ -441,7 +443,7 @@ namespace RealSolarSystem
                 body.angularV = body.angularVelocity.magnitude;
                 body.rotation = rot.TiltedAngle(body.directRotAngle);
                 body.transform.rotation = body.rotation;
-                
+
             }
             if (body.orbitDriver)
                 body.orbitDriver.UpdateOrbit();
@@ -488,9 +490,9 @@ namespace RealSolarSystem
         {
             ConfigNode RSSSettings = null;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
-                    RSSSettings = node;
+                RSSSettings = node;
 
-            if(RSSSettings == null)
+            if (RSSSettings == null)
                 throw new UnityException("*RSS* REALSOLARSYSTEM node not found!");
 
             print("*RSS* Printing CBTs");
@@ -501,7 +503,7 @@ namespace RealSolarSystem
             print("*RSS* fixing Kerbin mapdecals");
             // HARDCODED FOR NOW
             // For now does only Kerbin, and rescales ALL mapdecals.
-            if(!kerbinMapDecalsDone && RSSSettings.GetNode("Kerbin") != null)
+            if (!kerbinMapDecalsDone && RSSSettings.GetNode("Kerbin") != null)
             {
                 var mapDecals = FindObjectsOfType(typeof(PQSMod_MapDecalTangent)).OfType<PQSMod_MapDecalTangent>();
                 foreach (var mapDecal in mapDecals)
@@ -535,7 +537,7 @@ namespace RealSolarSystem
                         int itmp;
                         bool btmp;
                         double origRadius = body.Radius;
-                        if(node.HasValue("Radius"))
+                        if (node.HasValue("Radius"))
                         {
                             if (double.TryParse(node.GetValue("Radius"), out dtmp))
                                 body.Radius = dtmp;
@@ -668,38 +670,24 @@ namespace RealSolarSystem
                         }
                         if (body.orbitDriver != null)
                         {
-                            if(body.referenceBody != null)
+                            if (body.referenceBody != null)
                             {
-                                body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1/3);
+                                body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
                                 body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
                                 if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
                                     body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
-                            }   
-	                        else
-	                        {
-		                        body.sphereOfInfluence = double.PositiveInfinity;
-		                        body.hillSphere = double.PositiveInfinity;
-	                        }
+                            }
+                            else
+                            {
+                                body.sphereOfInfluence = double.PositiveInfinity;
+                                body.hillSphere = double.PositiveInfinity;
+                            }
                             body.orbitDriver.QueuedUpdate = true;
                         }
                         body.CBUpdate();
 
                         if (body.Radius != origRadius)
                         {
-                            // Scaled space
-                            if (ScaledSpace.Instance != null)
-                            {
-                                float SSTScale = 1.0f;
-                                if(node.HasValue("SSTScale"))
-                                    float.TryParse(node.GetValue("SSTScale"), out SSTScale);
-                                SSTScale *= (float)(body.Radius / origRadius);
-                                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                                {
-                                    if (t.name.Equals(node.name))
-                                        t.localScale = new Vector3(t.localScale.x * SSTScale, t.localScale.y * SSTScale, t.localScale.z * SSTScale);
-                                }
-                            }
-
                             // Scaled space fader
                             float SSFMult = (float)(body.Radius / origRadius);
                             float SSFStart = -1, SSFEnd = -1;
@@ -810,17 +798,24 @@ namespace RealSolarSystem
                                     if (p.name.Equals(pName))
                                     {
                                         p.radius = body.Radius;
-
-                                        if(custom) // YES, THIS IS SILLY
-                                            // I SHOULD JUST WRITE A REAL C# EXTENSIBLE LOADER
-                                            // Oh well. Hacks are quicker.
+                                        if (custom) // YES, THIS IS SILLY
+                                        // I SHOULD JUST WRITE A REAL C# EXTENSIBLE LOADER
+                                        // Oh well. Hacks are quicker.
                                         {
                                             ConfigNode pqsNode = node.GetNode("PQS").GetNode(pName);
-                                            foreach(ConfigNode modNode in pqsNode.nodes)
+                                            var mods = ((MonoBehaviour)p).transform.GetComponentsInChildren(typeof(PQSMod), true);
+                                            print("For PQS " + p.name + ", mod count = " + mods.Count());
+                                            foreach (PQSMod m in mods)
                                             {
-                                                if(modNode.name.Equals("PQSMod_VertexSimplexHeightAbsolute"))
-                                                    foreach(PQSMod_VertexSimplexHeightAbsolute mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexSimplexHeightAbsolute)))
+                                                print("Mod " + m.name + " is " + m.GetType());
+                                            }
+                                            foreach (var m in mods)
+                                            {
+                                                foreach (ConfigNode modNode in pqsNode.nodes)
+                                                {
+                                                    if (modNode.name.Equals("PQSMod_VertexSimplexHeightAbsolute") && m.GetType().ToString().Equals(modNode.name))
                                                     {
+                                                        PQSMod_VertexSimplexHeightAbsolute mod = m as PQSMod_VertexSimplexHeightAbsolute;
                                                         if (modNode.HasValue("deformity"))
                                                         {
                                                             if (double.TryParse(modNode.GetValue("deformity"), out dtmp))
@@ -838,9 +833,9 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
-                                                if(modNode.name.Equals("PQSMod_VertexHeightNoiseVertHeightCurve2"))
-                                                    foreach(PQSMod_VertexHeightNoiseVertHeightCurve2 mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexHeightNoiseVertHeightCurve2)))
+                                                    if (modNode.name.Equals("PQSMod_VertexHeightNoiseVertHeightCurve2") && m.GetType().ToString().Equals(modNode.name))
                                                     {
+                                                        PQSMod_VertexHeightNoiseVertHeightCurve2 mod = m as PQSMod_VertexHeightNoiseVertHeightCurve2;
                                                         if (modNode.HasValue("deformity"))
                                                         {
                                                             if (float.TryParse(modNode.GetValue("deformity"), out ftmp))
@@ -864,13 +859,18 @@ namespace RealSolarSystem
                                                         if (modNode.HasValue("simplexHeightStart"))
                                                         {
                                                             if (float.TryParse(modNode.GetValue("simplexHeightStart"), out ftmp))
-                                                                mod.ridgedSubFrequency = ftmp;
+                                                                mod.simplexHeightStart = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("simplexHeightEnd"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("simplexHeightEnd"), out ftmp))
+                                                                mod.simplexHeightEnd = ftmp;
                                                         }
                                                         mod.OnSetup();
                                                     }
-                                                if(modNode.name.Equals("PQSMod_VertexRidgedAltitudeCurve"))
-                                                    foreach(PQSMod_VertexRidgedAltitudeCurve mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexRidgedAltitudeCurve)))
+                                                    if (modNode.name.Equals("PQSMod_VertexRidgedAltitudeCurve") && m.GetType().ToString().Equals(modNode.name))
                                                     {
+                                                        PQSMod_VertexRidgedAltitudeCurve mod = m as PQSMod_VertexRidgedAltitudeCurve;
                                                         if (modNode.HasValue("deformity"))
                                                         {
                                                             if (float.TryParse(modNode.GetValue("deformity"), out ftmp))
@@ -886,21 +886,21 @@ namespace RealSolarSystem
                                                             if (int.TryParse(modNode.GetValue("ridgedAddOctaves"), out itmp))
                                                                 mod.ridgedAddOctaves = itmp;
                                                         }
-                                                        mod.OnSetup();
-                                                    }
-                                                if(modNode.name.Equals("PQSMod_AltitudeAlpha"))
-                                                    foreach(PQSMod_AltitudeAlpha mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_AltitudeAlpha)))
-                                                    {
-                                                        if (modNode.HasValue("atmosphereDepth"))
+                                                        if (modNode.HasValue("simplexHeightStart"))
                                                         {
-                                                            if (double.TryParse(modNode.GetValue("atmosphereDepth"), out dtmp))
-                                                                mod.atmosphereDepth = dtmp;
+                                                            if (float.TryParse(modNode.GetValue("simplexHeightStart"), out ftmp))
+                                                                mod.simplexHeightStart = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("simplexHeightEnd"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("simplexHeightEnd"), out ftmp))
+                                                                mod.simplexHeightEnd = ftmp;
                                                         }
                                                         mod.OnSetup();
                                                     }
-                                                if(modNode.name.Equals("PQSMod_VertexHeightMap"))
-                                                    foreach(PQSMod_VertexHeightMap mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_VertexHeightMap)))
+                                                    if (modNode.name.Equals("PQSMod_VertexHeightMap") && m.GetType().ToString().Equals(modNode.name))
                                                     {
+                                                        PQSMod_VertexHeightMap mod = m as PQSMod_VertexHeightMap;
                                                         if (modNode.HasValue("heightMapDeformity"))
                                                         {
                                                             if (double.TryParse(modNode.GetValue("heightMapDeformity"), out dtmp))
@@ -908,9 +908,19 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
-                                                if(modNode.name.Equals("PQSMod_AerialPerspectiveMaterial"))
-                                                    foreach(PQSMod_AerialPerspectiveMaterial mod in Resources.FindObjectsOfTypeAll(typeof(PQSMod_AerialPerspectiveMaterial)))
+                                                    if (modNode.name.Equals("PQSMod_AltitudeAlpha") && m.GetType().ToString().Equals(modNode.name))
                                                     {
+                                                        PQSMod_AltitudeAlpha mod = m as PQSMod_AltitudeAlpha;
+                                                        if (modNode.HasValue("atmosphereDepth"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("atmosphereDepth"), out dtmp))
+                                                                mod.atmosphereDepth = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                    if (modNode.name.Equals("PQSMod_AerialPerspectiveMaterial") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSMod_AerialPerspectiveMaterial mod = m as PQSMod_AerialPerspectiveMaterial;
                                                         if (modNode.HasValue("heightMapDeformity"))
                                                         {
                                                             if (float.TryParse(modNode.GetValue("heightMapDeformity"), out ftmp))
@@ -918,6 +928,82 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
+
+                                                    if (modNode.name.Equals("PQSMod_VertexHeightMap") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSMod_VertexHeightMap mod = m as PQSMod_VertexHeightMap;
+                                                        if (modNode.HasValue("heightMapDeformity"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("heightMapDeformity"), out dtmp))
+                                                                mod.heightMapDeformity = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                    if (modNode.name.Equals("PQSMod_VertexSimplexHeight") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSMod_VertexSimplexHeight mod = m as PQSMod_VertexSimplexHeight;
+                                                        if (modNode.HasValue("deformity"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("deformity"), out dtmp))
+                                                                mod.deformity = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("persistence"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("persistence"), out dtmp))
+                                                                mod.persistence = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("frequency"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("frequency"), out dtmp))
+                                                                mod.frequency = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("octaves"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("octaves"), out dtmp))
+                                                                mod.octaves = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                    if (modNode.name.Equals("PQSMod_VertexHeightNoiseVertHeight") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSMod_VertexHeightNoiseVertHeight mod = m as PQSMod_VertexHeightNoiseVertHeight;
+                                                        if (modNode.HasValue("deformity"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("deformity"), out ftmp))
+                                                                mod.deformity = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("frequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("frequency"), out ftmp))
+                                                                mod.frequency = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("octaves"))
+                                                        {
+                                                            if (int.TryParse(modNode.GetValue("octaves"), out itmp))
+                                                                mod.octaves = itmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                    if (modNode.name.Equals("PQSMod_VoronoiCraters") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSMod_VoronoiCraters mod = m as PQSMod_VoronoiCraters;
+                                                        if (modNode.HasValue("KEYvoronoiSeed"))
+                                                            if (int.Parse(modNode.GetValue("KEYvoronoiSeed")) != mod.voronoiSeed)
+                                                                continue;
+
+                                                        if (modNode.HasValue("deformation"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("deformation"), out dtmp))
+                                                                mod.deformation = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("voronoiFrequency"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("voronoiFrequency"), out dtmp))
+                                                                mod.voronoiFrequency = dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                }
                                             }
                                         }
                                         try
@@ -946,6 +1032,132 @@ namespace RealSolarSystem
                                         ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
                                         print("Atmo updated");
                                     }
+                                }
+                            }
+                            // Scaled space
+                            if (ScaledSpace.Instance != null)
+                            {
+                                float SSTScale = 1.0f;
+                                if (node.HasValue("SSTScale"))
+                                    float.TryParse(node.GetValue("SSTScale"), out SSTScale);
+                                SSTScale *= (float)(body.Radius / origRadius);
+                                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                                {
+                                    if (t.name.Equals(node.name))
+                                    {
+                                        t.localScale = new Vector3(t.localScale.x * SSTScale, t.localScale.y * SSTScale, t.localScale.z * SSTScale);
+                                    }
+                                }
+                            }
+                            // texture rebuild
+                            if (node.HasNode("Export"))
+                            {
+                                int res = 2048;
+                                bool ocean = false;
+                                Color oceanColor;
+                                double maxHeight, oceanHeight;
+                                PQS bodyPQS = null;
+                                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
+                                    if (p.name.Equals(body.name))
+                                    {
+                                        bodyPQS = p;
+                                        break;
+                                    }
+                                if (bodyPQS != null)
+                                {
+                                    maxHeight = bodyPQS.radiusDelta * 0.5;
+                                    oceanHeight = 0;
+                                    ocean = body.ocean;
+                                    oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
+                                    ConfigNode exportNode = node.GetNode("Export");
+                                    if (exportNode.HasValue("resolution"))
+                                    {
+                                        if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
+                                            res = itmp;
+                                    }
+                                    if (exportNode.HasValue("maxHeight"))
+                                    {
+                                        if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
+                                            maxHeight = dtmp;
+                                    }
+
+                                    if (exportNode.HasValue("oceanHeight"))
+                                    {
+                                        if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
+                                            oceanHeight = dtmp;
+                                    }
+                                    if (exportNode.HasValue("oceanColor"))
+                                    {
+                                        ocean = true;
+                                        Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
+                                        oceanColor = new Color(col.x, col.y, col.z);
+                                    }
+                                    /*Texture2D KerbinScaledSpace300 = null;
+                                    Texture2D KerbinScaledSpace401 = null;
+                                    foreach (Texture2D tex in Resources.FindObjectsOfTypeAll(typeof(Texture2D)))
+                                    {
+                                        if (tex.name.Equals("KerbinScaledSpace300"))
+                                            KerbinScaledSpace300 = tex;
+                                        if (tex.name.Equals("KerbinScaledSpace401"))
+                                            KerbinScaledSpace401 = tex;
+                                    }*/
+                                    Texture2D[] kerbinTextures = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
+                                    /*foreach (Texture2D t in kerbinTextures)
+                                    {
+                                        MonoBehaviour.DontDestroyOnLoad(t);
+                                    }*/
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "1.png", kerbinTextures[0].EncodeToPNG());
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "2.png", kerbinTextures[1].EncodeToPNG());
+                                    /*foreach (Material mat in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                    {
+                                        if (mat.mainTexture.name.Equals("KerbinScaledSpace300"))
+                                        {
+                                            mat.mainTexture = kerbinTextures[0];
+                                            try
+                                            {
+                                                Resources.UnloadAsset(KerbinScaledSpace300);
+                                            }
+                                            catch
+                                            {
+                                            }
+                                        }
+                                        if (mat.mainTexture.name.Equals("KerbinScaledSpace401"))
+                                        {
+                                            mat.mainTexture = kerbinTextures[1];
+                                            try
+                                            {
+                                                Resources.UnloadAsset(KerbinScaledSpace401);
+                                            }
+                                            catch
+                                            {
+                                            }
+                                        }
+                                        if (mat.GetTexture("_BumpMap") != null)
+                                        {
+                                            if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace300"))
+                                            {
+                                                mat.SetTexture("_BumpMap", kerbinTextures[0]);
+                                                try
+                                                {
+                                                    Resources.UnloadAsset(KerbinScaledSpace300);
+                                                }
+                                                catch
+                                                {
+                                                }
+                                            }
+                                            if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace401"))
+                                            {
+                                                mat.SetTexture("_BumpMap", kerbinTextures[1]);
+                                                try
+                                                {
+                                                    Resources.UnloadAsset(KerbinScaledSpace401);
+                                                }
+                                                catch
+                                                {
+                                                }
+                                            }
+                                        }
+                                    }*/
                                 }
                             }
                         }
