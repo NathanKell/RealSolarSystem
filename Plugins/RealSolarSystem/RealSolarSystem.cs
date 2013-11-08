@@ -992,12 +992,33 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
+
+                                                    // City
+                                                    if (modNode.name.Equals("PQSCity") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSCity mod = m as PQSCity;
+                                                        if (modNode.HasValue("KEYname"))
+                                                            if(!(mod.name.Equals(modNode.GetValue("KEYname"))))
+                                                                continue;
+
+                                                        if (modNode.HasValue("repositionRadial"))
+                                                        {
+                                                            mod.repositionRadial = KSPUtil.ParseVector3(modNode.GetValue("repositionRadial"));
+                                                        }
+                                                        if (modNode.HasValue("lodvisibleRangeMult"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("lodvisibleRangeMult"), out dtmp))
+                                                                foreach (PQSCity.LODRange l in mod.lod)
+                                                                    l.visibleRange *= (float)dtmp;
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
                                                 }
                                             }
                                         }
                                         try
                                         {
-                                            p.RebuildSphere();
+                                            //p.ResetSphere();
                                         }
                                         catch
                                         {

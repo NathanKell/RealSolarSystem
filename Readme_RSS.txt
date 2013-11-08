@@ -16,7 +16,7 @@ YOU REALLY SHOULD USE FAR WITH THIS. And make sure you're not using KIDS to scal
 
 The planets are pretty blurry, BTW. I know.
 
-Planets included (no new graphics for now)
+Planets included (no new graphics for now, excepting Kerbin and Mun)
 Mercury is represented by Moho
 Venus is represented by Eve
 Earth is represented by Kerbin
@@ -44,9 +44,10 @@ Expect problems. But also expect glee.
 ===========================
 Changelog
 v5 -- \/
-*Every KSP body is now a proxy for a body in the real solar system.
+*Every KSP body is now a proxy for a body in the real solar system. However, only the terrains of Kerbin and Mun are edited; the others are merely rescaled.
 *Added configurable timewarp. By default 5 and 50 are removed and instead 1 million x and 6m x are added on at the end.
-*Edited terrain generator for Kerbin
+*Edited terrain generator for Kerbin and Mun.
+*More support for parameters in the config file.
 
 v4 -- \/
 *Switched to new config file system
