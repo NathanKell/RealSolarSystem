@@ -928,17 +928,6 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
-
-                                                    if (modNode.name.Equals("PQSMod_VertexHeightMap") && m.GetType().ToString().Equals(modNode.name))
-                                                    {
-                                                        PQSMod_VertexHeightMap mod = m as PQSMod_VertexHeightMap;
-                                                        if (modNode.HasValue("heightMapDeformity"))
-                                                        {
-                                                            if (double.TryParse(modNode.GetValue("heightMapDeformity"), out dtmp))
-                                                                mod.heightMapDeformity = dtmp;
-                                                        }
-                                                        mod.OnSetup();
-                                                    }
                                                     if (modNode.name.Equals("PQSMod_VertexSimplexHeight") && m.GetType().ToString().Equals(modNode.name))
                                                     {
                                                         PQSMod_VertexSimplexHeight mod = m as PQSMod_VertexSimplexHeight;
@@ -1052,91 +1041,69 @@ namespace RealSolarSystem
                             // texture rebuild
                             if (node.HasNode("Export"))
                             {
-                                int res = 2048;
-                                bool ocean = false;
-                                Color oceanColor;
-                                double maxHeight, oceanHeight;
-                                PQS bodyPQS = null;
-                                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
-                                    if (p.name.Equals(body.name))
-                                    {
-                                        bodyPQS = p;
-                                        break;
-                                    }
-                                if (bodyPQS != null)
+                                try
                                 {
-                                    maxHeight = bodyPQS.radiusDelta * 0.5;
-                                    oceanHeight = 0;
-                                    ocean = body.ocean;
-                                    oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
-                                    ConfigNode exportNode = node.GetNode("Export");
-                                    if (exportNode.HasValue("resolution"))
+                                    int res = 2048;
+                                    bool ocean = false;
+                                    Color oceanColor;
+                                    double maxHeight, oceanHeight;
+                                    PQS bodyPQS = null;
+                                    foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
+                                        if (p.name.Equals(body.name))
+                                        {
+                                            bodyPQS = p;
+                                            break;
+                                        }
+                                    if (bodyPQS != null)
                                     {
-                                        if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
-                                            res = itmp;
-                                    }
-                                    if (exportNode.HasValue("maxHeight"))
-                                    {
-                                        if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
-                                            maxHeight = dtmp;
-                                    }
+                                        maxHeight = bodyPQS.radiusDelta * 0.5;
+                                        oceanHeight = 0;
+                                        ocean = body.ocean;
+                                        oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
+                                        ConfigNode exportNode = node.GetNode("Export");
+                                        if (exportNode.HasValue("resolution"))
+                                        {
+                                            if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
+                                                res = itmp;
+                                        }
+                                        if (exportNode.HasValue("maxHeight"))
+                                        {
+                                            if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
+                                                maxHeight = dtmp;
+                                        }
 
-                                    if (exportNode.HasValue("oceanHeight"))
-                                    {
-                                        if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
-                                            oceanHeight = dtmp;
-                                    }
-                                    if (exportNode.HasValue("oceanColor"))
-                                    {
-                                        ocean = true;
-                                        Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
-                                        oceanColor = new Color(col.x, col.y, col.z);
-                                    }
-                                    /*Texture2D KerbinScaledSpace300 = null;
-                                    Texture2D KerbinScaledSpace401 = null;
-                                    foreach (Texture2D tex in Resources.FindObjectsOfTypeAll(typeof(Texture2D)))
-                                    {
-                                        if (tex.name.Equals("KerbinScaledSpace300"))
-                                            KerbinScaledSpace300 = tex;
-                                        if (tex.name.Equals("KerbinScaledSpace401"))
-                                            KerbinScaledSpace401 = tex;
-                                    }*/
-                                    Texture2D[] kerbinTextures = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
-                                    /*foreach (Texture2D t in kerbinTextures)
-                                    {
-                                        MonoBehaviour.DontDestroyOnLoad(t);
-                                    }*/
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "1.png", kerbinTextures[0].EncodeToPNG());
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "2.png", kerbinTextures[1].EncodeToPNG());
-                                    /*foreach (Material mat in Resources.FindObjectsOfTypeAll(typeof(Material)))
-                                    {
-                                        if (mat.mainTexture.name.Equals("KerbinScaledSpace300"))
+                                        if (exportNode.HasValue("oceanHeight"))
                                         {
-                                            mat.mainTexture = kerbinTextures[0];
-                                            try
-                                            {
-                                                Resources.UnloadAsset(KerbinScaledSpace300);
-                                            }
-                                            catch
-                                            {
-                                            }
+                                            if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
+                                                oceanHeight = dtmp;
                                         }
-                                        if (mat.mainTexture.name.Equals("KerbinScaledSpace401"))
+                                        if (exportNode.HasValue("oceanColor"))
                                         {
-                                            mat.mainTexture = kerbinTextures[1];
-                                            try
-                                            {
-                                                Resources.UnloadAsset(KerbinScaledSpace401);
-                                            }
-                                            catch
-                                            {
-                                            }
+                                            ocean = true;
+                                            Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
+                                            oceanColor = new Color(col.x, col.y, col.z);
                                         }
-                                        if (mat.GetTexture("_BumpMap") != null)
+                                        /*Texture2D KerbinScaledSpace300 = null;
+                                        Texture2D KerbinScaledSpace401 = null;
+                                        foreach (Texture2D tex in Resources.FindObjectsOfTypeAll(typeof(Texture2D)))
                                         {
-                                            if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace300"))
+                                            if (tex.name.Equals("KerbinScaledSpace300"))
+                                                KerbinScaledSpace300 = tex;
+                                            if (tex.name.Equals("KerbinScaledSpace401"))
+                                                KerbinScaledSpace401 = tex;
+                                        }*/
+                                        Texture2D[] kerbinTextures = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
+                                        /*foreach (Texture2D t in kerbinTextures)
+                                        {
+                                            MonoBehaviour.DontDestroyOnLoad(t);
+                                        }*/
+                                        System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "1.png", kerbinTextures[0].EncodeToPNG());
+                                        System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "2.png", kerbinTextures[1].EncodeToPNG());
+                                        /*foreach (Material mat in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                        {
+                                            if (mat.mainTexture.name.Equals("KerbinScaledSpace300"))
                                             {
-                                                mat.SetTexture("_BumpMap", kerbinTextures[0]);
+                                                mat.mainTexture = kerbinTextures[0];
                                                 try
                                                 {
                                                     Resources.UnloadAsset(KerbinScaledSpace300);
@@ -1145,9 +1112,9 @@ namespace RealSolarSystem
                                                 {
                                                 }
                                             }
-                                            if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace401"))
+                                            if (mat.mainTexture.name.Equals("KerbinScaledSpace401"))
                                             {
-                                                mat.SetTexture("_BumpMap", kerbinTextures[1]);
+                                                mat.mainTexture = kerbinTextures[1];
                                                 try
                                                 {
                                                     Resources.UnloadAsset(KerbinScaledSpace401);
@@ -1156,8 +1123,36 @@ namespace RealSolarSystem
                                                 {
                                                 }
                                             }
-                                        }
-                                    }*/
+                                            if (mat.GetTexture("_BumpMap") != null)
+                                            {
+                                                if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace300"))
+                                                {
+                                                    mat.SetTexture("_BumpMap", kerbinTextures[0]);
+                                                    try
+                                                    {
+                                                        Resources.UnloadAsset(KerbinScaledSpace300);
+                                                    }
+                                                    catch
+                                                    {
+                                                    }
+                                                }
+                                                if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace401"))
+                                                {
+                                                    mat.SetTexture("_BumpMap", kerbinTextures[1]);
+                                                    try
+                                                    {
+                                                        Resources.UnloadAsset(KerbinScaledSpace401);
+                                                    }
+                                                    catch
+                                                    {
+                                                    }
+                                                }
+                                            }
+                                        }*/
+                                    }
+                                }
+                                catch
+                                {
                                 }
                             }
                         }
@@ -1196,6 +1191,7 @@ namespace RealSolarSystem
                 {
                 }
             }
+            print("*RSS* Done loading!");
         }
     }
 }
