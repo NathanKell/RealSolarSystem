@@ -54,8 +54,9 @@ namespace RealSolarSystem
                                 EditorLogic.fetch.editorBounds.extents *= ftmp; // thanks, asmi!
                     }
                 }
-                catch
+                catch(Exception e)
                 {
+                    print("Camera fixing failed: " + e.Message);
                 }
             }
 
@@ -115,8 +116,9 @@ namespace RealSolarSystem
                                     }
                                 }
                             }
-                            catch
+                            catch (Exception e)
                             {
+                                print("Solar panel fixing failed: " + e.Message);
                             }
                         }
                     }
@@ -139,6 +141,11 @@ namespace RealSolarSystem
         public double currentTime = 0;
         public static bool fixedTimeWarp = false;
 
+        public void Start()
+        {
+            fixedTimeWarp = false;
+        }
+
         public void Update()
         {
             if (ScaledSpace.Instance == null)
@@ -159,7 +166,7 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
 
             // Fix Timewarp
-            if (/*!fixedTimeWarp &&*/ TimeWarp.fetch)
+            if (!fixedTimeWarp && TimeWarp.fetch)
             {
                 fixedTimeWarp = true;
                 ConfigNode twNode = null;
@@ -421,7 +428,7 @@ namespace RealSolarSystem
         }
     }
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    /*[KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class CBRotationFixer : MonoBehaviour
     {
         public static Dictionary<string, CBRotation> CBRotations = new Dictionary<string, CBRotation>();
@@ -462,9 +469,9 @@ namespace RealSolarSystem
                     UpdateBody(Planetarium.fetch.Sun);
             }
         }
-    }
+    }*/
 
-    [KSPAddon(KSPAddon.Startup.MainMenu, false)]
+    [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(RealSolarSystem))]
     public class RealSolarSystem : MonoBehaviour
     {
         public void UpdateMass(CelestialBody body)
@@ -495,8 +502,8 @@ namespace RealSolarSystem
             if (RSSSettings == null)
                 throw new UnityException("*RSS* REALSOLARSYSTEM node not found!");
 
-            print("*RSS* Printing CBTs");
-            /*foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
+            /*print("*RSS* Printing CBTs");
+            foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                 Utils.DumpCBT(c);*/
 
             // thanks to asmi for this!
@@ -735,6 +742,7 @@ namespace RealSolarSystem
                                     {
                                         if (c.body.name.Equals(node.name))
                                         {
+                                            print("Found CBT for " + node.name);
                                             if (node.HasValue("PQSdeactivateAltitude"))
                                             {
                                                 if (double.TryParse(node.GetValue("PQSdeactivateAltitude"), out dtmp))
@@ -772,10 +780,12 @@ namespace RealSolarSystem
                                         }
                                     }
                                 }
-                                catch
+                                catch (Exception e)
                                 {
+                                    print("CBT fix for " + node.name + " failed: " + e.Message);
                                 }
                             }
+                            print("Did CBT for " + node.name);
 
                             // the Planet Quadtree Sphere
                             List<string> PQSs = new List<string>();
@@ -793,22 +803,22 @@ namespace RealSolarSystem
                             }
                             foreach (string pName in PQSs)
                             {
+                                print("Finding PQS " + pName);
                                 foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
                                 {
                                     if (p.name.Equals(pName))
                                     {
+                                        if (body.pqsController != p)
+                                            if (body.pqsController != p.parentSphere)
+                                                continue;
                                         p.radius = body.Radius;
+                                        print("Editing PQS " + pName + ", radius = " + p.radius);
                                         if (custom) // YES, THIS IS SILLY
                                         // I SHOULD JUST WRITE A REAL C# EXTENSIBLE LOADER
                                         // Oh well. Hacks are quicker.
                                         {
                                             ConfigNode pqsNode = node.GetNode("PQS").GetNode(pName);
                                             var mods = ((MonoBehaviour)p).transform.GetComponentsInChildren(typeof(PQSMod), true);
-                                            print("For PQS " + p.name + ", mod count = " + mods.Count());
-                                            foreach (PQSMod m in mods)
-                                            {
-                                                print("Mod " + m.name + " is " + m.GetType());
-                                            }
                                             foreach (var m in mods)
                                             {
                                                 foreach (ConfigNode modNode in pqsNode.nodes)
@@ -898,6 +908,7 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
+                                                    ///
                                                     if (modNode.name.Equals("PQSMod_VertexHeightMap") && m.GetType().ToString().Equals(modNode.name))
                                                     {
                                                         PQSMod_VertexHeightMap mod = m as PQSMod_VertexHeightMap;
@@ -1018,10 +1029,13 @@ namespace RealSolarSystem
                                         }
                                         try
                                         {
+                                            print("Rebuilding sphere " + p.name);
                                             //p.ResetSphere();
+                                            p.RebuildSphere();
                                         }
-                                        catch
+                                        catch (Exception e)
                                         {
+                                            print("Rebuild sphere for " + node.name + " failed: " + e.Message);
                                         }
                                     }
                                 }
@@ -1172,8 +1186,9 @@ namespace RealSolarSystem
                                         }*/
                                     }
                                 }
-                                catch
+                                catch (Exception e)
                                 {
+                                    print("Export for " + node.name + " failed: " + e.Message);
                                 }
                             }
                         }
@@ -1204,15 +1219,50 @@ namespace RealSolarSystem
                     {
                         body.CBUpdate();
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        print("CBUpdate for " + body.name + " failed: " + e.Message);
                     }
                 }
-                catch
+                catch (Exception e)
                 {
+                    print("Final update bodies failed: " + e.Message);
                 }
             }
             print("*RSS* Done loading!");
+        }
+    }
+    /// <summary>
+    /// KSPAddon with equality checking using an additional type parameter. Fixes the issue where AddonLoader prevents multiple start-once addons with the same start scene.
+    /// By Majiir
+    /// </summary>
+    public class KSPAddonFixed : KSPAddon, IEquatable<KSPAddonFixed>
+    {
+        private readonly Type type;
+
+        public KSPAddonFixed(KSPAddon.Startup startup, bool once, Type type)
+            : base(startup, once)
+        {
+            this.type = type;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() != this.GetType()) { return false; }
+            return Equals((KSPAddonFixed)obj);
+        }
+
+        public bool Equals(KSPAddonFixed other)
+        {
+            if (this.once != other.once) { return false; }
+            if (this.startup != other.startup) { return false; }
+            if (this.type != other.type) { return false; }
+            return true;
+        }
+
+        public override int GetHashCode()
+        {
+            return this.startup.GetHashCode() ^ this.once.GetHashCode() ^ this.type.GetHashCode();
         }
     }
 }

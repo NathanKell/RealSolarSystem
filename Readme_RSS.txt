@@ -1,7 +1,6 @@
 Real Solar System WIP
-Currently, Kerbin is rescaled to Earth size and placed in its appropriate oribt, and Mun is rescaled/changed to be the Moon. Minmus is not rescaled, but its orbit is changed as if it were a captured minor rock.
 
-Thanks to asmi for kicking me into to doing this and offering help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), to ZRM for many ideas and info, and to everyone else who has been playtesting it so far in the Realism Overhaul thread and offered other help.
+Thanks to asmi for kicking me into to doing this and offering help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), to ZRM for many ideas and info, to yargnit for playtesting extraordinaire, and to everyone else who has been playtesting it so far in the Realism Overhaul thread and offered other help.
 
 
 I take no responsibility for this breaking anything, even if it weren't a WIP and totally in alpha stage.
@@ -48,6 +47,8 @@ v5 -- \/
 *Added configurable timewarp. By default 5 and 50 are removed and instead 1 million x and 6m x are added on at the end.
 *Edited terrain generator for Kerbin and Mun.
 *More support for parameters in the config file.
+*Using Majiir's KSPAddonFixed.
+*Moved KSC to be nearer the shore.
 
 v4 -- \/
 *Switched to new config file system
