@@ -165,6 +165,19 @@ namespace RealSolarSystem
             /*if(HighLogic.LoadedSceneHasPlanetarium && PlanetariumCamera.fetch)
                 PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
 
+            // PQS dump
+            if (HighLogic.LoadedSceneIsFlight && Input.GetKeyDown(KeyCode.P) && Input.GetKey(KeyCode.LeftAlt))
+            {
+                if (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.mainBody != null)
+                {
+                    if (FlightGlobals.ActiveVessel.mainBody.pqsController == null)
+                        print("*RSS* mainbody PQS null!");
+                    else
+                        Utils.DumpPQS(FlightGlobals.ActiveVessel.mainBody.pqsController);
+                }
+            }
+
+
             // Fix Timewarp
             if (!fixedTimeWarp && TimeWarp.fetch)
             {
@@ -696,7 +709,7 @@ namespace RealSolarSystem
                         if (body.Radius != origRadius)
                         {
                             // Scaled space fader
-                            float SSFMult = (float)(body.Radius / origRadius);
+                            float SSFMult = 1.0f;
                             float SSFStart = -1, SSFEnd = -1;
                             if (node.HasValue("SSFStart"))
                             {
@@ -720,12 +733,12 @@ namespace RealSolarSystem
                                 {
                                     if (ssf.celestialBody.name.Equals(node.name))
                                     {
-                                        if (SSFStart > 0)
+                                        if (SSFStart >= 0)
                                             ssf.fadeStart = SSFStart;
                                         else
                                             ssf.fadeStart *= SSFMult;
 
-                                        if (SSFEnd > 0)
+                                        if (SSFEnd >= 0)
                                             ssf.fadeEnd = SSFEnd;
                                         else
                                             ssf.fadeEnd *= SSFMult;

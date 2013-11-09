@@ -42,6 +42,10 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
+v5.1  \/
+*Fixed bug where scaledspace meshes were being faded too early (now missing planets appear)
+*Fixed Duna's atmosphere end height in the info box.
+
 v5 -- \/
 *Every KSP body is now a proxy for a body in the real solar system. However, only the terrains of Kerbin and Mun are edited; the others are merely rescaled.
 *Added configurable timewarp. By default 5 and 50 are removed and instead 1 million x and 6m x are added on at the end.
