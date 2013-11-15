@@ -1057,12 +1057,72 @@ namespace RealSolarSystem
                             {
                                 if (ag != null && ag.planet != null)
                                 {
+                                    // generalized version of Starwaster's code. Thanks Starwaster!
                                     if (ag.planet.name.Equals(node.name))
                                     {
                                         print("Found atmo for " + node.name + ": " + ag.name);
-                                        ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                                        if (node.HasNode("AtmosphereFromGround"))
+                                        {
+                                            ConfigNode modNode = node.GetNode("AtmosphereFromGround");
+                                            if (modNode.HasValue("outerRadius"))
+                                            {
+                                                if (float.TryParse(modNode.GetValue("outerRadius"), out ftmp))
+                                                    ag.outerRadius = ftmp * ScaledSpace.InverseScaleFactor;
+                                            }
+                                            else if (modNode.HasValue("outerRadiusAtmo"))
+                                            {
+                                                ag.outerRadius = ((float)body.Radius + body.maxAtmosphereAltitude) * ScaledSpace.InverseScaleFactor;
+                                            }
+                                            else if (modNode.HasValue("outerRadiusMult"))
+                                            {
+                                                if (float.TryParse(modNode.GetValue("outerRadiusMult"), out ftmp))
+                                                    ag.outerRadius = ftmp * (float)body.Radius * ScaledSpace.InverseScaleFactor;
+                                            }
+
+                                            if (modNode.HasValue("innerRadius"))
+                                            {
+                                                if (float.TryParse(modNode.GetValue("innerRadius"), out ftmp))
+                                                    ag.innerRadius = ftmp * ScaledSpace.InverseScaleFactor;
+                                            }
+                                            else if (modNode.HasValue("innerRadiusMult"))
+                                            {
+                                                if (float.TryParse(modNode.GetValue("innerRadiusMult"), out ftmp))
+                                                    ag.innerRadius = ftmp * ag.outerRadius;
+                                            }
+
+                                            if (modNode.HasValue("doScale"))
+                                            {
+                                                if (bool.TryParse(modNode.GetValue("doScale"), out btmp))
+                                                    ag.doScale = btmp;
+                                            }
+                                            if (modNode.HasValue("transformScale"))
+                                            {
+                                                if (float.TryParse(modNode.GetValue("transformScale"), out ftmp) && ag.transform != null)
+                                                    ag.transform.localScale = new Vector3(ftmp, ftmp, ftmp);
+                                            }
+                                            else if (modNode.HasValue("transformAtmo"))
+                                            {
+                                                ag.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
+                                            }
+
+                                            if (modNode.HasValue("invWaveLength"))
+                                            {
+                                                Vector3 col = KSPUtil.ParseVector3(modNode.GetValue("invWaveLength"));
+                                                ag.invWaveLength = new Color(col.x, col.y, col.z);
+                                            }
+                                            if (modNode.HasValue("waveLength"))
+                                            {
+                                                Vector3 col = KSPUtil.ParseVector3(modNode.GetValue("waveLength"));
+                                                ag.waveLength = new Color(col.x, col.y, col.z);
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // the defaults
+                                            ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                                            ag.innerRadius = ag.outerRadius * 0.975f;
+                                        }
                                         ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
-                                        ag.innerRadius = ag.outerRadius * 0.975f;
                                         ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
                                         ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
                                         ag.scaleDepth = -0.25f;
