@@ -66,6 +66,34 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class SolarPanelFixer : MonoBehaviour
     {
+
+        public void FixSP(ModuleDeployableSolarPanel sp, ConfigNode curveNode)
+        {
+            sp.powerCurve = new FloatCurve();
+            /*ConfigNode node = new ConfigNode();
+            sp.powerCurve.Save(node);
+            foreach (ConfigNode.Value k in node.values)
+            {
+                string[] val = k.value.Split(' ');
+                val[0] = (double.Parse(val[0]) * 11).ToString();
+                string retval = "";
+                foreach (string s in val)
+                    retval += s + " ";
+                k.value = retval;
+            }*/
+            /*ConfigNode node = new ConfigNode("powerCurve");
+            node.AddValue("key", "0 223.8 0 -.5");
+            node.AddValue("key", "57909100000 6.6736 -0.5 -0.5");
+            node.AddValue("key", "108208000000 1.9113 -0.5 -0.5");
+            node.AddValue("key", "149598261000 1.0 -0.1 -0.1");
+            node.AddValue("key", "227939100000 0.431 -.03 -.03");
+            node.AddValue("key", "778547200000 0.037 -.01 -.001");
+            node.AddValue("key", "5874000000000 0 -0.001 0");
+
+                                        
+            sp.powerCurve.Load(node);*/
+            sp.powerCurve.Load(curveNode);
+        }
         public static bool fixedSolar = false;
         public void Start()
         {
@@ -80,45 +108,71 @@ namespace RealSolarSystem
                         curveNode = node.GetNode("powerCurve");
                     if (curveNode != null)
                     {
-                        foreach (AvailablePart ap in PartLoader.LoadedPartsList)
+                        foreach(Part p in Resources.FindObjectsOfTypeAll(typeof(Part)))
                         {
                             try
                             {
-                                if (ap.partPrefab != null)
+                               if (p.Modules.Contains("ModuleDeployableSolarPanel"))
                                 {
-                                    if (ap.partPrefab.Modules.Contains("ModuleDeployableSolarPanel"))
+                                    ModuleDeployableSolarPanel sp = (ModuleDeployableSolarPanel)(p.Modules["ModuleDeployableSolarPanel"]);
+                                    FixSP(sp, curveNode);
+                                    print("Fixed " + p.name + " (" + p.partInfo.title + ")");
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                print("Solar panel fixing failed for " + p.name + ": " + e.Message);
+                            }
+                        }
+                        ConfigNode[] allParts = GameDatabase.Instance.GetConfigNodes("PART");
+                        foreach(ConfigNode pNode in allParts)
+                        {
+                            try
+                            {
+                                foreach(ConfigNode node in pNode.nodes)
+                                {
+                                    if(node.name.Equals("MODULE"))
                                     {
-                                        ModuleDeployableSolarPanel sp = (ModuleDeployableSolarPanel)(ap.partPrefab.Modules["ModuleDeployableSolarPanel"]);
-                                        /*ConfigNode node = new ConfigNode();
-                                        sp.powerCurve.Save(node);
-                                        foreach (ConfigNode.Value k in node.values)
+                                        if(node.GetValue("name").Equals("ModuleDeployableSolarPanel"))
                                         {
-                                            string[] val = k.value.Split(' ');
-                                            val[0] = (double.Parse(val[0]) * 11).ToString();
-                                            string retval = "";
-                                            foreach (string s in val)
-                                                retval += s + " ";
-                                            k.value = retval;
-                                        }*/
-                                        /*ConfigNode node = new ConfigNode("powerCurve");
-                                        node.AddValue("key", "0 223.8 0 -.5");
-                                        node.AddValue("key", "57909100000 6.6736 -0.5 -0.5");
-                                        node.AddValue("key", "108208000000 1.9113 -0.5 -0.5");
-                                        node.AddValue("key", "149598261000 1.0 -0.1 -0.1");
-                                        node.AddValue("key", "227939100000 0.431 -.03 -.03");
-                                        node.AddValue("key", "778547200000 0.037 -.01 -.001");
-                                        node.AddValue("key", "5874000000000 0 -0.001 0");
-
-                                        sp.powerCurve = new FloatCurve();
-                                        sp.powerCurve.Load(node);*/
-                                        sp.powerCurve.Load(curveNode);
-                                        print("Fixed " + ap.name + " (" + ap.title + ")");
+                                            pNode.RemoveNode("powerCurve");
+                                            pNode.AddNode(curveNode);
+                                            print("Fixed part config " + pNode.GetValue("name") + " (" + pNode.GetValue("title") + ")");
+                                        }
                                     }
                                 }
                             }
                             catch (Exception e)
                             {
-                                print("Solar panel fixing failed: " + e.Message);
+                                print("Solar panel fixing of part confignodes failed: " + e.Message);
+                            }
+                        }
+                        if(HighLogic.CurrentGame != null)
+                        {
+                            try
+                            {
+                                foreach(ProtoVessel pv in HighLogic.CurrentGame.flightState.protoVessels)
+                                {
+                                    foreach(ProtoPartSnapshot ps in pv.protoPartSnapshots)
+                                    {
+                                        foreach(ProtoPartModuleSnapshot pm in ps.modules)
+                                        {
+                                            if(pm.moduleName.Equals("ModuleDeployableSolarPanel"))
+                                            {
+                                                if(pm.moduleValues.HasNode("powerCurve"))
+                                                {
+                                                    pm.moduleValues.RemoveNode("powerCurve");
+                                                    pm.moduleValues.AddNode(curveNode);
+                                                    print("Fixed " + ps.partName + " (vessel " + pv.vesselName + ")");
+                                                }
+                                        }
+                                        }
+                                    }
+                                }
+                            }
+                            catch (Exception e)
+                            {
+                                print("Solar panel fixing for current vessels failed: " + e.Message);
                             }
                         }
                     }
@@ -593,7 +647,7 @@ namespace RealSolarSystem
                         }
                         if (node.HasValue("staticPressureASL"))
                         {
-                            if (double.TryParse(node.GetValue("maxAtmosphereAltitude"), out dtmp))
+                            if (double.TryParse(node.GetValue("staticPressureASL"), out dtmp))
                                 body.staticPressureASL = dtmp;
                         }
                         if (node.HasValue("rotationPeriod"))
