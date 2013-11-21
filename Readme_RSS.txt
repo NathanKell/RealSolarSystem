@@ -42,6 +42,10 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
+v5.2  \/
+*Fixed Titan's atmosphere
+*Fixed solar panels (I hope)
+
 v5.1  \/
 *Fixed bug where scaledspace meshes were being faded too early (now missing planets appear)
 *Fixed Duna's atmosphere end height in the info box.
