@@ -45,6 +45,7 @@ Changelog
 v5.2  \/
 *Fixed Titan's atmosphere
 *Fixed solar panels (I hope)
+*Added configurable atmospheres per Starwaster's work.
 
 v5.1  \/
 *Fixed bug where scaledspace meshes were being faded too early (now missing planets appear)
