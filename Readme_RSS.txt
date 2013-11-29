@@ -42,6 +42,10 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
+v5.3  \/
+*Changed atmo editor to ALT-G
+*Fixed Mean Anomaly to be Mean Anomaly at Epoch
+
 v5.2  \/
 *Fixed Titan's atmosphere
 *Fixed solar panels (I hope)

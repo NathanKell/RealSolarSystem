@@ -707,10 +707,10 @@ namespace RealSolarSystem
                                 if (double.TryParse(onode.GetValue("eccentricity"), out dtmp))
                                     body.orbit.eccentricity = dtmp;
                             }
-                            if (onode.HasValue("meanAnomaly"))
+                            if (onode.HasValue("meanAnomalyAtEpoch"))
                             {
-                                if (double.TryParse(onode.GetValue("meanAnomaly"), out dtmp))
-                                    body.orbit.meanAnomaly = dtmp;
+                                if (double.TryParse(onode.GetValue("meanAnomalyAtEpoch"), out dtmp))
+                                    body.orbit.meanAnomalyAtEpoch = dtmp;
                             }
 
                             if (onode.HasValue("inclination"))
@@ -1382,7 +1382,7 @@ namespace RealSolarSystem
         private Boolean GUIOpen;
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.G))
+            if (Input.GetKeyDown(KeyCode.G) && Input.GetKeyDown(KeyCode.LeftAlt))
             {
                 GUIOpen = !GUIOpen;
             }
