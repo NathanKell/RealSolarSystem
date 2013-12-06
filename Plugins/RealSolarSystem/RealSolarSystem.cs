@@ -611,6 +611,14 @@ namespace RealSolarSystem
             }
 
             print("*RSS* fixing bodies");
+            double epoch = 0;
+            bool useEpoch = false;
+            if (RSSSettings.HasValue("Epoch"))
+                if (double.TryParse(RSSSettings.GetValue("Epoch"), out epoch))
+                    useEpoch = true;
+                else
+                    useEpoch = false;
+
             foreach (ConfigNode node in RSSSettings.nodes)
             {
                 foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
@@ -697,6 +705,9 @@ namespace RealSolarSystem
                         ConfigNode onode = node.GetNode("Orbit");
                         if (body.orbitDriver != null && body.orbit != null && onode != null)
                         {
+                            if(useEpoch)
+                                body.orbit.epoch = epoch;
+
                             if (onode.HasValue("semiMajorAxis"))
                             {
                                 if (double.TryParse(onode.GetValue("semiMajorAxis"), out dtmp))
@@ -707,12 +718,23 @@ namespace RealSolarSystem
                                 if (double.TryParse(onode.GetValue("eccentricity"), out dtmp))
                                     body.orbit.eccentricity = dtmp;
                             }
+                            bool anomFix = false;
                             if (onode.HasValue("meanAnomalyAtEpoch"))
                             {
                                 if (double.TryParse(onode.GetValue("meanAnomalyAtEpoch"), out dtmp))
+                                {
                                     body.orbit.meanAnomalyAtEpoch = dtmp;
+                                    anomFix = true;
+                                }
                             }
-
+                            if (onode.HasValue("meanAnomalyAtEpochD"))
+                            {
+                                if (double.TryParse(onode.GetValue("meanAnomalyAtEpochD"), out dtmp))
+                                {
+                                    body.orbit.meanAnomalyAtEpoch = dtmp * 0.0174532925199433;
+                                    anomFix = true;
+                                }
+                            }
                             if (onode.HasValue("inclination"))
                             {
                                 if (double.TryParse(onode.GetValue("inclination"), out dtmp))
@@ -753,6 +775,13 @@ namespace RealSolarSystem
                                     }
                                 }
                             }
+                            if (anomFix)
+                            {
+                                // assume eccentricity < 1.0
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch; // let KSP handle epoch
+                                body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / 6.2831853071795862;
+                                body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
+                            }
                         }
                         if (body.orbitDriver != null)
                         {
@@ -768,7 +797,7 @@ namespace RealSolarSystem
                                 body.sphereOfInfluence = double.PositiveInfinity;
                                 body.hillSphere = double.PositiveInfinity;
                             }
-                            body.orbitDriver.QueuedUpdate = true;
+                            // doesn't seem to do anything? - body.orbitDriver.QueuedUpdate = true;
                         }
                         body.CBUpdate();
 
