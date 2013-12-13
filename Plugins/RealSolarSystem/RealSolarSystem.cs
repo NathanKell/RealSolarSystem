@@ -97,7 +97,7 @@ namespace RealSolarSystem
         public static bool fixedSolar = false;
         public void Start()
         {
-            if (!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.SPACECENTER))
+            if (!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
             {
                 fixedSolar = true;
                 print("*RSS* Fixing Solar Panels");
@@ -650,6 +650,11 @@ namespace RealSolarSystem
                             if (double.TryParse(node.GetValue("GeeASL"), out dtmp))
                                 body.GeeASL = dtmp;
                         }
+                        if (node.HasValue("atmosphere"))
+                        {
+                            if (bool.TryParse(node.GetValue("atmosphere"), out btmp))
+                                body.atmosphere = btmp;
+                        }
                         if (node.HasValue("atmosphereScaleHeight"))
                         {
                             if (double.TryParse(node.GetValue("atmosphereScaleHeight"), out dtmp))
@@ -783,22 +788,7 @@ namespace RealSolarSystem
                                 body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
                             }
                         }
-                        if (body.orbitDriver != null)
-                        {
-                            if (body.referenceBody != null)
-                            {
-                                body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
-                                body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
-                                if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
-                                    body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
-                            }
-                            else
-                            {
-                                body.sphereOfInfluence = double.PositiveInfinity;
-                                body.hillSphere = double.PositiveInfinity;
-                            }
-                            // doesn't seem to do anything? - body.orbitDriver.QueuedUpdate = true;
-                        }
+                        // SOI and HillSphere done at end
                         body.CBUpdate();
 
                         if (body.Radius != origRadius)
@@ -1241,6 +1231,68 @@ namespace RealSolarSystem
                                     }
                                 }
                             }
+
+                            // Science
+                            if (node.HasNode("CelestialBodyScienceParams"))
+                            {
+                                ConfigNode spNode = node.GetNode("CelestialBodyScienceParams");
+                                if (body.scienceValues != null)
+                                {
+                                    foreach (ConfigNode.Value val in spNode.values)
+                                    {
+                                        // meh, for now hard-code it. Saves worry of GIGO.
+                                        /*if(body.scienceValues.GetType().GetField(val.name) != null)
+                                            if(float.TryParse(val.value, out ftmp))
+                                                body.scienceValues.GetType().GetField(val.name).SetValue(*/
+                                        if (spNode.HasValue("LandedDataValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("LandedDataValue"), out ftmp))
+                                                body.scienceValues.LandedDataValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("SplashedDataValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("SplashedDataValue"), out ftmp))
+                                                body.scienceValues.SplashedDataValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("FlyingLowDataValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("FlyingLowDataValue"), out ftmp))
+                                                body.scienceValues.FlyingLowDataValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("FlyingHighDataValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("FlyingHighDataValue"), out ftmp))
+                                                body.scienceValues.FlyingHighDataValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("InSpaceLowDataValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("InSpaceLowDataValue"), out ftmp))
+                                                body.scienceValues.InSpaceLowDataValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("InSpaceHighDataValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("InSpaceHighDataValue"), out ftmp))
+                                                body.scienceValues.InSpaceHighDataValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("RecoveryValue"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("RecoveryValue"), out ftmp))
+                                                body.scienceValues.RecoveryValue = ftmp;
+                                        }
+                                        if (spNode.HasValue("flyingAltitudeThreshold"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("flyingAltitudeThreshold"), out ftmp))
+                                                body.scienceValues.flyingAltitudeThreshold = ftmp;
+                                        }
+                                        if (spNode.HasValue("spaceAltitudeThreshold"))
+                                        {
+                                            if (float.TryParse(spNode.GetValue("spaceAltitudeThreshold"), out ftmp))
+                                                body.scienceValues.spaceAltitudeThreshold = ftmp;
+                                        }
+                                    }
+                                }
+                            }
+
                             // texture rebuild
                             if (node.HasNode("Export"))
                             {
@@ -1374,6 +1426,9 @@ namespace RealSolarSystem
                         {
                             body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
                             body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                            if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
+                                body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
+
                             body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
                         }
                         else
@@ -1381,7 +1436,7 @@ namespace RealSolarSystem
                             body.sphereOfInfluence = double.PositiveInfinity;
                             body.hillSphere = double.PositiveInfinity;
                         }
-                        body.orbitDriver.QueuedUpdate = true;
+                        // doesn't seem needed - body.orbitDriver.QueuedUpdate = true;
                     }
                     try
                     {

@@ -1,19 +1,16 @@
 Real Solar System WIP
+This mod will convert the Kerbol System into the Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
 
-Thanks to asmi for kicking me into to doing this and offering help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), to ZRM for many ideas and info, to yargnit for playtesting extraordinaire, and to everyone else who has been playtesting it so far in the Realism Overhaul thread and offered other help.
+Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
 
 I take no responsibility for this breaking anything, even if it weren't a WIP and totally in alpha stage.
 
 License: CC-BY-SA
 
+INSTALLATION:
 Extract to KSP/GameData.
-
-Start a new game and enjoy. Oh, and grab my Modular Fuels Continued v3 and set it to realistic Mass mode, or you'll have an even harder time than real life.
-
-YOU REALLY SHOULD USE FAR WITH THIS. And make sure you're not using KIDS to scale the Isps of anything. Deadly Reentry needs more powerful heatshields (WIP, check the thread).
-
-The planets are pretty blurry, BTW. I know.
+NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
 Planets included (no new graphics for now, excepting Kerbin and Mun)
 Mercury is represented by Moho
@@ -35,8 +32,9 @@ Pluto is represented by Vall
 
 Known bugs:
 *Parts are wobbly. Get Kerbal Joint Reinforcement by ferram
-*Sometimes you get a black screen trying to launch. Revert, close KSP, restart, try again.
+*Launch Clamps have issues. Make your own using radial decouplers, or place a stack decoupler under the bottom of your rocket and ring it with trusses.
 *Water disappears when looking right at it.
+*Terrain is smoother and gentler, and looks blurrier.
 *Doubled terrain on some planets (I haven't made new scaledspace meshes yet)
 
 Expect problems. But also expect glee.
@@ -44,7 +42,12 @@ Expect problems. But also expect glee.
 Changelog
 v5.3  \/
 *Changed atmo editor to ALT-G
-*Fixed Mean Anomaly to be Mean Anomaly at Epoch
+*Fixed Mean Anomaly to be Mean Anomaly at Epoch, fixed handling of it to actually work
+*Added new root-of-config property Epoch, for setting starting date. Now, KSP year 0 is 1950.
+*Support enabling/disabling atmosphere
+*Used metaphor's planet config changes
+*Added ability to change science parameters for all bodies (includes config by Medieval Nerd)
+*Fixed SOI not respecting minimums
 
 v5.2  \/
 *Fixed Titan's atmosphere
