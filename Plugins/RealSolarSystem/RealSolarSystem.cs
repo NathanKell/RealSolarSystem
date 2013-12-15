@@ -139,8 +139,8 @@ namespace RealSolarSystem
                                     {
                                         if (node.HasValue("name") && node.GetValue("name").Equals("ModuleDeployableSolarPanel"))
                                         {
-                                            pNode.RemoveNode("powerCurve");
-                                            pNode.AddNode(curveNode);
+                                            node.RemoveNode("powerCurve");
+                                            node.AddNode(curveNode);
                                             print("Fixed part config " + pNode.GetValue("name") + " (" + pNode.GetValue("title") + ")");
                                         }
                                     }
