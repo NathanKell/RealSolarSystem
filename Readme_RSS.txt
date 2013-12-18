@@ -40,6 +40,10 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
+v5.4 \/
+*Solar panels finally fixed (really!) thanks to StarWaster.
+*Fixed atmo editor keychange
+
 v5.3  \/
 *Changed atmo editor to ALT-G
 *Fixed Mean Anomaly to be Mean Anomaly at Epoch, fixed handling of it to actually work

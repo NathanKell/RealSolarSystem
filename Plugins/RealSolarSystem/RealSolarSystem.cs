@@ -1114,6 +1114,30 @@ namespace RealSolarSystem
                                                         {
                                                             mod.repositionRadial = KSPUtil.ParseVector3(modNode.GetValue("repositionRadial"));
                                                         }
+                                                        if (modNode.HasValue("reorientInitialUp"))
+                                                        {
+                                                            mod.reorientInitialUp = KSPUtil.ParseVector3(modNode.GetValue("reorientInitialUp"));
+                                                        }
+                                                        if (modNode.HasValue("repositionToSphere"))
+                                                        {
+                                                            if (bool.TryParse(modNode.GetValue("repositionToSphere"), out btmp))
+                                                                mod.repositionToSphere = btmp;
+                                                        }
+                                                        if (modNode.HasValue("repositionToSphereSurface"))
+                                                        {
+                                                            if (bool.TryParse(modNode.GetValue("repositionToSphereSurface"), out btmp))
+                                                                mod.repositionToSphereSurface = btmp;
+                                                        }
+                                                        if (modNode.HasValue("reorientToSphere"))
+                                                        {
+                                                            if (bool.TryParse(modNode.GetValue("reorientToSphere"), out btmp))
+                                                                mod.reorientToSphere = btmp;
+                                                        }
+                                                        if (modNode.HasValue("repositionRadiusOffset"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("repositionRadiusOffset"), out dtmp))
+                                                                mod.repositionRadiusOffset = dtmp;
+                                                        }
                                                         if (modNode.HasValue("lodvisibleRangeMult"))
                                                         {
                                                             if (double.TryParse(modNode.GetValue("lodvisibleRangeMult"), out dtmp))
@@ -1466,7 +1490,7 @@ namespace RealSolarSystem
         private Boolean GUIOpen;
         public void Update()
         {
-            if (Input.GetKeyDown(KeyCode.G) && Input.GetKeyDown(KeyCode.LeftAlt))
+            if (Input.GetKeyDown(KeyCode.G) && Input.GetKey(KeyCode.LeftAlt))
             {
                 GUIOpen = !GUIOpen;
             }
