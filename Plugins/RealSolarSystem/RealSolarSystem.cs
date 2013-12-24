@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Linq;
 using UnityEngine;
 using KSP;
@@ -12,8 +13,14 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class CameraFixer : MonoBehaviour
     {
+        public static bool ready = false;
         public void Start()
         {
+            if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
+                ready = true;
+            if (!ready)
+                return;
+
             if (HighLogic.LoadedSceneHasPlanetarium && PlanetariumCamera.fetch)
             {
                 print("*RSS* Fixing PCam. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
@@ -218,7 +225,7 @@ namespace RealSolarSystem
                 return;
             //currentTime = Planetarium.GetUniversalTime();
             //if(currentTime > lastTime + 1)
-            if (Input.GetKeyDown(KeyCode.S) && Input.GetKey(KeyCode.LeftAlt))
+            /*if (Input.GetKeyDown(KeyCode.S) && Input.GetKey(KeyCode.LeftAlt))
             {
                 print("*SST* Printing Scaled Space transforms");
                 foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
@@ -227,12 +234,12 @@ namespace RealSolarSystem
                 }
                 foreach (ScaledSpaceFader ssf in Resources.FindObjectsOfTypeAll(typeof(ScaledSpaceFader)))
                     Utils.DumpSSF(ssf);
-            }
+            }*/
             /*if(HighLogic.LoadedSceneHasPlanetarium && PlanetariumCamera.fetch)
                 PlanetariumCamera.fetch.maxDistance = 1500000000f;*/
 
             // PQS dump
-            if (HighLogic.LoadedSceneIsFlight && Input.GetKeyDown(KeyCode.P) && Input.GetKey(KeyCode.LeftAlt))
+            /*if (HighLogic.LoadedSceneIsFlight && Input.GetKeyDown(KeyCode.P) && Input.GetKey(KeyCode.LeftAlt))
             {
                 if (FlightGlobals.ActiveVessel != null && FlightGlobals.ActiveVessel.mainBody != null)
                 {
@@ -241,11 +248,11 @@ namespace RealSolarSystem
                     else
                         Utils.DumpPQS(FlightGlobals.ActiveVessel.mainBody.pqsController);
                 }
-            }
+            }*/
 
 
             // Fix Timewarp
-            if (!fixedTimeWarp && TimeWarp.fetch)
+            if (!fixedTimeWarp && TimeWarp.fetch != null)
             {
                 fixedTimeWarp = true;
                 ConfigNode twNode = null;
@@ -286,7 +293,7 @@ namespace RealSolarSystem
         }
     }
 
-    public class Utils : MonoBehaviour
+    /*public class Utils : MonoBehaviour
     {
         public static void DumpSSF(ScaledSpaceFader ssf)
         {
@@ -348,24 +355,6 @@ namespace RealSolarSystem
             print("zUpAngularVelocity = " + body.zUpAngularVelocity);
             print("pqsController = " + body.pqsController);
             print("terrainController = " + body.terrainController);
-            /*if (body.terrainController != null)
-            {
-                print("PQSController: ");
-                print("circ = " + body.terrainController.circ);
-                print("horizonAngle = " + body.terrainController.horizonAngle);
-                print("horizonDistance = " + body.terrainController.horizonDistance);
-                print("parameterScaleFactor = " + body.terrainController.parameterScaleFactor);
-                print("quadSize = " + body.terrainController.quadSize);
-                print("radius = " + body.terrainController.radius);
-                print("sphereColliderRadiusOffset = " + body.terrainController.sphereColliderRadiusOffset);
-                print("visibleRadius = " + body.terrainController.visibleRadius);
-                print("waterLevel = " + body.terrainController.waterLevel);
-                print("waterThreshold = " + body.terrainController.waterThreshold);
-            }*/
-            /*if (body.pqsController != null)
-            {
-                DumpPQS(body.pqsController);
-            }*/
         }
         public static void DumpPQS(PQS pqs)
         {
@@ -381,8 +370,6 @@ namespace RealSolarSystem
             print("isThinking = " + pqs.isThinking);
             print("quadAllowBuild = " + pqs.quadAllowBuild);
             print("surfaceRelativeQuads = " + pqs.surfaceRelativeQuads);
-            print("useCustomNormals = " + pqs.useCustomNormals);
-            print("useQuadUV = " + pqs.useQuadUV);
             print("useSharedMaterial = " + pqs.useSharedMaterial);
             print("circumference = " + pqs.circumference);
             // double
@@ -463,7 +450,7 @@ namespace RealSolarSystem
                     print("key," + i + " = " + c.keys[i].time + " " + c.keys[i].value + " " + c.keys[i].inTangent + " " + c.keys[i].outTangent);
 
         }
-    }
+    }*/
 
     public class CBRotation
     {
@@ -553,6 +540,8 @@ namespace RealSolarSystem
     [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(RealSolarSystem))]
     public class RealSolarSystem : MonoBehaviour
     {
+        public static Dictionary<AtmosphereFromGround, bool> afgBools;
+        public static bool doneRSS = false;
         public void UpdateMass(CelestialBody body)
         {
             double rsq = body.Radius * body.Radius;
@@ -574,6 +563,8 @@ namespace RealSolarSystem
         public static bool done = false;
         public void Start()
         {
+            afgBools = new Dictionary<AtmosphereFromGround,bool>();
+
             ConfigNode RSSSettings = null;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
@@ -1164,6 +1155,7 @@ namespace RealSolarSystem
                             }
                             foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
                             {
+                                //print("*RSS* Found AG " + ag.name + " " + (ag.tag == null ? "" : ag.tag) + ". Planet " + (ag.planet == null ? "NULL" : ag.planet.name));
                                 if (ag != null && ag.planet != null)
                                 {
                                     // generalized version of Starwaster's code. Thanks Starwaster!
@@ -1236,6 +1228,8 @@ namespace RealSolarSystem
                                         ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
                                         ag.scaleDepth = -0.25f;
                                         ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
+                                        afgBools[ag] = ag.DEBUG_alwaysUpdateAll;
+                                        ag.DEBUG_alwaysUpdateAll = true;
                                         print("Atmo updated");
                                     }
                                 }
@@ -1477,6 +1471,7 @@ namespace RealSolarSystem
                 }
             }
             print("*RSS* Done loading!");
+            doneRSS = true;
         }
 
     }
@@ -1488,10 +1483,15 @@ namespace RealSolarSystem
         private static GUIStyle windowStyle = null;
         private AtmosphereFromGround afg = null;
         private Boolean GUIOpen;
+        private bool origUpdateBool;
         public void Update()
         {
             if (Input.GetKeyDown(KeyCode.G) && Input.GetKey(KeyCode.LeftAlt))
             {
+                if(!GUIOpen)
+                    origUpdateBool = afg.DEBUG_alwaysUpdateAll;
+                else
+                    afg.DEBUG_alwaysUpdateAll = origUpdateBool;
                 GUIOpen = !GUIOpen;
             }
         }
@@ -1511,6 +1511,15 @@ namespace RealSolarSystem
 
         public void Start()
         {
+            if (RealSolarSystem.doneRSS && RealSolarSystem.afgBools.Count > 0)
+            {
+                foreach (KeyValuePair<AtmosphereFromGround, bool> k in RealSolarSystem.afgBools)
+                {
+                    if (k.Key != null)
+                        k.Key.DEBUG_alwaysUpdateAll = k.Value;
+                }
+                RealSolarSystem.afgBools.Clear();
+            }
             if (afg == null)
                 afg = findAFG();
             //print("[AFGEditor] Start()");
