@@ -40,6 +40,9 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
+v5.5 \/
+*Fixed for KSP 0.23
+
 v5.4 \/
 *Solar panels finally fixed (really!) thanks to StarWaster.
 *Fixed atmo editor keychange
