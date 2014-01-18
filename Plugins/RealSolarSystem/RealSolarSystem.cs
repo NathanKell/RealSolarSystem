@@ -1208,13 +1208,13 @@ namespace RealSolarSystem
 
                                             if (modNode.HasValue("invWaveLength"))
                                             {
-                                                Vector3 col = KSPUtil.ParseVector3(modNode.GetValue("invWaveLength"));
-                                                ag.invWaveLength = new Color(col.x, col.y, col.z);
+                                                Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
+                                                ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
                                             }
                                             if (modNode.HasValue("waveLength"))
                                             {
-                                                Vector3 col = KSPUtil.ParseVector3(modNode.GetValue("waveLength"));
-                                                ag.waveLength = new Color(col.x, col.y, col.z);
+                                                Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
+                                                ag.waveLength = new Color(col.x, col.y, col.z, col.w);
                                             }
                                         }
                                         else

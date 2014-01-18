@@ -40,10 +40,14 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
-v5.5 \/
+v5.6  \/
+*Fixed wavelenght color parsing to take four arguments (colors are RGBA after all)
+*Added compatibility patches for VisualEnhancements and (thanks, jrandom!) SCANSat
+ 
+v5.5  \/
 *Fixed for KSP 0.23
 
-v5.4 \/
+v5.4  \/
 *Solar panels finally fixed (really!) thanks to StarWaster.
 *Fixed atmo editor keychange
 
