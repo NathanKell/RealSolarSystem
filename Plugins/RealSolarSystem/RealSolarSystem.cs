@@ -16,6 +16,18 @@ namespace RealSolarSystem
         public static bool ready = false;
         public void Start()
         {
+            foreach (AtmosphereFromSpace afs in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromSpace)))
+            {
+                try
+                {
+                    print("Found afs " + afs.name + ", tag " + afs.tag);
+                    print("   Parent: " + afs.transform.parent.name);
+                }
+                catch (Exception e)
+                {
+                    print("Failed, " + e.Message);
+                }
+            }
             if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
                 ready = true;
             if (!ready)
@@ -435,8 +447,30 @@ namespace RealSolarSystem
         public static void DumpSST(Transform t)
         {
             print("Transform  = " + t.name);
-            print("Scale = " + t.localScale.x + ", " + t.localScale.y + ", " + t.localScale.z);
-            print("Pos = " + t.position + "; lPos = " + t.localPosition);
+            print("Scale = (" + t.localScale.x + ", " + t.localScale.y + ", " + t.localScale.z + ")");
+            print("Pos = (" + t.position.x + ", " + t.position.y + ", " + t.position.z + "); lPos = (" + t.localPosition.x + ", " + t.localPosition.y + ", " + t.localPosition.z + ")");
+            PrintComponents(t);
+        }
+        public static void DumpAllSST()
+        {
+            print("*RSS* Dumping ScaledSpace");
+            if (ScaledSpace.Instance != null)
+            {
+                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                    DumpSST(t);
+            }
+        }
+        void PrintComponents(Transform t)
+        {
+            print("Transform " + t.name + " has components:");
+            foreach (Component c in t.GetComponents(typeof(Component)).ToList())
+                print(c.name + " (" + c.GetType() + ")");
+        }
+        void PrintTransformRecursive(Transform t)
+        {
+            PrintComponents(t);
+            for (int i = 0; i < t.transform.childCount; i++)
+                PrintTransformRecursive(t.transform.GetChild(i));
         }
 
         public static void dumpKeys(AnimationCurve c)
@@ -537,11 +571,24 @@ namespace RealSolarSystem
         }
     }*/
 
+
     [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(RealSolarSystem))]
     public class RealSolarSystem : MonoBehaviour
     {
-        public static Dictionary<AtmosphereFromGround, bool> afgBools;
         public static bool doneRSS = false;
+
+        public Vector3 LLAtoECEF(double lat, double lon, double alt, double radius)
+        {
+            const double degreesToRadians =  Math.PI / 180.0;
+            lat = (lat-90) * degreesToRadians;
+            lon *= degreesToRadians;
+            double x, y, z;
+            double n = radius; // for now, it's still a sphere, so just the radius
+            x = (n + alt) * -1.0 * Math.Sin(lat) * Math.Cos(lon);
+            y = (n + alt) * Math.Cos(lat); // for now, it's still a sphere, so no eccentricity
+            z = (n + alt) * -1.0 * Math.Sin(lat) * Math.Sin(lon);
+            return new Vector3((float)x, (float)y, (float)z);
+        }
         public void UpdateMass(CelestialBody body)
         {
             double rsq = body.Radius * body.Radius;
@@ -563,7 +610,6 @@ namespace RealSolarSystem
         public static bool done = false;
         public void Start()
         {
-            afgBools = new Dictionary<AtmosphereFromGround,bool>();
 
             ConfigNode RSSSettings = null;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
@@ -575,31 +621,6 @@ namespace RealSolarSystem
             /*print("*RSS* Printing CBTs");
             foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                 Utils.DumpCBT(c);*/
-
-            // thanks to asmi for this!
-            print("*RSS* fixing Kerbin mapdecals");
-            // HARDCODED FOR NOW
-            // For now does only Kerbin, and rescales ALL mapdecals.
-            if (!kerbinMapDecalsDone && RSSSettings.GetNode("Kerbin") != null)
-            {
-                var mapDecals = FindObjectsOfType(typeof(PQSMod_MapDecalTangent)).OfType<PQSMod_MapDecalTangent>();
-                foreach (var mapDecal in mapDecals)
-                {
-                    foreach (CelestialBody b in FlightGlobals.Bodies)
-                        if (b.name.Equals("Kerbin"))
-                        {
-                            ConfigNode knode = RSSSettings.GetNode("Kerbin");
-                            double radius;
-                            if (knode.HasValue("Radius") && double.TryParse(knode.GetValue("Radius"), out radius))
-                            {
-                                mapDecal.position *= (float)(radius / b.Radius);
-                                mapDecal.radius *= (radius / b.Radius);
-                            }
-                            break;
-                        }
-                }
-                kerbinMapDecalsDone = true;
-            }
 
             print("*RSS* fixing bodies");
             double epoch = 0;
@@ -622,6 +643,7 @@ namespace RealSolarSystem
                         int itmp;
                         bool btmp;
                         double origRadius = body.Radius;
+                        double origAtmo = body.maxAtmosphereAltitude;
                         if (node.HasValue("Radius"))
                         {
                             if (double.TryParse(node.GetValue("Radius"), out dtmp))
@@ -701,7 +723,7 @@ namespace RealSolarSystem
                         ConfigNode onode = node.GetNode("Orbit");
                         if (body.orbitDriver != null && body.orbit != null && onode != null)
                         {
-                            if(useEpoch)
+                            if (useEpoch)
                                 body.orbit.epoch = epoch;
 
                             if (onode.HasValue("semiMajorAxis"))
@@ -907,7 +929,48 @@ namespace RealSolarSystem
                                         // Oh well. Hacks are quicker.
                                         {
                                             ConfigNode pqsNode = node.GetNode("PQS").GetNode(pName);
-                                            var mods = ((MonoBehaviour)p).transform.GetComponentsInChildren(typeof(PQSMod), true);
+
+                                            // PQS members
+                                            if(pqsNode.HasValue("maxLevel"))
+                                            {
+                                                if (int.TryParse(pqsNode.GetValue("maxLevel"), out itmp))
+                                                {
+                                                    p.maxLevel = itmp;
+                                                    PQSCache.PresetList.GetPreset(p.name).maxSubdivision = itmp;
+                                                }
+                                            }
+                                            if (pqsNode.HasValue("maxQuadLenghtsPerFrame"))
+                                            {
+                                                if (float.TryParse(pqsNode.GetValue("maxQuadLenghtsPerFrame"), out ftmp))
+                                                {
+                                                    p.maxQuadLenghtsPerFrame = ftmp;
+                                                }
+                                            }
+                                            if (pqsNode.HasValue("visRadAltitudeMax"))
+                                            {
+                                                if (double.TryParse(pqsNode.GetValue("visRadAltitudeMax"), out dtmp))
+                                                {
+                                                    p.visRadAltitudeMax = dtmp;
+                                                }
+                                            }
+                                            if (pqsNode.HasValue("visRadAltitudeValue"))
+                                            {
+                                                if (double.TryParse(pqsNode.GetValue("visRadAltitudeValue"), out dtmp))
+                                                {
+                                                    p.visRadAltitudeValue = dtmp;
+                                                }
+                                            }
+                                            if (pqsNode.HasValue("visRadSeaLevelValue"))
+                                            {
+                                                if (double.TryParse(pqsNode.GetValue("visRadSeaLevelValue"), out dtmp))
+                                                {
+                                                    p.visRadSeaLevelValue = dtmp;
+                                                }
+                                            }
+
+
+                                            // PQSMods
+                                            var mods = p.transform.GetComponentsInChildren(typeof(PQSMod), true);
                                             foreach (var m in mods)
                                             {
                                                 foreach (ConfigNode modNode in pqsNode.nodes)
@@ -1006,6 +1069,23 @@ namespace RealSolarSystem
                                                             if (double.TryParse(modNode.GetValue("heightMapDeformity"), out dtmp))
                                                                 mod.heightMapDeformity = dtmp;
                                                         }
+                                                        if (modNode.HasValue("heightMapOffset"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("heightMapOffset"), out dtmp))
+                                                                mod.heightMapOffset = dtmp;
+                                                            print("*RSS* Set offset " + mod.heightMapOffset);
+                                                        }
+                                                        if (modNode.HasValue("heightMap"))
+                                                        {
+                                                            Texture2D map = new Texture2D(4,4, TextureFormat.Alpha8, false);
+                                                            map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
+                                                            //print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
+                                                            //System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
+                                                            //DestroyImmediate(mod.heightMap);
+                                                            //mod.heightMap = ScriptableObject.CreateInstance<MapSO>();
+                                                            mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
+                                                            DestroyImmediate(map);
+                                                        }
                                                         mod.OnSetup();
                                                     }
                                                     if (modNode.name.Equals("PQSMod_AltitudeAlpha") && m.GetType().ToString().Equals(modNode.name))
@@ -1092,18 +1172,173 @@ namespace RealSolarSystem
                                                         }
                                                         mod.OnSetup();
                                                     }
+                                                    if (modNode.name.Equals("PQSLandControl") && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        PQSLandControl mod = m as PQSLandControl;
+
+                                                        if (modNode.HasValue("vHeightMax"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("vHeightMax"), out ftmp))
+                                                                mod.vHeightMax = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("altitudeBlend"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("altitudeBlend"), out ftmp))
+                                                                mod.altitudeBlend = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("altitudeFrequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("altitudeFrequency"), out ftmp))
+                                                                mod.altitudeFrequency = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("altitudePersistance"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("altitudePersistance"), out ftmp))
+                                                                mod.altitudePersistance = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("latitudeBlend"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("latitudeBlend"), out ftmp))
+                                                                mod.latitudeBlend = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("latitudeFrequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("latitudeFrequency"), out ftmp))
+                                                                mod.latitudeFrequency = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("latitudePersistance"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("latitudePersistance"), out ftmp))
+                                                                mod.latitudePersistance = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("longitudeBlend"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("longitudeBlend"), out ftmp))
+                                                                mod.longitudeBlend = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("longitudeFrequency"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("longitudeFrequency"), out ftmp))
+                                                                mod.longitudeFrequency = ftmp;
+                                                        }
+                                                        if (modNode.HasValue("longitudePersistance"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("longitudePersistance"), out ftmp))
+                                                                mod.longitudePersistance = ftmp;
+                                                        }
+                                                        foreach (ConfigNode lcNode in modNode.GetNodes("LandClass"))
+                                                        {
+                                                            bool found = false;
+                                                            string lcName = lcNode.GetValue("landClassName");
+                                                            foreach (PQSLandControl.LandClass lc in mod.landClasses)
+                                                            {
+                                                                if (lc.landClassName.Equals(lcName))
+                                                                {
+                                                                    found = true;
+                                                                    if (lcNode.HasValue("color"))
+                                                                    {
+                                                                        Vector4 col = KSPUtil.ParseVector4(lcNode.GetValue("color"));
+                                                                        lc.color = new Color(col.x, col.y, col.z, col.w);
+                                                                    }
+                                                                    if (lcNode.HasValue("noiseColor"))
+                                                                    {
+                                                                        Vector4 col = KSPUtil.ParseVector4(lcNode.GetValue("noiseColor"));
+                                                                        lc.noiseColor = new Color(col.x, col.y, col.z, col.w);
+                                                                    }
+
+                                                                    // ranges
+                                                                    if(lcNode.HasNode("altitudeRange"))
+                                                                    {
+                                                                        ConfigNode range = lcNode.GetNode("altitudeRange");
+                                                                        if (range.HasValue("startStart"))
+                                                                            if (double.TryParse(range.GetValue("startStart"), out dtmp))
+                                                                                lc.altitudeRange.startStart = dtmp;
+                                                                        if (range.HasValue("startEnd"))
+                                                                            if (double.TryParse(range.GetValue("startEnd"), out dtmp))
+                                                                                lc.altitudeRange.startEnd = dtmp;
+                                                                        if (range.HasValue("endStart"))
+                                                                            if (double.TryParse(range.GetValue("endStart"), out dtmp))
+                                                                                lc.altitudeRange.endStart = dtmp;
+                                                                        if (range.HasValue("endEnd"))
+                                                                            if (double.TryParse(range.GetValue("endEnd"), out dtmp))
+                                                                                lc.altitudeRange.endEnd = dtmp;
+                                                                    }
+                                                                    if (lcNode.HasNode("latitudeRange"))
+                                                                    {
+                                                                        ConfigNode range = lcNode.GetNode("latitudeRange");
+                                                                        if (range.HasValue("startStart"))
+                                                                            if (double.TryParse(range.GetValue("startStart"), out dtmp))
+                                                                                lc.latitudeRange.startStart = dtmp;
+                                                                        if (range.HasValue("startEnd"))
+                                                                            if (double.TryParse(range.GetValue("startEnd"), out dtmp))
+                                                                                lc.latitudeRange.startEnd = dtmp;
+                                                                        if (range.HasValue("endStart"))
+                                                                            if (double.TryParse(range.GetValue("endStart"), out dtmp))
+                                                                                lc.latitudeRange.endStart = dtmp;
+                                                                        if (range.HasValue("endEnd"))
+                                                                            if (double.TryParse(range.GetValue("endEnd"), out dtmp))
+                                                                                lc.latitudeRange.endEnd = dtmp;
+                                                                    }
+                                                                    if (lcNode.HasNode("longitudeRange"))
+                                                                    {
+                                                                        ConfigNode range = lcNode.GetNode("longitudeRange");
+                                                                        if (range.HasValue("startStart"))
+                                                                            if (double.TryParse(range.GetValue("startStart"), out dtmp))
+                                                                                lc.longitudeRange.startStart = dtmp;
+                                                                        if (range.HasValue("startEnd"))
+                                                                            if (double.TryParse(range.GetValue("startEnd"), out dtmp))
+                                                                                lc.longitudeRange.startEnd = dtmp;
+                                                                        if (range.HasValue("endStart"))
+                                                                            if (double.TryParse(range.GetValue("endStart"), out dtmp))
+                                                                                lc.longitudeRange.endStart = dtmp;
+                                                                        if (range.HasValue("endEnd"))
+                                                                            if (double.TryParse(range.GetValue("endEnd"), out dtmp))
+                                                                                lc.longitudeRange.endEnd = dtmp;
+                                                                    }
+                                                                    if (lcNode.HasValue("latitudeDouble"))
+                                                                    {
+                                                                        if (bool.TryParse(lcNode.GetValue("latitudeDouble"), out btmp))
+                                                                            lc.latitudeDouble = btmp;
+                                                                    }
+                                                                    if (lcNode.HasValue("minimumRealHeight"))
+                                                                        if (double.TryParse(lcNode.GetValue("minimumRealHeight"), out dtmp))
+                                                                            lc.minimumRealHeight = dtmp;
+                                                                    if (lcNode.HasValue("alterRealHeight"))
+                                                                        if (double.TryParse(lcNode.GetValue("alterRealHeight"), out dtmp))
+                                                                            lc.alterRealHeight = dtmp;
+                                                                    if (lcNode.HasValue("alterApparentHeight"))
+                                                                        if (float.TryParse(lcNode.GetValue("alterApparentHeight"), out ftmp))
+                                                                            lc.alterApparentHeight = ftmp;
+
+
+                                                                    break; // don't need to find any more
+                                                                }
+                                                            }
+                                                            if (!found)
+                                                                print("*RSS* LandClass " + lcName + " not found in PQSLandControl for PQS " + p.name + " of CB " + body.name);
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
 
                                                     // City
                                                     if (modNode.name.Equals("PQSCity") && m.GetType().ToString().Equals(modNode.name))
                                                     {
                                                         PQSCity mod = m as PQSCity;
                                                         if (modNode.HasValue("KEYname"))
-                                                            if(!(mod.name.Equals(modNode.GetValue("KEYname"))))
+                                                            if (!(mod.name.Equals(modNode.GetValue("KEYname"))))
                                                                 continue;
 
                                                         if (modNode.HasValue("repositionRadial"))
                                                         {
                                                             mod.repositionRadial = KSPUtil.ParseVector3(modNode.GetValue("repositionRadial"));
+                                                        }
+                                                        if (modNode.HasValue("latitude") && modNode.HasValue("longitude"))
+                                                        {
+                                                            double lat, lon;
+                                                            double.TryParse(modNode.GetValue("latitude"), out lat);
+                                                            double.TryParse(modNode.GetValue("longitude"), out lon);
+
+                                                            mod.repositionRadial = LLAtoECEF(lat, lon, 0, body.Radius);
                                                         }
                                                         if (modNode.HasValue("reorientInitialUp"))
                                                         {
@@ -1135,7 +1370,113 @@ namespace RealSolarSystem
                                                                 foreach (PQSCity.LODRange l in mod.lod)
                                                                     l.visibleRange *= (float)dtmp;
                                                         }
+
+                                                        if (modNode.HasValue("reorientFinalAngle"))
+                                                        {
+                                                            if (float.TryParse(modNode.GetValue("reorientFinalAngle"), out ftmp))
+                                                                mod.reorientFinalAngle = ftmp;
+                                                        }
+                                                        
                                                         mod.OnSetup();
+                                                    }
+                                                    // KSC Flat area
+                                                    if(modNode.name.Equals("PQSMod_MapDecalTangent")  && m.GetType().ToString().Equals(modNode.name))
+                                                    {
+                                                        // thanks to asmi for this!
+                                                        PQSMod_MapDecalTangent mod = m as PQSMod_MapDecalTangent;
+                                                        if (modNode.HasValue("position"))
+                                                        {
+                                                            mod.position = KSPUtil.ParseVector3(modNode.GetValue("position"));
+                                                        }
+                                                        if (modNode.HasValue("radius"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("radius"), out dtmp))
+                                                                mod.radius = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("heightMapDeformity"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("heightMapDeformity"), out dtmp))
+                                                                mod.heightMapDeformity = dtmp;
+                                                        }
+                                                        if (modNode.HasValue("absoluteOffset"))
+                                                        {
+                                                            if (double.TryParse(modNode.GetValue("absoluteOffset"), out dtmp))
+                                                                mod.absoluteOffset = dtmp;
+                                                        }
+
+                                                        if (modNode.HasValue("absolute"))
+                                                        {
+                                                            if (bool.TryParse(modNode.GetValue("absolute"), out btmp))
+                                                                mod.absolute = btmp;
+                                                        }
+                                                        if(modNode.HasValue("rescaleToRadius"))
+                                                        {
+                                                            mod.position *= (float)(body.Radius / origRadius);
+                                                            mod.radius *= (body.Radius / origRadius);
+                                                        }
+                                                        if (modNode.HasValue("latitude") && modNode.HasValue("longitude"))
+                                                        {
+                                                            double lat, lon;
+                                                            double.TryParse(modNode.GetValue("latitude"), out lat);
+                                                            double.TryParse(modNode.GetValue("longitude"), out lon);
+
+                                                            mod.position = LLAtoECEF(lat, lon, 0, body.Radius);
+                                                        }
+                                                        mod.OnSetup();
+                                                    }
+                                                }
+                                            }
+                                            if (pqsNode.HasNode("Add"))
+                                            {
+                                                foreach (ConfigNode modNode in pqsNode.GetNode("Add").nodes)
+                                                {
+                                                    if (modNode.name.Equals("PQSMod_VertexColorMapBlend"))
+                                                    {
+                                                        /*CelestialBody cbDuna = null;
+                                                        foreach (CelestialBody b in FlightGlobals.Bodies)
+                                                            if (b.name.Equals("Duna"))
+                                                                cbDuna = b;
+
+                                                        PQSMod_VertexColorMapBlend dunaColor = cbDuna.transform.GetComponentInChildren<PQSMod_VertexColorMapBlend>();*/
+                                                        GameObject tempObj = new GameObject();
+
+
+                                                        PQSMod_VertexColorMapBlend colorMap = (PQSMod_VertexColorMapBlend)tempObj.AddComponent(typeof(PQSMod_VertexColorMapBlend));
+
+                                                        tempObj.transform.parent = p.gameObject.transform;
+                                                        colorMap.sphere = p;
+
+                                                        Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
+                                                        map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("vertexColorMap")));
+                                                        colorMap.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
+                                                        colorMap.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
+                                                        
+                                                        colorMap.blend = 1.0f;
+                                                        if (modNode.HasValue("blend"))
+                                                            if (float.TryParse(modNode.GetValue("blend"), out ftmp))
+                                                                colorMap.blend = ftmp;
+                                                        
+                                                        colorMap.order = 9999993;
+                                                        if (modNode.HasValue("order"))
+                                                            if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                                colorMap.order = itmp;
+
+                                                        colorMap.modEnabled = true;
+                                                        DestroyImmediate(map);
+                                                    }
+                                                }
+                                            }
+                                            if (pqsNode.HasNode("Disable"))
+                                            {
+                                                foreach (ConfigNode modNode in pqsNode.GetNode("Disable").nodes)
+                                                {
+                                                    if (modNode.name.Equals("PQSLandControl"))
+                                                    {
+                                                        List<PQSLandControl> modList = p.transform.GetComponentsInChildren<PQSLandControl>(true).ToList();
+                                                        foreach (PQSLandControl m in modList)
+                                                        {
+                                                            m.modEnabled = false;
+                                                        }
                                                     }
                                                 }
                                             }
@@ -1228,8 +1569,9 @@ namespace RealSolarSystem
                                         ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
                                         ag.scaleDepth = -0.25f;
                                         ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
-                                        afgBools[ag] = ag.DEBUG_alwaysUpdateAll;
-                                        ag.DEBUG_alwaysUpdateAll = true;
+                                        MethodInfo setMaterial = ag.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
+                                        setMaterial.Invoke(ag, new object[] { true });
+
                                         print("Atmo updated");
                                     }
                                 }
@@ -1240,12 +1582,96 @@ namespace RealSolarSystem
                                 float SSTScale = 1.0f;
                                 if (node.HasValue("SSTScale"))
                                     float.TryParse(node.GetValue("SSTScale"), out SSTScale);
-                                SSTScale *= (float)(body.Radius / origRadius);
                                 foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                                 {
+                                    print("*RSS* For " + t.name + ", Shader = " + t.gameObject.renderer.material.shader.name);
                                     if (t.name.Equals(node.name))
                                     {
-                                        t.localScale = new Vector3(t.localScale.x * SSTScale, t.localScale.y * SSTScale, t.localScale.z * SSTScale);
+                                        // replace
+                                        int replaceColor = 0;
+                                        string path = "";
+                                        if (node.HasValue("SSColor"))
+                                        {
+                                            replaceColor = 1;
+                                            path = node.GetValue("SSColor");
+                                        }
+                                        if (node.HasValue("SSColor32"))
+                                        {
+                                            replaceColor = 2;
+                                            path = node.GetValue("SSColor32");
+                                        }
+                                        if (replaceColor > 0)
+                                        {
+                                            Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
+                                            map.LoadImage(System.IO.File.ReadAllBytes(path));
+                                            map.Compress(true);
+                                            map.Apply(true, true);
+                                            Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
+                                            foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                            {
+                                                if(m.GetTexture("_MainTex") == oldColor)
+                                                    m.SetTexture("_MainTex", map);
+                                            }
+                                            DestroyImmediate(oldColor);
+                                            // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
+                                        }
+                                        if (node.HasValue("SSBump"))
+                                        {
+                                            Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                                            map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
+                                            //map.Compress(true);
+                                            map.Apply(true, true);
+                                            Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
+                                            foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                            {
+                                                if(m.GetTexture("_BumpMap") == oldBump)
+                                                    m.SetTexture("_BumpMap", map);
+                                            }
+                                            DestroyImmediate(oldBump);
+                                            // t.gameObject.renderer.material.SetTexture("_BumpMap", map);
+                                        }
+
+                                        // Fix mesh
+                                        bool rescale = true;
+                                        if (body.pqsController != null)
+                                        {
+                                            //MeshFilter[] meshes = t.GetComponentsInChildren<MeshFilter>();
+                                            try
+                                            {
+                                                MeshFilter m = t.gameObject.GetComponentInChildren<MeshFilter>();
+                                                if (m == null || m.mesh == null)
+                                                {
+                                                    print("*RSS* Failure wrapping " + body.pqsController.name + ": mesh is null");
+                                                }
+                                                else
+                                                {
+                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
+                                                    PQSMeshWrapper w = new PQSMeshWrapper();
+                                                    w.targetPQS = body.pqsController;
+                                                    w.outputRadius = body.Radius * ScaledSpace.InverseScaleFactor * SSTScale;
+                                                    w.sphereMesh = m.mesh;
+                                                    Mesh newMesh = w.CreateWrappedMesh();
+                                                    m.mesh = newMesh;
+                                                    print("*RSS*: Done wrapping. Checking atmo.");
+                                                    Transform atmo = t.FindChild("Atmosphere");
+                                                    if (atmo != null)
+                                                    {
+                                                        //atmo.localScale = new Vector3(atmo.localScale.x * SSTScale, atmo.localScale.y * SSTScale, atmo.localScale.z * SSTScale);
+                                                        float scaleFactor = (float)((body.Radius + body.maxAtmosphereAltitude) / (origRadius + origAtmo) * SSTScale);
+                                                    }
+                                                    rescale = false;
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                print("Exception wrapping: " + e.Message);
+                                            }
+                                        }
+                                        if(rescale)
+                                        {
+                                            float scaleFactor = (float)(body.Radius / origRadius * SSTScale);
+                                            t.localScale = new Vector3(t.localScale.x * scaleFactor, t.localScale.y * scaleFactor, t.localScale.z * scaleFactor);
+                                        }
                                     }
                                 }
                             }
@@ -1372,56 +1798,6 @@ namespace RealSolarSystem
                                         }*/
                                         System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "1.png", kerbinTextures[0].EncodeToPNG());
                                         System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "2.png", kerbinTextures[1].EncodeToPNG());
-                                        /*foreach (Material mat in Resources.FindObjectsOfTypeAll(typeof(Material)))
-                                        {
-                                            if (mat.mainTexture.name.Equals("KerbinScaledSpace300"))
-                                            {
-                                                mat.mainTexture = kerbinTextures[0];
-                                                try
-                                                {
-                                                    Resources.UnloadAsset(KerbinScaledSpace300);
-                                                }
-                                                catch
-                                                {
-                                                }
-                                            }
-                                            if (mat.mainTexture.name.Equals("KerbinScaledSpace401"))
-                                            {
-                                                mat.mainTexture = kerbinTextures[1];
-                                                try
-                                                {
-                                                    Resources.UnloadAsset(KerbinScaledSpace401);
-                                                }
-                                                catch
-                                                {
-                                                }
-                                            }
-                                            if (mat.GetTexture("_BumpMap") != null)
-                                            {
-                                                if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace300"))
-                                                {
-                                                    mat.SetTexture("_BumpMap", kerbinTextures[0]);
-                                                    try
-                                                    {
-                                                        Resources.UnloadAsset(KerbinScaledSpace300);
-                                                    }
-                                                    catch
-                                                    {
-                                                    }
-                                                }
-                                                if (mat.GetTexture("_BumpMap").name.Equals("KerbinScaledSpace401"))
-                                                {
-                                                    mat.SetTexture("_BumpMap", kerbinTextures[1]);
-                                                    try
-                                                    {
-                                                        Resources.UnloadAsset(KerbinScaledSpace401);
-                                                    }
-                                                    catch
-                                                    {
-                                                    }
-                                                }
-                                            }
-                                        }*/
                                     }
                                 }
                                 catch (Exception e)
@@ -1473,7 +1849,6 @@ namespace RealSolarSystem
             print("*RSS* Done loading!");
             doneRSS = true;
         }
-
     }
     // From Starwaster
     [KSPAddon(KSPAddon.Startup.Flight, false)]
@@ -1511,15 +1886,6 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (RealSolarSystem.doneRSS && RealSolarSystem.afgBools.Count > 0)
-            {
-                foreach (KeyValuePair<AtmosphereFromGround, bool> k in RealSolarSystem.afgBools)
-                {
-                    if (k.Key != null)
-                        k.Key.DEBUG_alwaysUpdateAll = k.Value;
-                }
-                RealSolarSystem.afgBools.Clear();
-            }
             if (afg == null)
                 afg = findAFG();
             //print("[AFGEditor] Start()");
