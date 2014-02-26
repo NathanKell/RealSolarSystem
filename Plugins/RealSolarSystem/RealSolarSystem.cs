@@ -39,7 +39,7 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1e10f;
                 print("Fixed. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
             }
-            if (HighLogic.LoadedSceneIsFlight)
+            if (HighLogic.LoadedSceneHasPlanetarium && MapView.fetch != null)
             {
                 try
                 {
@@ -49,12 +49,9 @@ namespace RealSolarSystem
                     if (camNode != null)
                     {
                         float ftmp;
-                        if(MapView.fetch != null)
-                        {
-                            if (camNode.HasValue("max3DlineDrawDist"))
-                                if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp))
-                                    MapView.fetch.max3DlineDrawDist = ftmp;
-                        }
+                        if (camNode.HasValue("max3DlineDrawDist"))
+                            if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp))
+                                MapView.fetch.max3DlineDrawDist = ftmp;
                     }
                 }
                 catch (Exception e)
