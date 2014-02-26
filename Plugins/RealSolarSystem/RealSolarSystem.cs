@@ -52,7 +52,7 @@ namespace RealSolarSystem
                         if(MapView.fetch != null)
                         {
                             if (camNode.HasValue("max3DlineDrawDist"))
-                                if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp)))
+                                if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp))
                                     MapView.fetch.max3DlineDrawDist = ftmp;
                         }
                     }
