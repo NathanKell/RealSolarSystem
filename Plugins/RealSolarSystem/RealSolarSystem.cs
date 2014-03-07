@@ -39,6 +39,26 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1e10f;
                 print("Fixed. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
             }
+            if (HighLogic.LoadedSceneHasPlanetarium && MapView.fetch != null)
+            {
+                try
+                {
+                    ConfigNode camNode = null;
+                    foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                        camNode = node;
+                    if (camNode != null)
+                    {
+                        float ftmp;
+                        if (camNode.HasValue("max3DlineDrawDist"))
+                            if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp))
+                                MapView.fetch.max3DlineDrawDist = ftmp;
+                    }
+                }
+                catch (Exception e)
+                {
+                    print("MapView fixing failed: " + e.Message);
+                }
+            }
             if (HighLogic.LoadedSceneIsEditor)
             {
                 try
