@@ -697,46 +697,54 @@ namespace RealSolarSystem
                             if (bool.TryParse(node.GetValue("useLegacyAtmosphere"), out btmp))
                                 body.useLegacyAtmosphere = btmp;
                             print("*RSS* " + body.GetName() + " useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
-                            ConfigNode PCnode = node.GetNode("pressureCurve");
-
-                            //return (double)(body.pressureCurve.Evaluate((float)((altitude - (double)body.altitudeOffset) * (double)body.altitudeMultiplier) * 0.001f) * body.pressureMultiplier);
-                            string[] curve = PCnode.GetValues("key");
-                            print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
-                            print("*RSS* " + "    Overriding the following properties with '1'");
-                            body.useLegacyAtmosphere = true;
-                            body.altitudeOffset = 1f;
-                            body.altitudeMultiplier = 1f;
-                            body.pressureMultiplier = 1f;
-                            print("*RSS* " + body.GetName() + ".altitudeOffset = " + body.altitudeOffset.ToString());
-                            print("*RSS* " + body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
-                            print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
-                            //int i = keys.Length;
-                            char[] cParams = new char[]{' ',',',';','\t'};
-                            AnimationCurve pressureCurve = new AnimationCurve();
-
-                            for (int i = 0; i < curve.Length; i++)
+                            if (!body.useLegacyAtmosphere)
                             {
-                                string[] keyTmp = curve[i].Split(cParams, StringSplitOptions.RemoveEmptyEntries);
-                                print("*RSS* " + keyTmp[0] + " " + keyTmp[1] + " " + keyTmp[2] + " " + keyTmp[3]);
-                                if (curve.Length == 4)
+                                ConfigNode PCnode = node.GetNode("pressureCurve");
+                                if (PCnode != null)
                                 {
-                                    Keyframe key = new Keyframe();
-                                    key.time = float.Parse(keyTmp[0]);
-                                    key.value = float.Parse(keyTmp[1]);
-                                    key.inTangent = float.Parse(keyTmp[2]);
-                                    key.outTangent = float.Parse(keyTmp[3]);
-                                    pressureCurve.AddKey(key);
+                                    //return (double)(body.pressureCurve.Evaluate((float)((altitude - (double)body.altitudeOffset) * (double)body.altitudeMultiplier) * 0.001f) * body.pressureMultiplier);
+                                    string[] curve = PCnode.GetValues("key");
+                                    print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
+                                    print("*RSS* " + "    Overriding the following properties with '1'");
+                                    body.altitudeOffset = 1f;
+                                    body.altitudeMultiplier = 1f;
+                                    body.pressureMultiplier = 1f;
+                                    print("*RSS* " + body.GetName() + ".altitudeOffset = " + body.altitudeOffset.ToString());
+                                    print("*RSS* " + body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
+                                    print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
+                                    //int i = keys.Length;
+                                    char[] cParams = new char[] { ' ', ',', ';', '\t' };
+                                    AnimationCurve pressureCurve = new AnimationCurve();
+
+                                    for (int i = 0; i < curve.Length; i++)
+                                    {
+                                        string[] keyTmp = curve[i].Split(cParams, StringSplitOptions.RemoveEmptyEntries);
+                                        print("*RSS* " + keyTmp[0] + " " + keyTmp[1] + " " + keyTmp[2] + " " + keyTmp[3]);
+                                        if (curve.Length == 4)
+                                        {
+                                            Keyframe key = new Keyframe();
+                                            key.time = float.Parse(keyTmp[0]);
+                                            key.value = float.Parse(keyTmp[1]);
+                                            key.inTangent = float.Parse(keyTmp[2]);
+                                            key.outTangent = float.Parse(keyTmp[3]);
+                                            pressureCurve.AddKey(key);
+                                        }
+                                        else
+                                        {
+                                            Keyframe key = new Keyframe();
+                                            key.time = float.Parse(keyTmp[0]);
+                                            key.value = float.Parse(keyTmp[1]);
+                                            pressureCurve.AddKey(key);
+                                        }
+                                    }
+                                    body.pressureCurve = pressureCurve;
+                                    print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
                                 }
                                 else
                                 {
-                                    Keyframe key = new Keyframe();
-                                    key.time = float.Parse(keyTmp[0]);
-                                    key.value = float.Parse(keyTmp[1]);
-                                    pressureCurve.AddKey(key);
+                                    print("*RSS* useLegacyAtmosphere = False but pressureCurve not found!");
                                 }
                             }
-                            body.pressureCurve = pressureCurve;
-                            print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");                        
                         }
                         if (node.HasValue("rotationPeriod"))
                         {
@@ -840,6 +848,11 @@ namespace RealSolarSystem
                                             body.orbit.referenceBody = b;
                                             break;
                                         }
+                                       // if (b.GetName() == "Duna")
+                                        //{
+                                         //   PQSMod_LandClassController
+                                          //  print("*RSS-DUNA* " + 
+                                        //}
                                     }
                                 }
                             }
@@ -1904,7 +1917,7 @@ namespace RealSolarSystem
         public void Start()
         {
             ConfigNode RSSSettings = null;
-            bool btmp;
+            bool UseLegacyAtmosphere;
 
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
@@ -1914,12 +1927,16 @@ namespace RealSolarSystem
                 if (RSSSettings.HasNode(body.GetName()))
                 {
                     ConfigNode node = RSSSettings.GetNode(body.GetName());
-
+                    print("*RSS* checking useLegacyAtmosphere for " + body.GetName());
                     if (node.HasValue("useLegacyAtmosphere"))
                     {
-                        bool UseLegacyAtmosphere = bool.TryParse(node.GetValue("useLegacyAtmosphere"), out btmp);
+                        bool.TryParse(node.GetValue("useLegacyAtmosphere"), out UseLegacyAtmosphere);
+                        print("*RSSWatchDog* " + body.GetName() + ".useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
                         if (UseLegacyAtmosphere != body.useLegacyAtmosphere)
+                        {
+                            print ("*RSSWatchDog* resetting useLegacyAtmosphere to " + UseLegacyAtmosphere.ToString());
                             body.useLegacyAtmosphere = UseLegacyAtmosphere;
+                        }
                     }
                 }
             }
@@ -2104,3 +2121,4 @@ namespace RealSolarSystem
         }
     }
 }
+
