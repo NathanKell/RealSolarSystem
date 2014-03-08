@@ -39,26 +39,6 @@ namespace RealSolarSystem
                 PlanetariumCamera.fetch.maxDistance = 1e10f;
                 print("Fixed. Min " + PlanetariumCamera.fetch.minDistance + ", Max " + PlanetariumCamera.fetch.maxDistance + ". Start " + PlanetariumCamera.fetch.startDistance + ", zoom " + PlanetariumCamera.fetch.zoomScaleFactor);
             }
-            if (HighLogic.LoadedSceneHasPlanetarium && MapView.fetch != null)
-            {
-                try
-                {
-                    ConfigNode camNode = null;
-                    foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
-                        camNode = node;
-                    if (camNode != null)
-                    {
-                        float ftmp;
-                        if (camNode.HasValue("max3DlineDrawDist"))
-                            if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp))
-                                MapView.fetch.max3DlineDrawDist = ftmp;
-                    }
-                }
-                catch (Exception e)
-                {
-                    print("MapView fixing failed: " + e.Message);
-                }
-            }
             if (HighLogic.LoadedSceneIsEditor)
             {
                 try
@@ -664,6 +644,10 @@ namespace RealSolarSystem
                         bool btmp;
                         double origRadius = body.Radius;
                         double origAtmo = body.maxAtmosphereAltitude;
+                        // some exploratory stuff
+                        print(body.GetName() + ".altitudeOffset = " + body.altitudeOffset.ToString());
+                        print(body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
+                        print(body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
                         if (node.HasValue("Radius"))
                         {
                             if (double.TryParse(node.GetValue("Radius"), out dtmp))
@@ -707,6 +691,52 @@ namespace RealSolarSystem
                         {
                             if (double.TryParse(node.GetValue("staticPressureASL"), out dtmp))
                                 body.staticPressureASL = dtmp;
+                        }
+                        if (node.HasValue("useLegacyAtmosphere"))
+                        {
+                            if (bool.TryParse(node.GetValue("useLegacyAtmosphere"), out btmp))
+                                body.useLegacyAtmosphere = btmp;
+                            print("*RSS* " + body.GetName() + " useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
+                            ConfigNode PCnode = node.GetNode("pressureCurve");
+
+                            //return (double)(body.pressureCurve.Evaluate((float)((altitude - (double)body.altitudeOffset) * (double)body.altitudeMultiplier) * 0.001f) * body.pressureMultiplier);
+                            string[] curve = PCnode.GetValues("key");
+                            print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
+                            print("*RSS* " + "    Overriding the following properties with '1'");
+                            body.useLegacyAtmosphere = true;
+                            body.altitudeOffset = 1f;
+                            body.altitudeMultiplier = 1f;
+                            body.pressureMultiplier = 1f;
+                            print("*RSS* " + body.GetName() + ".altitudeOffset = " + body.altitudeOffset.ToString());
+                            print("*RSS* " + body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
+                            print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
+                            //int i = keys.Length;
+                            char[] cParams = new char[]{' ',',',';','\t'};
+                            AnimationCurve pressureCurve = new AnimationCurve();
+
+                            for (int i = 0; i < curve.Length; i++)
+                            {
+                                string[] keyTmp = curve[i].Split(cParams, StringSplitOptions.RemoveEmptyEntries);
+                                print("*RSS* " + keyTmp[0] + " " + keyTmp[1] + " " + keyTmp[2] + " " + keyTmp[3]);
+                                if (curve.Length == 4)
+                                {
+                                    Keyframe key = new Keyframe();
+                                    key.time = float.Parse(keyTmp[0]);
+                                    key.value = float.Parse(keyTmp[1]);
+                                    key.inTangent = float.Parse(keyTmp[2]);
+                                    key.outTangent = float.Parse(keyTmp[3]);
+                                    pressureCurve.AddKey(key);
+                                }
+                                else
+                                {
+                                    Keyframe key = new Keyframe();
+                                    key.time = float.Parse(keyTmp[0]);
+                                    key.value = float.Parse(keyTmp[1]);
+                                    pressureCurve.AddKey(key);
+                                }
+                            }
+                            body.pressureCurve = pressureCurve;
+                            print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");                        
                         }
                         if (node.HasValue("rotationPeriod"))
                         {
@@ -1390,13 +1420,6 @@ namespace RealSolarSystem
                                                                 foreach (PQSCity.LODRange l in mod.lod)
                                                                     l.visibleRange *= (float)dtmp;
                                                         }
-
-                                                        if (modNode.HasValue("reorientFinalAngle"))
-                                                        {
-                                                            if (float.TryParse(modNode.GetValue("reorientFinalAngle"), out ftmp))
-                                                                mod.reorientFinalAngle = ftmp;
-                                                        }
-                                                        
                                                         mod.OnSetup();
                                                     }
                                                     // KSC Flat area
@@ -1870,6 +1893,42 @@ namespace RealSolarSystem
             doneRSS = true;
         }
     }
+
+    // Checks to make sure useLegacyAtmosphere didn't get munged with
+    // Could become a general place to prevent RSS changes from being reverted when our back is turned.
+    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    public class RSSWatchDog : MonoBehaviour
+    {
+        CelestialBody body = FlightGlobals.getMainBody();
+
+        public void Start()
+        {
+            ConfigNode RSSSettings = null;
+            bool btmp;
+
+            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
+                RSSSettings = node;
+
+            if (RSSSettings != null)
+            {
+                if (RSSSettings.HasNode(body.GetName()))
+                {
+                    ConfigNode node = RSSSettings.GetNode(body.GetName());
+
+                    if (node.HasValue("useLegacyAtmosphere"))
+                    {
+                        bool UseLegacyAtmosphere = bool.TryParse(node.GetValue("useLegacyAtmosphere"), out btmp);
+                        if (UseLegacyAtmosphere != body.useLegacyAtmosphere)
+                            body.useLegacyAtmosphere = UseLegacyAtmosphere;
+                    }
+                }
+            }
+        }
+        
+
+    }
+
+
     // From Starwaster
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class AFGEditor : MonoBehaviour
@@ -2045,4 +2104,3 @@ namespace RealSolarSystem
         }
     }
 }
-
