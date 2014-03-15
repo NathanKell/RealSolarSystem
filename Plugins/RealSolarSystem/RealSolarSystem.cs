@@ -608,6 +608,47 @@ namespace RealSolarSystem
 
 
         public static bool done = false;
+
+        public AnimationCurve loadAnimationCurve(string[] curveData)
+        {
+            char[] cParams = new char[] { ' ', ',', ';', '\t' };
+            AnimationCurve animationCurve = new AnimationCurve();
+            try
+            {
+                for (int i = 0; i < curveData.Length; i++)
+                {
+                    string[] keyTmp = curveData[i].Split(cParams, StringSplitOptions.RemoveEmptyEntries);
+                    if (keyTmp.Length == 4)
+                    {
+                        print("*RSS* " + keyTmp[0] + " " + keyTmp[1] + " " + keyTmp[2] + " " + keyTmp[3]);
+                        Keyframe key = new Keyframe();
+                        key.time = float.Parse(keyTmp[0]);
+                        key.value = float.Parse(keyTmp[1]);
+                        key.inTangent = float.Parse(keyTmp[2]);
+                        key.outTangent = float.Parse(keyTmp[3]);
+                        animationCurve.AddKey(key);
+                    }
+                    else if (keyTmp.Length == 2)
+                    {
+                        print("*RSS* " + keyTmp[0] + " " + keyTmp[1]);
+                        Keyframe key = new Keyframe();
+                        key.time = float.Parse(keyTmp[0]);
+                        key.value = float.Parse(keyTmp[1]);
+                        animationCurve.AddKey(key);
+                    }
+                    else
+                    {
+                        MonoBehaviour.print("*RSS* Invalid animationCurve data: animationCurve data must have exactly two or four parameters!");
+                    }
+                }
+                return animationCurve;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
+
         public void Start()
         {
 
@@ -702,7 +743,6 @@ namespace RealSolarSystem
                                 ConfigNode PCnode = node.GetNode("pressureCurve");
                                 if (PCnode != null)
                                 {
-                                    //return (double)(body.pressureCurve.Evaluate((float)((altitude - (double)body.altitudeOffset) * (double)body.altitudeMultiplier) * 0.001f) * body.pressureMultiplier);
                                     string[] curve = PCnode.GetValues("key");
                                     print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
                                     print("*RSS* " + "    Overriding the following properties with '1'");
@@ -714,30 +754,11 @@ namespace RealSolarSystem
                                     print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
                                     //int i = keys.Length;
                                     char[] cParams = new char[] { ' ', ',', ';', '\t' };
-                                    AnimationCurve pressureCurve = new AnimationCurve();
-
-                                    for (int i = 0; i < curve.Length; i++)
-                                    {
-                                        string[] keyTmp = curve[i].Split(cParams, StringSplitOptions.RemoveEmptyEntries);
-                                        print("*RSS* " + keyTmp[0] + " " + keyTmp[1] + " " + keyTmp[2] + " " + keyTmp[3]);
-                                        if (curve.Length == 4)
-                                        {
-                                            Keyframe key = new Keyframe();
-                                            key.time = float.Parse(keyTmp[0]);
-                                            key.value = float.Parse(keyTmp[1]);
-                                            key.inTangent = float.Parse(keyTmp[2]);
-                                            key.outTangent = float.Parse(keyTmp[3]);
-                                            pressureCurve.AddKey(key);
-                                        }
-                                        else
-                                        {
-                                            Keyframe key = new Keyframe();
-                                            key.time = float.Parse(keyTmp[0]);
-                                            key.value = float.Parse(keyTmp[1]);
-                                            pressureCurve.AddKey(key);
-                                        }
-                                    }
-                                    body.pressureCurve = pressureCurve;
+                                    AnimationCurve pressureCurve = loadAnimationCurve(curve);
+                                    if (pressureCurve != null)
+                                        body.pressureCurve = pressureCurve;
+                                    else
+                                        body.useLegacyAtmosphere = true;
                                     print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
                                 }
                                 else
@@ -2121,4 +2142,3 @@ namespace RealSolarSystem
         }
     }
 }
-
