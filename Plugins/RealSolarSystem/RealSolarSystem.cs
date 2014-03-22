@@ -666,6 +666,7 @@ namespace RealSolarSystem
             }
             catch (Exception e)
             {
+                print("Caught exception while parsing animationcurve: " + e.Message);
                 return null;
             }
         }
