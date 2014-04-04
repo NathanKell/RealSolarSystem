@@ -40,6 +40,10 @@ Known bugs:
 Expect problems. But also expect glee.
 ===========================
 Changelog
+v6    \/
+*Fixed orbit lines (thanks HoneyFox!)
+*Added PressureCurve support (thanks Starwaster!)
+
 v5.6  \/
 *Fixed wavelenght color parsing to take four arguments (colors are RGBA after all)
 *Added compatibility patches for VisualEnhancements and (thanks, jrandom!) SCANSat
