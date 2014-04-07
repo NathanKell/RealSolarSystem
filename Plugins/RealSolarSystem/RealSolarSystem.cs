@@ -241,7 +241,7 @@ namespace RealSolarSystem
                         }
                         if (node.HasValue("tidallyLocked"))
                         {
-                            if (bool.TryParse(node.GetValue("rotationPeriod"), out btmp))
+                            if (bool.TryParse(node.GetValue("tidallyLocked"), out btmp))
                                 body.tidallyLocked = btmp;
                         }
                         if (node.HasValue("initialRotation"))
