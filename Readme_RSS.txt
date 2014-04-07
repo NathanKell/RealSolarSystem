@@ -42,7 +42,11 @@ Expect problems. But also expect glee.
 Changelog
 v6    \/
 *Fixed orbit lines (thanks HoneyFox!)
-*Added PressureCurve support (thanks Starwaster!)
+*Added pressureCurve support with curves for Earth, Venus, and Mars (thanks Starwaster!)
+*Added temperatureCurve support (nothing here yet)
+*Fixed a typo with tidally locked orbits (thanks eggrobin!)
+*Converted orbits to Earth-relative inclination, to support axial tilt (megathanks eggrobbin!)
+*Recompiled for .23.5
 
 v5.6  \/
 *Fixed wavelenght color parsing to take four arguments (colors are RGBA after all)
