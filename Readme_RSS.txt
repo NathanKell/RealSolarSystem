@@ -31,8 +31,12 @@ Pluto is represented by Vall
 ===========================
 Changelog
 v6    \/
+*Changed Kerbin's heightmap, textures, and PQSMods to resemble Earth (allow replacing heightmaps, SS diffuse, and SS normal maps)
+*PQSCity and MapDecalTangent can be positioned by latitude/longitude
+*Modify scaledspace meshes based on PQS terrain automatically on game load
+*Add many new PQSMod settings and limited add/remove support.
 *Fixed orbit lines (thanks HoneyFox!)
-*Added pressureCurve support with curves for Earth, Venus, and Mars (thanks Starwaster!)
+*Added pressureCurve support with curves for Earth, Venus, and Mars (megathanks Starwaster!)
 *Added temperatureCurve support (nothing here yet)
 *Fixed a typo with tidally locked orbits (thanks eggrobin!)
 *Converted orbits to Earth-relative inclination, to support axial tilt (megathanks eggrobbin!)
