@@ -154,7 +154,7 @@ namespace RealSolarSystem
                             if (double.TryParse(node.GetValue("GeeASL"), out dtmp))
                                 body.GeeASL = dtmp;
                         }
-                        if (node.HasValue("gravParam"))
+                        if (node.HasValue("gravParameter"))
                         {
                             if (double.TryParse(node.GetValue("gravParameter"), out dtmp))
                             {
