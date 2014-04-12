@@ -1,10 +1,8 @@
-Real Solar System WIP
+Real Solar System
 This mod will convert the Kerbol System into the Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
-
-I take no responsibility for this breaking anything, even if it weren't a WIP and totally in alpha stage.
 
 License: CC-BY-SA
 
@@ -12,7 +10,7 @@ INSTALLATION:
 Extract to KSP/GameData.
 NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
-Planets included (no new graphics for now, excepting Kerbin and Mun)
+Planets included (no new graphics for now, excepting Earth and the Moon)
 Mercury is represented by Moho
 Venus is represented by Eve
 Earth is represented by Kerbin
@@ -30,19 +28,19 @@ Titan is represented by Laythe
 Uranus is represented by Minmus
 Pluto is represented by Vall
 
-Known bugs:
-*Parts are wobbly. Get Kerbal Joint Reinforcement by ferram
-*Launch Clamps have issues. Make your own using radial decouplers, or place a stack decoupler under the bottom of your rocket and ring it with trusses.
-*Water disappears when looking right at it.
-*Terrain is smoother and gentler, and looks blurrier.
-*Doubled terrain on some planets (I haven't made new scaledspace meshes yet)
-
-Expect problems. But also expect glee.
 ===========================
 Changelog
 v6    \/
+*Changed Kerbin's heightmap, textures, and PQSMods to resemble Earth (allow replacing heightmaps, SS diffuse, and SS normal maps)
+*PQSCity and MapDecalTangent can be positioned by latitude/longitude
+*Modify scaledspace meshes based on PQS terrain automatically on game load
+*Add many new PQSMod settings and limited add/remove support.
 *Fixed orbit lines (thanks HoneyFox!)
-*Added PressureCurve support (thanks Starwaster!)
+*Added pressureCurve support with curves for Earth, Venus, and Mars (megathanks Starwaster!)
+*Added temperatureCurve support (nothing here yet)
+*Fixed a typo with tidally locked orbits (thanks eggrobin!)
+*Converted orbits to Earth-relative inclination, to support axial tilt (megathanks eggrobbin!)
+*Recompiled for .23.5
 
 v5.6  \/
 *Fixed wavelenght color parsing to take four arguments (colors are RGBA after all)

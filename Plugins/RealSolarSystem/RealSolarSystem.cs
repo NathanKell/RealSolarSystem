@@ -200,24 +200,37 @@ namespace RealSolarSystem
                                     string[] curve = PCnode.GetValues("key");
                                     print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
                                     print("*RSS* " + "    Overriding the following properties with '1'");
-                                    body.altitudeOffset = 1f;
                                     body.altitudeMultiplier = 1f;
                                     body.pressureMultiplier = 1f;
-                                    print("*RSS* " + body.GetName() + ".altitudeOffset = " + body.altitudeOffset.ToString());
                                     print("*RSS* " + body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
                                     print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
-                                    //int i = keys.Length;
-                                    char[] cParams = new char[] { ' ', ',', ';', '\t' };
                                     AnimationCurve pressureCurve = loadAnimationCurve(curve);
                                     if (pressureCurve != null)
                                         body.pressureCurve = pressureCurve;
                                     else
+                                    {
                                         body.useLegacyAtmosphere = true;
+                                        Debug.LogWarning("Unable to load pressureCurve data for " + body.name + ": Using legacy atmosphere");
+                                    }
                                     print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
                                 }
                                 else
                                 {
                                     print("*RSS* useLegacyAtmosphere = False but pressureCurve not found!");
+                                }
+                            }
+                        }
+                        if (node.HasNode("temperatureCurve"))
+                        {
+                            ConfigNode TCnode = node.GetNode("temperatureCurve");
+                            if (TCnode != null)
+                            {
+                                string[] curve = TCnode.GetValues("key");
+                                AnimationCurve temperatureCurve = loadAnimationCurve(curve);
+                                if (temperatureCurve != null)
+                                {
+                                    body.temperatureCurve = temperatureCurve;
+                                    print("*RSS* found and loaded temperatureCurve data for " + body.name);
                                 }
                             }
                         }
@@ -228,7 +241,7 @@ namespace RealSolarSystem
                         }
                         if (node.HasValue("tidallyLocked"))
                         {
-                            if (bool.TryParse(node.GetValue("rotationPeriod"), out btmp))
+                            if (bool.TryParse(node.GetValue("tidallyLocked"), out btmp))
                                 body.tidallyLocked = btmp;
                         }
                         if (node.HasValue("initialRotation"))
