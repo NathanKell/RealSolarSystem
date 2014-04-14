@@ -1287,74 +1287,65 @@ namespace RealSolarSystem
                                     }
                                 }
                             }
-
-                            // texture rebuild
-                            if (node.HasNode("Export"))
+                        }
+                            
+                        // texture rebuild
+                        if (node.HasNode("Export"))
+                        {
+                            try
                             {
-                                try
-                                {
-                                    int res = 2048;
-                                    bool ocean = false;
-                                    Color oceanColor;
-                                    double maxHeight, oceanHeight;
-                                    PQS bodyPQS = null;
-                                    foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
-                                        if (p.name.Equals(body.name))
-                                        {
-                                            bodyPQS = p;
-                                            break;
-                                        }
-                                    if (bodyPQS != null)
+                                int res = 2048;
+                                bool ocean = false;
+                                Color oceanColor;
+                                double maxHeight, oceanHeight;
+                                PQS bodyPQS = null;
+                                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
+                                    if (p.name.Equals(body.name))
                                     {
-                                        maxHeight = bodyPQS.radiusDelta * 0.5;
-                                        oceanHeight = 0;
-                                        ocean = body.ocean;
-                                        oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
-                                        ConfigNode exportNode = node.GetNode("Export");
-                                        if (exportNode.HasValue("resolution"))
-                                        {
-                                            if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
-                                                res = itmp;
-                                        }
-                                        if (exportNode.HasValue("maxHeight"))
-                                        {
-                                            if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
-                                                maxHeight = dtmp;
-                                        }
-
-                                        if (exportNode.HasValue("oceanHeight"))
-                                        {
-                                            if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
-                                                oceanHeight = dtmp;
-                                        }
-                                        if (exportNode.HasValue("oceanColor"))
-                                        {
-                                            ocean = true;
-                                            Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
-                                            oceanColor = new Color(col.x, col.y, col.z);
-                                        }
-                                        /*Texture2D KerbinScaledSpace300 = null;
-                                        Texture2D KerbinScaledSpace401 = null;
-                                        foreach (Texture2D tex in Resources.FindObjectsOfTypeAll(typeof(Texture2D)))
-                                        {
-                                            if (tex.name.Equals("KerbinScaledSpace300"))
-                                                KerbinScaledSpace300 = tex;
-                                            if (tex.name.Equals("KerbinScaledSpace401"))
-                                                KerbinScaledSpace401 = tex;
-                                        }*/
-                                        Texture2D[] kerbinTextures = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
-                                        /*foreach (Texture2D t in kerbinTextures)
-                                        {
-                                            MonoBehaviour.DontDestroyOnLoad(t);
-                                        }*/
-                                        System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "1.png", kerbinTextures[0].EncodeToPNG());
-                                        System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + "/" + body.name + "2.png", kerbinTextures[1].EncodeToPNG());
+                                        bodyPQS = p;
+                                        break;
                                     }
-                                }
-                                catch (Exception e)
+                                if (bodyPQS != null)
                                 {
-                                    print("Export for " + node.name + " failed: " + e.Message);
+                                    maxHeight = bodyPQS.radiusDelta * 0.5;
+                                    oceanHeight = 0;
+                                    ocean = body.ocean;
+                                    oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
+                                    ConfigNode exportNode = node.GetNode("Export");
+                                    if (exportNode.HasValue("resolution"))
+                                    {
+                                        if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
+                                            res = itmp;
+                                    }
+                                    if (exportNode.HasValue("maxHeight"))
+                                    {
+                                        if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
+                                            maxHeight = dtmp;
+                                    }
+                                    if (exportNode.HasValue("ocean"))
+                                    {
+                                        if (bool.TryParse(exportNode.GetValue("ocean"), out btmp))
+                                            ocean = btmp;
+                                    }
+                                    if (exportNode.HasValue("oceanHeight"))
+                                    {
+                                        if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
+                                            oceanHeight = dtmp;
+                                    }
+                                    if (exportNode.HasValue("oceanColor"))
+                                    {
+                                        ocean = true;
+                                        Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
+                                        oceanColor = new Color(col.x, col.y, col.z);
+                                    }
+                                    Texture2D[] outputMaps = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "1.png", outputMaps[0].EncodeToPNG());
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "2.png", outputMaps[1].EncodeToPNG());
                                 }
+                            }
+                            catch (Exception e)
+                            {
+                                print("Export for " + node.name + " failed: " + e.Message);
                             }
                         }
                     }
