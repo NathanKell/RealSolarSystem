@@ -1322,7 +1322,11 @@ namespace RealSolarSystem
                                         if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
                                             maxHeight = dtmp;
                                     }
-
+                                    if (exportNode.HasValue("ocean"))
+                                    {
+                                        if (bool.TryParse(exportNode.GetValue("ocean"), out btmp))
+                                            ocean = btmp;
+                                    }
                                     if (exportNode.HasValue("oceanHeight"))
                                     {
                                         if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
@@ -1334,22 +1338,9 @@ namespace RealSolarSystem
                                         Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
                                         oceanColor = new Color(col.x, col.y, col.z);
                                     }
-                                    /*Texture2D KerbinScaledSpace300 = null;
-                                    Texture2D KerbinScaledSpace401 = null;
-                                    foreach (Texture2D tex in Resources.FindObjectsOfTypeAll(typeof(Texture2D)))
-                                    {
-                                        if (tex.name.Equals("KerbinScaledSpace300"))
-                                            KerbinScaledSpace300 = tex;
-                                        if (tex.name.Equals("KerbinScaledSpace401"))
-                                            KerbinScaledSpace401 = tex;
-                                    }*/
-                                    Texture2D[] kerbinTextures = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
-                                    /*foreach (Texture2D t in kerbinTextures)
-                                    {
-                                        MonoBehaviour.DontDestroyOnLoad(t);
-                                    }*/
-									System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "1.png", kerbinTextures[0].EncodeToPNG());
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "2.png", kerbinTextures[1].EncodeToPNG());
+                                    Texture2D[] outputMaps = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "1.png", outputMaps[0].EncodeToPNG());
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "2.png", outputMaps[1].EncodeToPNG());
                                 }
                             }
                             catch (Exception e)
