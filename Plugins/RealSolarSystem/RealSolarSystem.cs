@@ -1135,7 +1135,6 @@ namespace RealSolarSystem
                                     float.TryParse(node.GetValue("SSTScale"), out SSTScale);
                                 foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                                 {
-                                    print("*RSS* For " + t.name + ", Shader = " + t.gameObject.renderer.material.shader.name);
                                     if (t.name.Equals(node.name))
                                     {
                                         // replace
