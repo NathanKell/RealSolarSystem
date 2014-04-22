@@ -30,6 +30,13 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v6.1  \/
+*Fixed only changing things if radius differs
+*Fixed to work on non-Windows platforms (regex)
+*Fixed many atmosphere and temperature curves (eggrobin)
+*Fixed misc typos
+*Added Moon retexture
+
 v6    \/
 *Changed Kerbin's heightmap, textures, and PQSMods to resemble Earth (allow replacing heightmaps, SS diffuse, and SS normal maps)
 *PQSCity and MapDecalTangent can be positioned by latitude/longitude
