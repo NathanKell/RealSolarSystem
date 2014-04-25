@@ -14,7 +14,7 @@ namespace RealSolarSystem
     {
         public static bool doneRSS = false;
 
-        public Vector3 LLAtoECEF(double lat, double lon, double alt, double radius)
+        public static Vector3 LLAtoECEF(double lat, double lon, double alt, double radius)
         {
             const double degreesToRadians =  Math.PI / 180.0;
             lat = (lat-90) * degreesToRadians;
@@ -50,7 +50,6 @@ namespace RealSolarSystem
 
         // thanks to asmi for this!
         public static bool kerbinMapDecalsDone = false;
-
 
         public static bool done = false;
 
