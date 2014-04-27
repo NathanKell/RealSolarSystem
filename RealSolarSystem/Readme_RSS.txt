@@ -31,7 +31,11 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
-v6.1  \/
+v7    \/
+*Added bodyName support
+*Parsing changes, using stupid_chris's ConfigNodeExtensions
+*
+v6.1  \/ (released in Better Atmospheres)
 *Fixed only changing things if radius differs
 *Fixed to work on non-Windows platforms (regex)
 *Fixed many atmosphere and temperature curves (eggrobin)
