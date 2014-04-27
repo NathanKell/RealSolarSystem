@@ -112,11 +112,16 @@ namespace RealSolarSystem
             print("*RSS* fixing bodies");
             double epoch = 0;
             bool useEpoch = false;
+            bool doWrap = true;
             if (RSSSettings.HasValue("Epoch"))
                 if (double.TryParse(RSSSettings.GetValue("Epoch"), out epoch))
                     useEpoch = true;
                 else
                     useEpoch = false;
+
+            if (RSSSettings.HasValue("wrap"))
+                if (!bool.TryParse(RSSSettings.GetValue("wrap"), out doWrap))
+                   doWrap = true;
 
             foreach (ConfigNode node in RSSSettings.nodes)
             {
@@ -1075,44 +1080,84 @@ namespace RealSolarSystem
 
                                     // Fix mesh
                                     bool rescale = true;
-                                    if (false && body.pqsController != null)
+                                    if (body.pqsController != null && doWrap)
                                     {
                                         //MeshFilter[] meshes = t.GetComponentsInChildren<MeshFilter>();
-                                        try
+                                        MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
+                                        if (m == null || m.mesh == null)
                                         {
-                                            MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
-                                            if (m == null || m.mesh == null)
-                                            {
-                                                print("*RSS* Failure wrapping " + body.pqsController.name + ": mesh is null");
-                                            }
-                                            else
-                                            {
-                                                print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
-                                                PQSMeshWrapper w = new PQSMeshWrapper();
-                                                w.targetPQS = body.pqsController;
-                                                w.outputRadius = body.Radius * ScaledSpace.InverseScaleFactor * SSTScale;
-                                                w.sphereMesh = m.mesh;
-                                                Mesh newMesh = w.CreateWrappedMesh();
-                                                m.mesh = newMesh;
-                                                print("*RSS*: Done wrapping. Checking atmo.");
-                                                Transform atmo = t.FindChild("Atmosphere");
-                                                if (atmo != null)
-                                                {
-                                                    //atmo.localScale = new Vector3(atmo.localScale.x * SSTScale, atmo.localScale.y * SSTScale, atmo.localScale.z * SSTScale);
-                                                    float scaleFactor = (float)((body.Radius + body.maxAtmosphereAltitude) / (origRadius + origAtmo) * SSTScale);
-                                                }
-                                                rescale = false;
-                                            }
+                                            print("*RSS* Failure wrapping " + body.pqsController.name + ": mesh is null");
                                         }
-                                        catch (Exception e)
+                                        else
                                         {
-                                            print("Exception wrapping: " + e.Message);
+                                            char sep = System.IO.Path.DirectorySeparatorChar;
+                                            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
+                                                    + sep + "PluginData" + sep + t.name + ".obj";
+                                            bool wrap = true;
+                                            try
+                                            {
+                                                if (File.Exists(filePath))
+                                                {
+                                                    Mesh newMesh = ObjLib.FileToMesh(filePath);
+                                                    if (newMesh != null)
+                                                    {
+                                                        m.mesh = newMesh;
+                                                        wrap = false;
+                                                        rescale = false;
+                                                    }
+                                                }
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                print("Exception loading mesh " + filePath + " for " + t.name + ": " + e.Message);
+                                            }
+                                            if (wrap)
+                                            {
+                                                try
+                                                {
+                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
+                                                    PQSMeshWrapper w = new PQSMeshWrapper();
+                                                    w.targetPQS = body.pqsController;
+                                                    print("*RSS* set target");
+                                                    w.outputRadius = body.Radius * ScaledSpace.InverseScaleFactor * SSTScale;
+                                                    print("*RSS* set output radius");
+                                                    w.sphereMesh = m.mesh;
+                                                    print("*RSS* set target mesh");
+                                                    Mesh newMesh = w.CreateWrappedMesh();
+                                                    print("*RSS* wrapped.");
+                                                    m.mesh = newMesh;
+                                                    try
+                                                    {
+                                                        ObjLib.MeshToFile(m, filePath);
+                                                    }
+                                                    catch (Exception e)
+                                                    {
+                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
+                                                    }
+                                                    print("*RSS*: Done wrapping. Checking atmo.");
+                                                    rescale = false;
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    print("*RSS* Exception wrapping: " + e.Message);
+                                                }
+                                            }
                                         }
                                     }
-                                    if(rescale)
+                                    if (rescale)
                                     {
                                         float scaleFactor = (float)(body.Radius / origRadius * SSTScale);
                                         t.localScale = new Vector3(t.localScale.x * scaleFactor, t.localScale.y * scaleFactor, t.localScale.z * scaleFactor);
+                                    }
+                                    else
+                                    {
+                                        // rescale only atmo
+                                        Transform atmo = t.FindChild("Atmosphere");
+                                        if (atmo != null)
+                                        {
+                                            //atmo.localScale = new Vector3(atmo.localScale.x * SSTScale, atmo.localScale.y * SSTScale, atmo.localScale.z * SSTScale);
+                                            float scaleFactor = (float)((body.Radius + body.maxAtmosphereAltitude) / (origRadius + origAtmo) * SSTScale);
+                                        }
                                     }
                                 }
                             }

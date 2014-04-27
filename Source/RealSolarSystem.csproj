@@ -41,6 +41,7 @@
     <Compile Include="ConfigNodeExtensions.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="KSPAddonFixed.cs" />
+    <Compile Include="ObjLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealSolarSystem.cs" />
     <Compile Include="SolarPanelFixer.cs" />
