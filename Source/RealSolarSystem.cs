@@ -131,20 +131,11 @@ namespace RealSolarSystem
                         bool btmp;
                         double origRadius = body.Radius;
                         double origAtmo = body.maxAtmosphereAltitude;
-                        if (node.HasValue("bodyName"))
-                        {
-                            body.bodyName = node.GetValue("bodyName");
-                        }
-                        if (node.HasValue("bodyDescription"))
-                        {
-                            body.bodyDescription = node.GetValue("bodyDescription");
-                        }
-                        if (node.HasValue("Radius"))
-                        {
-                            if (double.TryParse(node.GetValue("Radius"), out dtmp))
-                                body.Radius = dtmp;
-
-                        }
+                        
+                        node.TryGetValue("bodyName", ref body.bodyName);
+                        node.TryGetValue("bodyDescription", ref body.bodyDescription);
+                        node.TryGetValue("Radius", ref body.Radius);
+                        
                         if (node.HasValue("Mass"))
                         {
                             if (double.TryParse(node.GetValue("Mass"), out dtmp))
@@ -166,62 +157,38 @@ namespace RealSolarSystem
                                 GravParamToOthers(body);
                             }
                         }
-                        if (node.HasValue("atmosphere"))
+
+                        node.TryGetValue("atmosphere", ref body.atmosphere);
+                        node.TryGetValue("atmosphereScaleHeight", ref body.atmosphereScaleHeight);
+                        node.TryGetValue("atmosphereMultiplier", ref body.atmosphereMultiplier);
+                        node.TryGetValue("maxAtmosphereAltitude", ref body.maxAtmosphereAltitude);
+                        node.TryGetValue("staticPressureASL", ref body.staticPressureASL);
+                        node.TryGetValue("useLegacyAtmosphere", ref body.useLegacyAtmosphere);
+                        if (!body.useLegacyAtmosphere)
                         {
-                            if (bool.TryParse(node.GetValue("atmosphere"), out btmp))
-                                body.atmosphere = btmp;
-                        }
-                        if (node.HasValue("atmosphereScaleHeight"))
-                        {
-                            if (double.TryParse(node.GetValue("atmosphereScaleHeight"), out dtmp))
-                                body.atmosphereScaleHeight = dtmp;
-                        }
-                        if (node.HasValue("atmosphereMultiplier"))
-                        {
-                            if (float.TryParse(node.GetValue("atmosphereMultiplier"), out ftmp))
-                                body.atmosphereMultiplier = ftmp;
-                        }
-                        if (node.HasValue("maxAtmosphereAltitude"))
-                        {
-                            if (float.TryParse(node.GetValue("maxAtmosphereAltitude"), out ftmp))
-                                body.maxAtmosphereAltitude = ftmp;
-                        }
-                        if (node.HasValue("staticPressureASL"))
-                        {
-                            if (double.TryParse(node.GetValue("staticPressureASL"), out dtmp))
-                                body.staticPressureASL = dtmp;
-                        }
-                        if (node.HasValue("useLegacyAtmosphere"))
-                        {
-                            if (bool.TryParse(node.GetValue("useLegacyAtmosphere"), out btmp))
-                                body.useLegacyAtmosphere = btmp;
-                            print("*RSS* " + body.GetName() + " useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
-                            if (!body.useLegacyAtmosphere)
+                            ConfigNode PCnode = node.GetNode("pressureCurve");
+                            if (PCnode != null)
                             {
-                                ConfigNode PCnode = node.GetNode("pressureCurve");
-                                if (PCnode != null)
-                                {
-                                    string[] curve = PCnode.GetValues("key");
-                                    print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
-                                    print("*RSS* " + "    Overriding the following properties with '1'");
-                                    body.altitudeMultiplier = 1f;
-                                    body.pressureMultiplier = 1f;
-                                    print("*RSS* " + body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
-                                    print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
-                                    AnimationCurve pressureCurve = loadAnimationCurve(curve);
-                                    if (pressureCurve != null)
-                                        body.pressureCurve = pressureCurve;
-                                    else
-                                    {
-                                        body.useLegacyAtmosphere = true;
-                                        Debug.LogWarning("Unable to load pressureCurve data for " + body.name + ": Using legacy atmosphere");
-                                    }
-                                    print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
-                                }
+                                string[] curve = PCnode.GetValues("key");
+                                print("*RSS* found pressureCurve with " + curve.Length.ToString() + " keys.");
+                                print("*RSS* " + "    Overriding the following properties with '1'");
+                                body.altitudeMultiplier = 1f;
+                                body.pressureMultiplier = 1f;
+                                print("*RSS* " + body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
+                                print("*RSS* " + body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
+                                AnimationCurve pressureCurve = loadAnimationCurve(curve);
+                                if (pressureCurve != null)
+                                    body.pressureCurve = pressureCurve;
                                 else
                                 {
-                                    print("*RSS* useLegacyAtmosphere = False but pressureCurve not found!");
+                                    body.useLegacyAtmosphere = true;
+                                    Debug.LogWarning("Unable to load pressureCurve data for " + body.name + ": Using legacy atmosphere");
                                 }
+                                print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
+                            }
+                            else
+                            {
+                                print("*RSS* useLegacyAtmosphere = False but pressureCurve not found!");
                             }
                         }
                         if (node.HasNode("temperatureCurve"))
@@ -238,26 +205,11 @@ namespace RealSolarSystem
                                 }
                             }
                         }
-                        if (node.HasValue("rotationPeriod"))
-                        {
-                            if (double.TryParse(node.GetValue("rotationPeriod"), out dtmp))
-                                body.rotationPeriod = dtmp;
-                        }
-                        if (node.HasValue("tidallyLocked"))
-                        {
-                            if (bool.TryParse(node.GetValue("tidallyLocked"), out btmp))
-                                body.tidallyLocked = btmp;
-                        }
-                        if (node.HasValue("initialRotation"))
-                        {
-                            if (double.TryParse(node.GetValue("initialRotation"), out dtmp))
-                                body.initialRotation = dtmp;
-                        }
-                        if (node.HasValue("inverseRotation"))
-                        {
-                            if (bool.TryParse(node.GetValue("inverseRotation"), out btmp))
-                                body.inverseRotation = btmp;
-                        }
+                        node.TryGetValue("rotationPeriod", ref body.rotationPeriod);
+                        node.TryGetValue("tidallyLocked", ref body.tidallyLocked);
+                        node.TryGetValue("initialRotation", ref body.initialRotation);
+                        node.TryGetValue("inverseRotation", ref body.inverseRotation);
+                        
                         UpdateMass(body);
 
                         /*if (node.HasValue("axialTilt"))
@@ -276,16 +228,9 @@ namespace RealSolarSystem
                             if (useEpoch)
                                 body.orbit.epoch = epoch;
 
-                            if (onode.HasValue("semiMajorAxis"))
-                            {
-                                if (double.TryParse(onode.GetValue("semiMajorAxis"), out dtmp))
-                                    body.orbit.semiMajorAxis = dtmp;
-                            }
-                            if (onode.HasValue("eccentricity"))
-                            {
-                                if (double.TryParse(onode.GetValue("eccentricity"), out dtmp))
-                                    body.orbit.eccentricity = dtmp;
-                            }
+                            onode.TryGetValue("semiMajorAxis", ref body.orbit.semiMajorAxis);
+                            onode.TryGetValue("eccentricity", ref body.orbit.eccentricity);
+                            
                             bool anomFix = false;
                             if (onode.HasValue("meanAnomalyAtEpoch"))
                             {
@@ -303,26 +248,11 @@ namespace RealSolarSystem
                                     anomFix = true;
                                 }
                             }
-                            if (onode.HasValue("inclination"))
-                            {
-                                if (double.TryParse(onode.GetValue("inclination"), out dtmp))
-                                    body.orbit.inclination = dtmp;
-                            }
-                            if (onode.HasValue("period"))
-                            {
-                                if (double.TryParse(onode.GetValue("period"), out dtmp))
-                                    body.orbit.period = dtmp;
-                            }
-                            if (onode.HasValue("LAN"))
-                            {
-                                if (double.TryParse(onode.GetValue("LAN"), out dtmp))
-                                    body.orbit.LAN = dtmp;
-                            }
-                            if (onode.HasValue("argumentOfPeriapsis"))
-                            {
-                                if (double.TryParse(onode.GetValue("argumentOfPeriapsis"), out dtmp))
-                                    body.orbit.argumentOfPeriapsis = dtmp;
-                            }
+                            onode.TryGetValue("inclination", ref body.orbit.inclination);
+                            onode.TryGetValue("period", ref body.orbit.period);
+                            onode.TryGetValue("LAN", ref body.orbit.LAN);
+                            onode.TryGetValue("argumentOfPeriapsis", ref body.orbit.argumentOfPeriapsis);
+
                             if (onode.HasValue("referenceBody"))
                             {
                                 string bodyname = onode.GetValue("referenceBody");
@@ -340,11 +270,6 @@ namespace RealSolarSystem
                                             body.orbit.referenceBody = b;
                                             break;
                                         }
-                                       // if (b.GetName() == "Duna")
-                                        //{
-                                         //   PQSMod_LandClassController
-                                          //  print("*RSS-DUNA* " + 
-                                        //}
                                     }
                                 }
                             }
@@ -362,21 +287,9 @@ namespace RealSolarSystem
                         // Scaled space fader
                         float SSFMult = 1.0f;
                         float SSFStart = -1, SSFEnd = -1;
-                        if (node.HasValue("SSFStart"))
-                        {
-                            if (float.TryParse(node.GetValue("SSFStart"), out ftmp))
-                                SSFStart = ftmp;
-                        }
-                        if (node.HasValue("SSFEnd"))
-                        {
-                            if (float.TryParse(node.GetValue("SSFEnd"), out ftmp))
-                                SSFEnd = ftmp;
-                        }
-                        if (node.HasValue("SSFMult"))
-                        {
-                            if (float.TryParse(node.GetValue("SSFMult"), out ftmp))
-                                SSFMult = ftmp;
-                        }
+                        node.TryGetValue("SSFStart", ref SSFStart);
+                        node.TryGetValue("SSFEnd", ref SSFEnd);
+                        node.TryGetValue("SSFMult", ref SSFMult);
 
                         foreach (ScaledSpaceFader ssf in Resources.FindObjectsOfTypeAll(typeof(ScaledSpaceFader)))
                         {
@@ -407,37 +320,17 @@ namespace RealSolarSystem
                                     if (c.body.name.Equals(node.name))
                                     {
                                         print("Found CBT for " + node.name);
-                                        if (node.HasValue("PQSdeactivateAltitude"))
-                                        {
-                                            if (double.TryParse(node.GetValue("PQSdeactivateAltitude"), out dtmp))
-                                                c.deactivateAltitude = dtmp;
-                                        }
+                                        node.TryGetValue("PQSdeactivateAltitude", ref c.deactivateAltitude);
                                         if (c.planetFade != null)
                                         {
-                                            if (node.HasValue("PQSfadeStart"))
-                                            {
-                                                if (float.TryParse(node.GetValue("PQSfadeStart"), out ftmp))
-                                                    c.planetFade.fadeStart = ftmp;
-                                            }
-                                            if (node.HasValue("PQSfadeEnd"))
-                                            {
-                                                if (float.TryParse(node.GetValue("PQSfadeEnd"), out ftmp))
-                                                    c.planetFade.fadeEnd = ftmp;
-                                            }
+                                            node.TryGetValue("PQSfadeStart", ref c.planetFade.fadeStart);
+                                            node.TryGetValue("PQSfadeEnd", ref c.planetFade.fadeEnd);
                                             if (c.secondaryFades != null)
                                             {
                                                 foreach (PQSMod_CelestialBodyTransform.AltitudeFade af in c.secondaryFades)
                                                 {
-                                                    if (node.HasValue("PQSSecfadeStart"))
-                                                    {
-                                                        if (float.TryParse(node.GetValue("PQSSecfadeStart"), out ftmp))
-                                                            af.fadeStart = ftmp;
-                                                    }
-                                                    if (node.HasValue("PQSSecfadeEnd"))
-                                                    {
-                                                        if (float.TryParse(node.GetValue("PQSSecfadeEnd"), out ftmp))
-                                                            af.fadeEnd = ftmp;
-                                                    }
+                                                    node.TryGetValue("PQSSecfadeStart", ref af.fadeStart);
+                                                    node.TryGetValue("PQSSecfadeEnd", ref af.fadeEnd);
                                                 }
                                             }
                                         }
@@ -1087,12 +980,7 @@ namespace RealSolarSystem
                                             if (float.TryParse(modNode.GetValue("innerRadiusMult"), out ftmp))
                                                 ag.innerRadius = ftmp * ag.outerRadius;
                                         }
-
-                                        if (modNode.HasValue("doScale"))
-                                        {
-                                            if (bool.TryParse(modNode.GetValue("doScale"), out btmp))
-                                                ag.doScale = btmp;
-                                        }
+                                        modNode.TryGetValue("doScale", ref ag.doScale);
                                         if (modNode.HasValue("transformScale"))
                                         {
                                             if (float.TryParse(modNode.GetValue("transformScale"), out ftmp) && ag.transform != null)
@@ -1136,8 +1024,7 @@ namespace RealSolarSystem
                         if (ScaledSpace.Instance != null)
                         {
                             float SSTScale = 1.0f;
-                            if (node.HasValue("SSTScale"))
-                                float.TryParse(node.GetValue("SSTScale"), out SSTScale);
+                            node.TryGetValue("SSTScale", ref SSTScale);
                             foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                             {
                                 if (t.name.Equals(node.name))
@@ -1243,55 +1130,18 @@ namespace RealSolarSystem
                                     /*if(body.scienceValues.GetType().GetField(val.name) != null)
                                         if(float.TryParse(val.value, out ftmp))
                                             body.scienceValues.GetType().GetField(val.name).SetValue(*/
-                                    if (spNode.HasValue("LandedDataValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("LandedDataValue"), out ftmp))
-                                            body.scienceValues.LandedDataValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("SplashedDataValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("SplashedDataValue"), out ftmp))
-                                            body.scienceValues.SplashedDataValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("FlyingLowDataValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("FlyingLowDataValue"), out ftmp))
-                                            body.scienceValues.FlyingLowDataValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("FlyingHighDataValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("FlyingHighDataValue"), out ftmp))
-                                            body.scienceValues.FlyingHighDataValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("InSpaceLowDataValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("InSpaceLowDataValue"), out ftmp))
-                                            body.scienceValues.InSpaceLowDataValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("InSpaceHighDataValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("InSpaceHighDataValue"), out ftmp))
-                                            body.scienceValues.InSpaceHighDataValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("RecoveryValue"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("RecoveryValue"), out ftmp))
-                                            body.scienceValues.RecoveryValue = ftmp;
-                                    }
-                                    if (spNode.HasValue("flyingAltitudeThreshold"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("flyingAltitudeThreshold"), out ftmp))
-                                            body.scienceValues.flyingAltitudeThreshold = ftmp;
-                                    }
-                                    if (spNode.HasValue("spaceAltitudeThreshold"))
-                                    {
-                                        if (float.TryParse(spNode.GetValue("spaceAltitudeThreshold"), out ftmp))
-                                            body.scienceValues.spaceAltitudeThreshold = ftmp;
-                                    }
+                                    spNode.TryGetValue("LandedDataValue", ref body.scienceValues.LandedDataValue);
+                                    spNode.TryGetValue("SplashedDataValue", ref body.scienceValues.SplashedDataValue);
+                                    spNode.TryGetValue("FlyingLowDataValue", ref body.scienceValues.FlyingLowDataValue);
+                                    spNode.TryGetValue("FlyingHighDataValue", ref body.scienceValues.FlyingHighDataValue);
+                                    spNode.TryGetValue("InSpaceLowDataValue", ref body.scienceValues.InSpaceLowDataValue);
+                                    spNode.TryGetValue("InSpaceHighDataValue", ref body.scienceValues.InSpaceHighDataValue);
+                                    spNode.TryGetValue("RecoveryValue", ref body.scienceValues.RecoveryValue);
+                                    spNode.TryGetValue("flyingAltitudeThreshold", ref body.scienceValues.flyingAltitudeThreshold);
+                                    spNode.TryGetValue("spaceAltitudeThreshold", ref body.scienceValues.spaceAltitudeThreshold);
                                 }
                             }
                         }
-                        // END STUPID RADIUS CHECK
                             
                         // texture rebuild
                         if (node.HasNode("Export"))

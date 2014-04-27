@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\</OutputPath>
+    <OutputPath>..\RealSolarSystem\Plugins\</OutputPath>
     <DefineConstants>
     </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
@@ -38,6 +38,7 @@
     <Compile Include="CameraFixer.cs" />
     <Compile Include="CBRotation.cs" />
     <Compile Include="Checkers.cs" />
+    <Compile Include="ConfigNodeExtensions.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="KSPAddonFixed.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

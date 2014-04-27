@@ -49,10 +49,7 @@ namespace RealSolarSystem
                         camNode = node;
                     if (camNode != null)
                     {
-                        float ftmp;
-                        if (camNode.HasValue("max3DlineDrawDist"))
-                            if (float.TryParse(camNode.GetValue("max3DlineDrawDist"), out ftmp))
-                                MapView.fetch.max3DlineDrawDist = ftmp;
+                        camNode.TryGetValue("max3DlineDrawDist", ref MapView.fetch.max3DlineDrawDist);
                     }
                 }
                 catch (Exception e)
@@ -73,21 +70,16 @@ namespace RealSolarSystem
                         foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
                         {
                             //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                            if (camNode.HasValue("VABmaxHeight"))
-                                if (float.TryParse(camNode.GetValue("VABmaxHeight"), out ftmp))
-                                    c.maxHeight = ftmp;
-
-                            if (camNode.HasValue("VABmaxDistance"))
-                                if (float.TryParse(camNode.GetValue("VABmaxDistance"), out ftmp))
-                                    c.maxDistance = ftmp;
+                            camNode.TryGetValue("VABmaxHeight", ref c.maxHeight);
+                            camNode.TryGetValue("VABmaxDistance", ref c.maxDistance);
+                            camNode.TryGetValue("VABminDistance", ref c.minDistance);
                         }
 
                         foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
                         {
                             //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                            if (camNode.HasValue("SPHmaxDistance"))
-                                if (float.TryParse(camNode.GetValue("SPHmaxDistance"), out ftmp))
-                                    c.maxDistance = ftmp;
+                            camNode.TryGetValue("SPHmaxDistance", ref c.maxDistance);
+                            camNode.TryGetValue("SPHminDistance", ref c.minDistance);
                         }
                         if (camNode.HasValue("editorExtentsMult"))
                             if (float.TryParse(camNode.GetValue("editorExtentsMult"), out ftmp))
