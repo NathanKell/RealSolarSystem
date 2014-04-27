@@ -42,6 +42,7 @@ namespace RealSolarSystem
                                 TimeWarp.fetch.warpRates[i] = ftmp;
                     }
                 }
+                Destroy(this);
             }
         }
     }
