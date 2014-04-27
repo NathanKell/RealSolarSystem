@@ -26,18 +26,21 @@ namespace RealSolarSystem
             z = (n + alt) * -1.0 * Math.Sin(lat) * Math.Sin(lon);
             return new Vector3((float)x, (float)y, (float)z);
         }
-        public void UpdateMass(CelestialBody body)
+        public void GeeASLToOthers(CelestialBody body)
         {
             double rsq = body.Radius * body.Radius;
             body.gMagnitudeAtCenter = body.GeeASL * 9.81 * rsq;
-            body.gravParameter = rsq * body.GeeASL * 9.81;
+            body.gravParameter = body.gMagnitudeAtCenter;
             body.Mass = body.gravParameter * (1 / 6.674E-11);
         }
 
         // converts mass to Gee ASL using a body's radius.
-        public static double MassToGeeASL(double mass, double radius)
+        public void MassToOthers(CelestialBody body)
         {
-            return mass * (6.674E-11 / 9.81) / (radius * radius);
+            double rsq = body.Radius * body.Radius;
+            body.GeeASL = body.Mass * (6.674E-11 / 9.81) / rsq;
+            body.gMagnitudeAtCenter = body.GeeASL * 9.81 * rsq;
+            body.gravParameter = body.gMagnitudeAtCenter;
         }
 
         public static void GravParamToOthers(CelestialBody body)
@@ -113,15 +116,11 @@ namespace RealSolarSystem
             double epoch = 0;
             bool useEpoch = false;
             bool doWrap = true;
-            if (RSSSettings.HasValue("Epoch"))
-                if (double.TryParse(RSSSettings.GetValue("Epoch"), out epoch))
-                    useEpoch = true;
-                else
-                    useEpoch = false;
-
-            if (RSSSettings.HasValue("wrap"))
-                if (!bool.TryParse(RSSSettings.GetValue("wrap"), out doWrap))
-                   doWrap = true;
+            bool updateMass = true;
+            bool compressNormals = false;
+            useEpoch = RSSSettings.TryGetValue("Epoch", ref epoch);
+            RSSSettings.TryGetValue("wrap", ref doWrap);
+            RSSSettings.TryGetValue("compressNormals", ref compressNormals);
 
             foreach (ConfigNode node in RSSSettings.nodes)
             {
@@ -141,26 +140,20 @@ namespace RealSolarSystem
                         node.TryGetValue("bodyDescription", ref body.bodyDescription);
                         node.TryGetValue("Radius", ref body.Radius);
                         
-                        if (node.HasValue("Mass"))
+                        if (node.TryGetValue("Mass", ref body.Mass))
                         {
-                            if (double.TryParse(node.GetValue("Mass"), out dtmp))
-                            {
-                                body.Mass = dtmp;
-                                body.GeeASL = MassToGeeASL(dtmp, body.Radius);
-                            }
+                            MassToOthers(body);
+                            updateMass = false;
                         }
-                        if (node.HasValue("GeeASL"))
+                        if (node.TryGetValue("GeeASL", ref body.GeeASL))
                         {
-                            if (double.TryParse(node.GetValue("GeeASL"), out dtmp))
-                                body.GeeASL = dtmp;
+                            GeeASLToOthers(body);
+                            updateMass = false;
                         }
-                        if (node.HasValue("gravParameter"))
+                        if (node.TryGetValue("gravParameter", ref body.gravParameter))
                         {
-                            if (double.TryParse(node.GetValue("gravParameter"), out dtmp))
-                            {
-                                body.gravParameter = dtmp;
-                                GravParamToOthers(body);
-                            }
+                            GravParamToOthers(body);
+                            updateMass = false;
                         }
 
                         node.TryGetValue("atmosphere", ref body.atmosphere);
@@ -215,7 +208,8 @@ namespace RealSolarSystem
                         node.TryGetValue("initialRotation", ref body.initialRotation);
                         node.TryGetValue("inverseRotation", ref body.inverseRotation);
                         
-                        UpdateMass(body);
+                        if(updateMass)
+                            GeeASLToOthers(body);
 
                         /*if (node.HasValue("axialTilt"))
                         {
@@ -237,30 +231,22 @@ namespace RealSolarSystem
                             onode.TryGetValue("eccentricity", ref body.orbit.eccentricity);
                             
                             bool anomFix = false;
-                            if (onode.HasValue("meanAnomalyAtEpoch"))
+                            if (onode.TryGetValue("meanAnomalyAtEpoch", ref body.orbit.meanAnomalyAtEpoch))
                             {
-                                if (double.TryParse(onode.GetValue("meanAnomalyAtEpoch"), out dtmp))
-                                {
-                                    body.orbit.meanAnomalyAtEpoch = dtmp;
-                                    anomFix = true;
-                                }
+                                anomFix = true;
                             }
-                            if (onode.HasValue("meanAnomalyAtEpochD"))
+                            if (onode.TryGetValue("meanAnomalyAtEpochD", ref body.orbit.meanAnomalyAtEpoch))
                             {
-                                if (double.TryParse(onode.GetValue("meanAnomalyAtEpochD"), out dtmp))
-                                {
-                                    body.orbit.meanAnomalyAtEpoch = dtmp * 0.0174532925199433;
-                                    anomFix = true;
-                                }
+                                body.orbit.meanAnomalyAtEpoch *= 0.0174532925199433;
+                                anomFix = true;
                             }
                             onode.TryGetValue("inclination", ref body.orbit.inclination);
                             onode.TryGetValue("period", ref body.orbit.period);
                             onode.TryGetValue("LAN", ref body.orbit.LAN);
                             onode.TryGetValue("argumentOfPeriapsis", ref body.orbit.argumentOfPeriapsis);
-
-                            if (onode.HasValue("referenceBody"))
+                            string bodyname = "";
+                            if (onode.TryGetValue("referenceBody", ref bodyname))
                             {
-                                string bodyname = onode.GetValue("referenceBody");
                                 if (body.orbit.referenceBody == null || !body.orbit.referenceBody.Equals(bodyname))
                                 {
                                     foreach (CelestialBody b in FlightGlobals.Bodies)
@@ -960,30 +946,26 @@ namespace RealSolarSystem
                                     if (node.HasNode("AtmosphereFromGround"))
                                     {
                                         ConfigNode modNode = node.GetNode("AtmosphereFromGround");
-                                        if (modNode.HasValue("outerRadius"))
+                                        if (modNode.TryGetValue("outerRadius", ref ag.outerRadius))
                                         {
-                                            if (float.TryParse(modNode.GetValue("outerRadius"), out ftmp))
-                                                ag.outerRadius = ftmp * ScaledSpace.InverseScaleFactor;
+                                            ag.outerRadius *= ScaledSpace.InverseScaleFactor;
                                         }
                                         else if (modNode.HasValue("outerRadiusAtmo"))
                                         {
                                             ag.outerRadius = ((float)body.Radius + body.maxAtmosphereAltitude) * ScaledSpace.InverseScaleFactor;
                                         }
-                                        else if (modNode.HasValue("outerRadiusMult"))
+                                        else if (modNode.TryGetValue("outerRadiusMult", ref ag.outerRadius))
                                         {
-                                            if (float.TryParse(modNode.GetValue("outerRadiusMult"), out ftmp))
-                                                ag.outerRadius = ftmp * (float)body.Radius * ScaledSpace.InverseScaleFactor;
+                                            ag.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
                                         }
 
-                                        if (modNode.HasValue("innerRadius"))
+                                        if (modNode.TryGetValue("innerRadius", ref ag.innerRadius))
                                         {
-                                            if (float.TryParse(modNode.GetValue("innerRadius"), out ftmp))
-                                                ag.innerRadius = ftmp * ScaledSpace.InverseScaleFactor;
+                                            ag.innerRadius *= ScaledSpace.InverseScaleFactor;
                                         }
-                                        else if (modNode.HasValue("innerRadiusMult"))
+                                        else if (modNode.TryGetValue("innerRadiusMult", ref ag.innerRadius))
                                         {
-                                            if (float.TryParse(modNode.GetValue("innerRadiusMult"), out ftmp))
-                                                ag.innerRadius = ftmp * ag.outerRadius;
+                                            ag.innerRadius *= ag.outerRadius;
                                         }
                                         modNode.TryGetValue("doScale", ref ag.doScale);
                                         if (modNode.HasValue("transformScale"))
@@ -1066,16 +1048,19 @@ namespace RealSolarSystem
                                     {
                                         Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
                                         map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
-                                        //map.Compress(true);
+                                        if(compressNormals)
+                                            map.Compress(true);
                                         map.Apply(true, true);
                                         Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
-                                        foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                        if (oldBump != null)
                                         {
-                                            if(m.GetTexture("_BumpMap") == oldBump)
-                                                m.SetTexture("_BumpMap", map);
+                                            foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                            {
+                                                if (m.GetTexture("_BumpMap") == oldBump)
+                                                    m.SetTexture("_BumpMap", map);
+                                            }
+                                            DestroyImmediate(oldBump);
                                         }
-                                        DestroyImmediate(oldBump);
-                                        // t.gameObject.renderer.material.SetTexture("_BumpMap", map);
                                     }
 
                                     // Fix mesh
