@@ -131,10 +131,14 @@ namespace RealSolarSystem
                         bool btmp;
                         double origRadius = body.Radius;
                         double origAtmo = body.maxAtmosphereAltitude;
-                        // some exploratory stuff
-                        print(body.GetName() + ".altitudeOffset = " + body.altitudeOffset.ToString());
-                        print(body.GetName() + ".altitudeMultiplier = " + body.altitudeMultiplier.ToString());
-                        print(body.GetName() + ".pressureMultiplier = " + body.pressureMultiplier.ToString());
+                        if (node.HasValue("bodyName"))
+                        {
+                            body.bodyName = node.GetValue("bodyName");
+                        }
+                        if (node.HasValue("bodyDescription"))
+                        {
+                            body.bodyDescription = node.GetValue("bodyDescription");
+                        }
                         if (node.HasValue("Radius"))
                         {
                             if (double.TryParse(node.GetValue("Radius"), out dtmp))
@@ -1184,12 +1188,12 @@ namespace RealSolarSystem
 
                                     // Fix mesh
                                     bool rescale = true;
-                                    if (body.pqsController != null)
+                                    if (false && body.pqsController != null)
                                     {
                                         //MeshFilter[] meshes = t.GetComponentsInChildren<MeshFilter>();
                                         try
                                         {
-                                            MeshFilter m = t.gameObject.GetComponentInChildren<MeshFilter>();
+                                            MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
                                             if (m == null || m.mesh == null)
                                             {
                                                 print("*RSS* Failure wrapping " + body.pqsController.name + ": mesh is null");
