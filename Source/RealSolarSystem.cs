@@ -1091,7 +1091,7 @@ namespace RealSolarSystem
                                             {
                                                 m.mesh = joolMesh.mesh;
                                                 print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name);
-                                                float scaleFactor = (float)(body.Radius / 6000000 * SSTScale);
+                                                float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
                                                 t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                                                 rescale = false;
 	                                        }
@@ -1136,7 +1136,7 @@ namespace RealSolarSystem
 	                                                    PQSMeshWrapper w = new PQSMeshWrapper();
 	                                                    w.targetPQS = body.pqsController;
 	                                                    print("*RSS* set target");
-	                                                    w.outputRadius = body.Radius * ScaledSpace.InverseScaleFactor * SSTScale;
+	                                                    w.outputRadius = 1000.0; // same as stock SSMs
 	                                                    print("*RSS* set output radius");
 	                                                    w.sphereMesh = m.mesh;
 	                                                    /*print("*RSS* set target mesh. Creating test linkedmesh");
@@ -1153,7 +1153,9 @@ namespace RealSolarSystem
 	                                                    {
 	                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
 	                                                    }
-	                                                    print("*RSS*: Done wrapping and exporting. Checking atmo.");
+	                                                    print("*RSS*: Done wrapping and exporting. Setting scale");
+                                                        float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
+                                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 	                                                    rescale = false;
 	                                                }
 	                                                catch (Exception e)
