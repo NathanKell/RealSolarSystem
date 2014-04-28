@@ -31,16 +31,19 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
-v7    \/
-*Added bodyName support
-*Parsing changes, using stupid_chris's ConfigNodeExtensions
-*
-v6.1  \/ (released in Better Atmospheres)
+v6.1  \/
 *Fixed only changing things if radius differs
 *Fixed to work on non-Windows platforms (regex)
 *Fixed many atmosphere and temperature curves (eggrobin)
 *Fixed misc typos
-*Added Moon retexture
+*Added Moon retexture from SpacedInvader
+*Added bodyName support
+*Parsing changes, using stupid_chris's ConfigNodeExtensions
+*Added KSCSwitcher from regex: can switch KSC to other presets in Tracking Station
+*Speedup in timewarpchecker from swamp_ig
+*Added support for PQS->scaledspace wrapping (for real this time; didn't work before).
+*Added support for replacing scaledspace meshes with spheres (use this for now, importing is broken)
+*Added support for compressing normals (defaults to true)
 
 v6    \/
 *Changed Kerbin's heightmap, textures, and PQSMods to resemble Earth (allow replacing heightmaps, SS diffuse, and SS normal maps)
