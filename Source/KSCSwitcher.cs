@@ -110,6 +110,13 @@ namespace RealSolarSystem {
                             mod.repositionToSphereSurface = btmp;
                         }
                     }
+                    if (pqsCity.HasValue("repositionToSphereSurfaceAddHeight"))
+                    {
+                        if (bool.TryParse(pqsCity.GetValue("repositionToSphereSurfaceAddHeight"), out btmp))
+                        {
+                            mod.repositionToSphereSurfaceAddHeight = btmp;
+                        }
+                    }
                     if(pqsCity.HasValue("reorientToSphere")) {
                         if(bool.TryParse(pqsCity.GetValue("reorientToSphere"), out btmp)) {
                             mod.reorientToSphere = btmp;

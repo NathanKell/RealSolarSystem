@@ -806,6 +806,11 @@ namespace RealSolarSystem
                                                         if (bool.TryParse(modNode.GetValue("repositionToSphereSurface"), out btmp))
                                                             mod.repositionToSphereSurface = btmp;
                                                     }
+                                                    if (modNode.HasValue("repositionToSphereSurfaceAddHeight"))
+                                                    {
+                                                        if (bool.TryParse(modNode.GetValue("repositionToSphereSurfaceAddHeight"), out btmp))
+                                                            mod.repositionToSphereSurfaceAddHeight = btmp;
+                                                    }
                                                     if (modNode.HasValue("reorientToSphere"))
                                                     {
                                                         if (bool.TryParse(modNode.GetValue("reorientToSphere"), out btmp))
