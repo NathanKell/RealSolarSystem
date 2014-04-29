@@ -6,6 +6,7 @@ Thanks to asmi for kicking me into to doing this and offering so much help along
 
 License: CC-BY-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source) and stupid_chris (ConfigNodeExtensions, licensed CC-BY-NC-SA). Used with permission.
+Also included: Module Manager (by sarbian and ialdabaoth). See Module Manager thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/55219
 
 INSTALLATION:
 Extract to KSP/GameData.
