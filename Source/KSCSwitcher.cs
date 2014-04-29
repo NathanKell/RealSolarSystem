@@ -37,6 +37,7 @@ namespace RealSolarSystem {
 	                }
 	            }
 			}
+            print("*RSS* KSCSwitcher initialized");
 		}
 		
 		public void OnGUI() {
@@ -68,6 +69,10 @@ namespace RealSolarSystem {
             float ftmp;
             bool btmp;
 			CelestialBody Kerbin = FlightGlobals.Bodies.Find(body => body.name == "Kerbin");
+            if (Kerbin == null)
+            {
+                Kerbin = FlightGlobals.Bodies.Find(body => body.name == "Earth"); // temp fix
+            }
 			var mods = Kerbin.pqsController.transform.GetComponentsInChildren(typeof(PQSMod), true);
 			ConfigNode pqsCity = site.GetNode("PQSCity");
 			ConfigNode pqsDecal = site.GetNode("PQSMod_MapDecalTangent");
@@ -105,6 +110,13 @@ namespace RealSolarSystem {
                             mod.repositionToSphereSurface = btmp;
                         }
                     }
+                    if (pqsCity.HasValue("repositionToSphereSurfaceAddHeight"))
+                    {
+                        if (bool.TryParse(pqsCity.GetValue("repositionToSphereSurfaceAddHeight"), out btmp))
+                        {
+                            mod.repositionToSphereSurfaceAddHeight = btmp;
+                        }
+                    }
                     if(pqsCity.HasValue("reorientToSphere")) {
                         if(bool.TryParse(pqsCity.GetValue("reorientToSphere"), out btmp)) {
                             mod.reorientToSphere = btmp;
@@ -127,6 +139,7 @@ namespace RealSolarSystem {
                             mod.reorientFinalAngle = ftmp;
                         }
                     }
+                    print("*RSS* changed PQSCity");
                     
                     hasChanged = true;
                     mod.OnSetup();
@@ -166,15 +179,18 @@ namespace RealSolarSystem {
                         
                         mod.position = RealSolarSystem.LLAtoECEF(lat, lon, 0, Kerbin.Radius);
                     }
+                    print("*RSS* changed MapDecal_Tangent");
 
                     hasChanged = true;
                     mod.OnSetup();
                 }
 
                 if(hasChanged) {
+                    print("*RSS* Rebuilding");
 					Kerbin.pqsController.RebuildSphere();
 					ScreenMessages.PostScreenMessage("Launch site changed to " + name, 2.5f, ScreenMessageStyle.LOWER_CENTER);
 					showWindow = false;
+                    print("*RSS* Launch site change DONE");
                 }
 			}
 		}
