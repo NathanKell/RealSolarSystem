@@ -40,7 +40,9 @@ v6.1  \/
 *Added Moon retexture from SpacedInvader
 *Added bodyName support
 *Parsing changes, using stupid_chris's ConfigNodeExtensions
-*Added KSCSwitcher from regex: can switch KSC to other presets in Tracking Station
+*Added KSCSwitcher from regex: can switch KSC to other presets in the Tracking Station
+*Added many, many launch site configurations (compiled by eggrobin from the work by Captain Party, ferram, and others)
+*Added new descriptions to all Celestial Bodies, thanks to TheKosmonaut/SpaceAnt
 *Speedup in timewarpchecker from swamp_ig
 *Added support for PQS->scaledspace wrapping (for real this time; didn't work before).
 *Added support for replacing scaledspace meshes with spheres (use this for now, importing is broken)
