@@ -10,6 +10,13 @@ namespace RealSolarSystem
 {
     class ObjLib
     {
+        // **** VERTEX MATCH ****
+        public void UpdateVerticesFromFile(string filename)
+        {
+            StreamReader stream = File.OpenText(filename);
+            stream.ReadLine();
+            string curLine = stream.ReadLine();
+        }
         // **** EXPORT ****
         public static string MeshToString(MeshFilter mf)
         {

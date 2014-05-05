@@ -1082,6 +1082,8 @@ namespace RealSolarSystem
 
                                     // Fix mesh
                                     bool rescale = true;
+                                    bool doWrapHere = false;
+                                    node.TryGetValue("wrap", ref doWrapHere);
                                     if (body.pqsController != null && doWrap)
                                     {
                                         //MeshFilter[] meshes = t.GetComponentsInChildren<MeshFilter>();
@@ -1092,7 +1094,9 @@ namespace RealSolarSystem
                                         }
                                         else
                                         {
-                                            if (node.HasValue("useSphericalSSM") || spheresOnly)
+                                            bool sphereVal = false;
+                                            bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
+                                            if ((spheresOnly && !sphereHere) || sphereVal)
                                             {
                                                 m.mesh = joolMesh.mesh;
                                                 print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name);
