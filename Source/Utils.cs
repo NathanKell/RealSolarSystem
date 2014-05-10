@@ -10,6 +10,55 @@ namespace RealSolarSystem
 {
     public class Utils : MonoBehaviour
     {
+        public static void MatchVerts(MeshFilter mf, PQS pqs)
+        {
+            pqs.isBuildingMaps = true;
+
+            Vector3[] vertices = new Vector3[mf.mesh.vertexCount];
+            for (int i = 0; i < mf.mesh.vertexCount; i++)
+            {
+                Vector3 v = mf.mesh.vertices[i];
+                float height = (float)pqs.GetSurfaceHeight(v);
+
+                vertices[i] = v / v.magnitude * 1000.0f / 6000000.0f * height;
+            }
+            pqs.isBuildingMaps = false;
+            mf.mesh.vertices = vertices;
+        }
+        public static void CopyMesh(Mesh source, Mesh dest)
+        {
+            dest.vertices = new Vector3[source.vertexCount];
+            for (int i = 0; i < source.vertexCount; i++)
+                dest.vertices[i] = source.vertices[i];
+
+            dest.triangles = new int[source.triangles.Length];
+            for (int i = 0; i < source.triangles.Length; i++)
+                dest.triangles[i] = source.triangles[i];
+
+            dest.uv = new Vector2[source.uv.Length];
+            for (int i = 0; i < source.uv.Length; i++)
+                dest.uv[i] = source.uv[i];
+
+            dest.uv2 = new Vector2[source.uv2.Length];
+            for (int i = 0; i < source.uv2.Length; i++)
+                dest.uv2[i] = source.uv2[i];
+
+            dest.normals = new Vector3[source.normals.Length];
+            for (int i = 0; i < source.normals.Length; i++)
+                dest.normals[i] = source.normals[i];
+
+            dest.tangents = new Vector4[source.tangents.Length];
+            for (int i = 0; i < source.tangents.Length; i++)
+                dest.tangents[i] = source.tangents[i];
+
+            dest.colors = new Color[source.colors.Length];
+            for (int i = 0; i < source.colors.Length; i++)
+                dest.colors[i] = source.colors[i];
+
+            dest.colors32 = new Color32[source.colors32.Length];
+            for (int i = 0; i < source.colors32.Length; i++)
+                dest.colors32[i] = source.colors32[i];
+        }
         public static void DumpSSF(ScaledSpaceFader ssf)
         {
             print("SSF BODY NAME: " + ssf.celestialBody.name);

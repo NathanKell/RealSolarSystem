@@ -1099,6 +1099,7 @@ namespace RealSolarSystem
                                             if ((spheresOnly && !sphereHere) || sphereVal)
                                             {
                                                 m.mesh = joolMesh.mesh;
+                                                MeshFilter nmf = new MeshFilter();
                                                 print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name);
                                                 float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
                                                 t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
@@ -1109,7 +1110,7 @@ namespace RealSolarSystem
 	                                            char sep = System.IO.Path.DirectorySeparatorChar;
 	                                            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
 	                                                        + sep + "PluginData" + sep + t.name;
-	                                            string fp2 = filePath + "_orig.obj";
+	                                            /*string fp2 = filePath + "_orig.obj";
 	                                            filePath += ".obj";
 	                                            try
 	                                            {
@@ -1117,20 +1118,19 @@ namespace RealSolarSystem
 	                                            }
 	                                            catch (Exception e)
 	                                            {
-	                                                print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
-	                                            }
+	                                                print("*RSS* Exception saving orig mesh " + filePath + ": " + e.Message);
+	                                            }*/
 	                                            bool wrap = true;
 	                                            try
 	                                            {
 	                                                if (File.Exists(filePath))
 	                                                {
-	                                                    Mesh newMesh = ObjLib.FileToMesh(filePath);
-	                                                    if (newMesh != null)
-	                                                    {
-	                                                        m.mesh = newMesh;
-	                                                        wrap = false;
-	                                                        rescale = false;
-	                                                    }
+                                                        Utils.CopyMesh(joolMesh.mesh, m.mesh);
+                                                        ObjLib.UpdateVerticesFromFile(m.mesh, filePath);
+                                                        m.mesh.RecalculateBounds();
+                                                        m.mesh.RecalculateNormals();
+                                                        ObjLib.UpdateTangents(m.mesh);
+                                                        wrap = false;
 	                                                }
 	                                            }
 	                                            catch (Exception e)
@@ -1142,18 +1142,12 @@ namespace RealSolarSystem
 	                                                try
 	                                                {
 	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
-	                                                    PQSMeshWrapper w = new PQSMeshWrapper();
-	                                                    w.targetPQS = body.pqsController;
-	                                                    print("*RSS* set target");
-	                                                    w.outputRadius = 1000.0; // same as stock SSMs
-	                                                    print("*RSS* set output radius");
-	                                                    w.sphereMesh = m.mesh;
-	                                                    /*print("*RSS* set target mesh. Creating test linkedmesh");
-	                                                    LinkedMesh lm = new LinkedMesh(w.sphereMesh);
-	                                                    print("*RSS* created linkedmesh");*/
-	                                                    Mesh newMesh = w.CreateWrappedMesh();
+                                                        Utils.CopyMesh(joolMesh.mesh, m.mesh);
+                                                        Utils.MatchVerts(m, body.pqsController);
+                                                        m.mesh.RecalculateBounds();
+                                                        m.mesh.RecalculateNormals();
+                                                        ObjLib.UpdateTangents(m.mesh);
 	                                                    print("*RSS* wrapped.");
-	                                                    m.mesh = newMesh;
 	                                                    try
 	                                                    {
 	                                                        ObjLib.MeshToFile(m, filePath);
