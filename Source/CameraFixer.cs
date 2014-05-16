@@ -91,37 +91,37 @@ namespace RealSolarSystem
                     print("Camera fixing failed: " + e.Message);
                 }
             }
-			if(HighLogic.LoadedScene == GameScenes.SPACECENTER) {
-				PQSCity ksc = null;
-				foreach(PQSCity city in Resources.FindObjectsOfTypeAll(typeof(PQSCity))) {
-					if(city.name == "KSC") {
-						ksc = city;
-						break;
-					}
-				}
-				if(ksc == null) {
-					Debug.Log("*RSS* could not find KSC to fix the camera.");
-					return;
-				}
-				foreach(SpaceCenterCamera2 cam in Resources.FindObjectsOfTypeAll(typeof(SpaceCenterCamera2))) {
-					if(ksc.repositionToSphere || ksc.repositionToSphereSurface) {
-						CelestialBody Kerbin = FlightGlobals.Bodies.Find(body => body.name == ksc.sphere.name);
-						if(Kerbin == null) {
-        					Debug.Log("*RSS* could not find find the CelestialBody specified as KSC's sphere.");
-        					return;
-						}
-						double nomHeight = Kerbin.pqsController.GetSurfaceHeight((Vector3d) ksc.repositionRadial.normalized) - Kerbin.Radius;
-						if(ksc.repositionToSphereSurface) {
-							nomHeight += ksc.repositionRadiusOffset;
-						}
-						cam.altitudeInitial = 0f - (float) nomHeight;
-					} else {
-						cam.altitudeInitial = 0f - (float) ksc.repositionRadiusOffset;
-					}
-					cam.ResetCamera();
-					Debug.Log("*RSS* fixed the Space Center camera.");
-				}
-			}
+            if(HighLogic.LoadedScene == GameScenes.SPACECENTER) {
+                PQSCity ksc = null;
+                foreach(PQSCity city in Resources.FindObjectsOfTypeAll(typeof(PQSCity))) {
+                    if(city.name == "KSC") {
+                        ksc = city;
+                        break;
+                    }
+                }
+                if(ksc == null) {
+                    Debug.Log("*RSS* could not find KSC to fix the camera.");
+                    return;
+                }
+                foreach(SpaceCenterCamera2 cam in Resources.FindObjectsOfTypeAll(typeof(SpaceCenterCamera2))) {
+                    if(ksc.repositionToSphere || ksc.repositionToSphereSurface) {
+                        CelestialBody Kerbin = FlightGlobals.Bodies.Find(body => body.name == ksc.sphere.name);
+                        if(Kerbin == null) {
+                            Debug.Log("*RSS* could not find find the CelestialBody specified as KSC's sphere.");
+                            return;
+                        }
+                        double nomHeight = Kerbin.pqsController.GetSurfaceHeight((Vector3d) ksc.repositionRadial.normalized) - Kerbin.Radius;
+                        if(ksc.repositionToSphereSurface) {
+                            nomHeight += ksc.repositionRadiusOffset;
+                        }
+                        cam.altitudeInitial = 0f - (float) nomHeight;
+                    } else {
+                        cam.altitudeInitial = 0f - (float) ksc.repositionRadiusOffset;
+                    }
+                    cam.ResetCamera();
+                    Debug.Log("*RSS* fixed the Space Center camera.");
+                }
+            }
         }
     }
 }
