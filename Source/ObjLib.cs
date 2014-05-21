@@ -11,7 +11,7 @@ namespace RealSolarSystem
     class ObjLib
     {
         // **** VERTEX MATCH ****
-        public static void UpdateVerticesFromFile(Mesh mesh, string filename)
+        public static void UpdateMeshFromFile(Mesh mesh, string filename)
         {
             ProfileTimer.Push("UpdateVerts");
             StreamReader stream = File.OpenText(filename);
@@ -20,6 +20,8 @@ namespace RealSolarSystem
             char[] splitIdentifier = { ' ' };
             string[] brokenString;
             int v = 0; // first vertex
+            int t = 0; // first tangent
+            int n = 0; // first normal
             // borrowed from mesh-reading code.
             while (curLine != null && v < mesh.vertexCount)
             {
@@ -31,6 +33,16 @@ namespace RealSolarSystem
                         mesh.vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
                                                         System.Convert.ToSingle(brokenString[3]));
                         v++;
+                        break;
+                    case "vn":
+                        mesh.normals[n] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                                                        System.Convert.ToSingle(brokenString[3]));
+                        n++;
+                        break;
+                    case "t":
+                        mesh.tangents[t] = new Vector4(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                                                        System.Convert.ToSingle(brokenString[3]), System.Convert.ToSingle(brokenString[4]));
+                        t++;
                         break;
                 }
                 curLine = stream.ReadLine();
@@ -115,15 +127,16 @@ namespace RealSolarSystem
             mesh.tangents = tangents;
             ProfileTimer.Pop("UpdateTangents");
         }
-        public static void VertsToFile(MeshFilter mf, string fileName)
+        public static void VertsTangentsToFile(MeshFilter mf, string fileName)
         {
             using (StreamWriter sw = new StreamWriter(fileName))
             {
                 sw.Write("g " + mf.name + "\n");
                 foreach (Vector3 v in mf.mesh.vertices)
-                {
                     sw.Write(string.Format("v {0} {1} {2}\n", v.x, v.y, v.z));
-                }
+
+                foreach(Vector4 t in mf.mesh.tangents)
+                    sw.Write(string.Format("t {0} {1} {2} {3}\n", t.x, t.y, t.z, t.w));
             }
         }
         // **** EXPORT ****
@@ -148,6 +161,11 @@ namespace RealSolarSystem
             foreach (Vector3 v in m.uv)
             {
                 sb.Append(string.Format("vt {0} {1}\n", v.x, v.y));
+            }
+            sb.Append("\n"); // extend to include tangent output
+            foreach (Vector4 t in m.tangents)
+            {
+                sb.Append(string.Format("t {0} {1} {2} {3}\n", t.x, t.y, t.z, t.w));
             }
             for (int material = 0; material < m.subMeshCount; material++)
             {

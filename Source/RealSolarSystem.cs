@@ -1124,10 +1124,11 @@ namespace RealSolarSystem
                                                         Mesh tMesh = new Mesh();
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
 
-                                                        ObjLib.UpdateVerticesFromFile(tMesh, filePath);
+                                                        ObjLib.UpdateMeshFromFile(tMesh, filePath);
                                                         m.mesh.RecalculateBounds();
-                                                        m.mesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(tMesh);
+                                                        // done in UpdateFromFile
+                                                        /*m.mesh.RecalculateNormals();
+                                                        ObjLib.UpdateTangents(tMesh);*/
                                                         m.mesh = tMesh;
                                                         float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
                                                         t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
