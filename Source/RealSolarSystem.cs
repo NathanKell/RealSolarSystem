@@ -1121,12 +1121,12 @@ namespace RealSolarSystem
 	                                                if (File.Exists(filePath))
 	                                                {
                                                         Mesh tMesh = new Mesh();
-                                                        Utils.CopyMesh(joolMesh.mesh, ref tMesh);
+                                                        Utils.CopyMesh(joolMesh.mesh, tMesh);
 
-                                                        ObjLib.UpdateVerticesFromFile(ref tMesh, filePath);
+                                                        ObjLib.UpdateVerticesFromFile(tMesh, filePath);
                                                         m.mesh.RecalculateBounds();
                                                         m.mesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(ref tMesh);
+                                                        ObjLib.UpdateTangents(tMesh);
                                                         m.mesh = tMesh;
                                                         wrap = false;
 	                                                }
@@ -1141,11 +1141,11 @@ namespace RealSolarSystem
 	                                                {
 	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
                                                         Mesh tMesh = new Mesh();
-                                                        Utils.CopyMesh(joolMesh.mesh, ref tMesh);
-                                                        Utils.MatchVerts(ref tMesh, body.pqsController);
+                                                        Utils.CopyMesh(joolMesh.mesh, tMesh);
+                                                        Utils.MatchVerts(tMesh, body.pqsController);
                                                         tMesh.RecalculateBounds();
                                                         tMesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(ref tMesh);
+                                                        ObjLib.UpdateTangents(tMesh);
                                                         m.mesh = tMesh;
 	                                                    print("*RSS* wrapped.");
 	                                                    try
