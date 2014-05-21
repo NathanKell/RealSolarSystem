@@ -10,27 +10,24 @@ namespace RealSolarSystem
 {
     public class Utils : MonoBehaviour
     {
-        public static void MatchVerts(Mesh mesh, PQS pqs)
+        public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight)
         {
             char sep = System.IO.Path.DirectorySeparatorChar;
             string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
                         + sep + "PluginData" + sep + pqs.name + "_match.txt";
-            using (StreamWriter sw = new StreamWriter(filePath))
-            {
-                pqs.isBuildingMaps = true;
+            pqs.isBuildingMaps = true;
 
-                Vector3[] vertices = new Vector3[mesh.vertexCount];
-                for (int i = 0; i < mesh.vertexCount; i++)
-                {
-                    Vector3 v = mesh.vertices[i];
-                    double height = pqs.GetSurfaceHeight(v);
-                    sw.Write("For vertex " + i + string.Format(": {0} {1} {2}, ", v.x, v.y, v.z) + " height = " + height + "; ouput: ");
-                    vertices[i] = v / v.magnitude * (float)(1000.0 / 6000000.0 * height);
-                    sw.Write(string.Format("v {0} {1} {2}\n", v.x, v.y, v.z));
-                }
-                pqs.isBuildingMaps = false;
-                mesh.vertices = vertices;
+            Vector3[] vertices = new Vector3[mesh.vertexCount];
+            for (int i = 0; i < mesh.vertexCount; i++)
+            {
+                Vector3 v = mesh.vertices[i];
+                double height = pqs.GetSurfaceHeight(v);
+                if (height < oceanHeight)
+                    height = oceanHeight;
+                vertices[i] = v.normalized * (float)(1000.0 / 6000000.0 * height);
             }
+            pqs.isBuildingMaps = false;
+            mesh.vertices = vertices;
         }
         public static void CopyMesh(Mesh source, Mesh dest)
         {

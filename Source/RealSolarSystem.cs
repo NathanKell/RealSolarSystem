@@ -188,7 +188,7 @@ namespace RealSolarSystem
                                     body.useLegacyAtmosphere = true;
                                     Debug.LogWarning("Unable to load pressureCurve data for " + body.name + ": Using legacy atmosphere");
                                 }
-                                print("*RSS* finished with" + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
+                                print("*RSS* finished with " + body.GetName() + ".pressureCurve (" + body.pressureCurve.keys.Length.ToString() + " keys)");
                             }
                             else
                             {
@@ -1128,7 +1128,11 @@ namespace RealSolarSystem
                                                         m.mesh.RecalculateNormals();
                                                         ObjLib.UpdateTangents(tMesh);
                                                         m.mesh = tMesh;
+                                                        float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
+                                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                                                         wrap = false;
+                                                        rescale = false;
+                                                        print("*RSS* Loaded " + filePath + " and wrapped.");
 	                                                }
 	                                            }
 	                                            catch (Exception e)
@@ -1142,7 +1146,7 @@ namespace RealSolarSystem
 	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
                                                         Mesh tMesh = new Mesh();
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
-                                                        Utils.MatchVerts(tMesh, body.pqsController);
+                                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
                                                         tMesh.RecalculateBounds();
                                                         tMesh.RecalculateNormals();
                                                         ObjLib.UpdateTangents(tMesh);
