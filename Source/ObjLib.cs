@@ -11,7 +11,7 @@ namespace RealSolarSystem
     class ObjLib
     {
         // **** VERTEX MATCH ****
-        public static void UpdateVerticesFromFile(Mesh mesh, string filename)
+        public static void UpdateVerticesFromFile(ref Mesh mesh, string filename)
         {
             StreamReader stream = File.OpenText(filename);
             stream.ReadLine();
@@ -41,7 +41,7 @@ namespace RealSolarSystem
             mesh.RecalculateNormals();
         }
         // based on noontz's code here: http://forum.unity3d.com/threads/38984-How-to-Calculate-Mesh-Tangents
-        public static void UpdateTangents(Mesh mesh)
+        public static void UpdateTangents(ref Mesh mesh)
         {
             Vector4[] tangents = new Vector4[mesh.vertexCount];
             int triangleCount = mesh.triangles.Length / 3;

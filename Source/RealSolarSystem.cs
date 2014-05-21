@@ -113,7 +113,7 @@ namespace RealSolarSystem
             print("*RSS* fixing bodies");
             double epoch = 0;
             bool useEpoch = false;
-            bool doWrap = true;
+            bool doWrap = false;
             bool updateMass = true;
             bool compressNormals = false;
             bool spheresOnly = false;
@@ -1076,9 +1076,11 @@ namespace RealSolarSystem
 
                                     // Fix mesh
                                     bool rescale = true;
-                                    bool doWrapHere = false;
+                                    bool doWrapHere = doWrap;
                                     node.TryGetValue("wrap", ref doWrapHere);
-                                    if (body.pqsController != null && doWrap)
+                                    bool sphereVal = false;
+                                    bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
+                                    if (body.pqsController != null && doWrapHere)
                                     {
                                         //MeshFilter[] meshes = t.GetComponentsInChildren<MeshFilter>();
                                         MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
@@ -1088,8 +1090,6 @@ namespace RealSolarSystem
                                         }
                                         else
                                         {
-                                            bool sphereVal = false;
-                                            bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
                                             if ((spheresOnly && !sphereHere) || sphereVal)
                                             {
                                                 m.mesh = joolMesh.mesh;
@@ -1104,26 +1104,30 @@ namespace RealSolarSystem
 	                                            char sep = System.IO.Path.DirectorySeparatorChar;
 	                                            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
 	                                                        + sep + "PluginData" + sep + t.name;
-	                                            /*string fp2 = filePath + "_orig.obj";
-	                                            filePath += ".obj";
-	                                            try
-	                                            {
-	                                                ObjLib.MeshToFile(m, fp2);
-	                                            }
-	                                            catch (Exception e)
-	                                            {
-	                                                print("*RSS* Exception saving orig mesh " + filePath + ": " + e.Message);
-	                                            }*/
-	                                            bool wrap = true;
+
+                                                //string fp2 = filePath + "_orig.obj";
+                                                filePath += ".obj";
+                                                /*try
+                                                {
+                                                    ObjLib.MeshToFile(m, fp2);
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    print("*RSS* Exception saving orig mesh " + filePath + ": " + e.Message);
+                                                }*/
+                                                bool wrap = true;
 	                                            try
 	                                            {
 	                                                if (File.Exists(filePath))
 	                                                {
-                                                        Utils.CopyMesh(joolMesh.mesh, m.mesh);
-                                                        ObjLib.UpdateVerticesFromFile(m.mesh, filePath);
+                                                        Mesh tMesh = new Mesh();
+                                                        Utils.CopyMesh(joolMesh.mesh, ref tMesh);
+
+                                                        ObjLib.UpdateVerticesFromFile(ref tMesh, filePath);
                                                         m.mesh.RecalculateBounds();
                                                         m.mesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(m.mesh);
+                                                        ObjLib.UpdateTangents(ref tMesh);
+                                                        m.mesh = tMesh;
                                                         wrap = false;
 	                                                }
 	                                            }
@@ -1136,11 +1140,13 @@ namespace RealSolarSystem
 	                                                try
 	                                                {
 	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
-                                                        Utils.CopyMesh(joolMesh.mesh, m.mesh);
-                                                        Utils.MatchVerts(m, body.pqsController);
-                                                        m.mesh.RecalculateBounds();
-                                                        m.mesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(m.mesh);
+                                                        Mesh tMesh = new Mesh();
+                                                        Utils.CopyMesh(joolMesh.mesh, ref tMesh);
+                                                        Utils.MatchVerts(ref tMesh, body.pqsController);
+                                                        tMesh.RecalculateBounds();
+                                                        tMesh.RecalculateNormals();
+                                                        ObjLib.UpdateTangents(ref tMesh);
+                                                        m.mesh = tMesh;
 	                                                    print("*RSS* wrapped.");
 	                                                    try
 	                                                    {
