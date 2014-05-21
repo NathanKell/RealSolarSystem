@@ -12,6 +12,7 @@ namespace RealSolarSystem
     {
         public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight)
         {
+            ProfileTimer.Push("MatchVerts");
             char sep = System.IO.Path.DirectorySeparatorChar;
             string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
                         + sep + "PluginData" + sep + pqs.name + "_match.txt";
@@ -28,83 +29,81 @@ namespace RealSolarSystem
             }
             pqs.isBuildingMaps = false;
             mesh.vertices = vertices;
+            ProfileTimer.Push("Pop");
         }
         public static void CopyMesh(Mesh source, Mesh dest)
         {
-            /*char sep = System.IO.Path.DirectorySeparatorChar;
-            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
-                        + sep + "PluginData" + sep + source.name + "_copy.txt";
-            using (StreamWriter sw = new StreamWriter(filePath))
-            {*/
-                Vector3[] verts = new Vector3[source.vertexCount];
-                for (int i = 0; i < source.vertexCount; i++)
-                {
-                    verts[i].x = source.vertices[i].x;
-                    verts[i].y = source.vertices[i].y;
-                    verts[i].z = source.vertices[i].z;
-                }
-                dest.vertices = verts;
+            ProfileTimer.Push("CopyMesh");
+            Vector3[] verts = new Vector3[source.vertexCount];
+            for (int i = 0; i < source.vertexCount; i++)
+            {
+                verts[i].x = source.vertices[i].x;
+                verts[i].y = source.vertices[i].y;
+                verts[i].z = source.vertices[i].z;
+            }
+            dest.vertices = verts;
 
-                int[] tris = new int[source.triangles.Length];
-                for (int i = 0; i < source.triangles.Length; i++)
-                    tris[i] = source.triangles[i];
-                dest.triangles = tris;
+            int[] tris = new int[source.triangles.Length];
+            for (int i = 0; i < source.triangles.Length; i++)
+                tris[i] = source.triangles[i];
+            dest.triangles = tris;
 
-                Vector2[] uvs = new Vector2[source.uv.Length];
-                for (int i = 0; i < source.uv.Length; i++)
-                {
-                    uvs[i].x = source.uv[i].x;
-                    uvs[i].y = source.uv[i].y;
-                }
-                dest.uv = uvs;
+            Vector2[] uvs = new Vector2[source.uv.Length];
+            for (int i = 0; i < source.uv.Length; i++)
+            {
+                uvs[i].x = source.uv[i].x;
+                uvs[i].y = source.uv[i].y;
+            }
+            dest.uv = uvs;
 
-                Vector2[] uv2s = new Vector2[source.uv2.Length];
-                for (int i = 0; i < source.uv2.Length; i++)
-                {
-                    uv2s[i].x = source.uv2[i].x;
-                    uv2s[i].y = source.uv2[i].y;
-                }
-                dest.uv2 = uv2s;
+            Vector2[] uv2s = new Vector2[source.uv2.Length];
+            for (int i = 0; i < source.uv2.Length; i++)
+            {
+                uv2s[i].x = source.uv2[i].x;
+                uv2s[i].y = source.uv2[i].y;
+            }
+            dest.uv2 = uv2s;
 
-                Vector3[] normals = new Vector3[source.normals.Length];
-                for (int i = 0; i < source.normals.Length; i++)
-                {
-                    normals[i].x = source.normals[i].x;
-                    normals[i].y = source.normals[i].y;
-                    normals[i].z = source.normals[i].z;
-                }
-                dest.normals = normals;
+            Vector3[] normals = new Vector3[source.normals.Length];
+            for (int i = 0; i < source.normals.Length; i++)
+            {
+                normals[i].x = source.normals[i].x;
+                normals[i].y = source.normals[i].y;
+                normals[i].z = source.normals[i].z;
+            }
+            dest.normals = normals;
 
-                Vector4[] tangents = new Vector4[source.tangents.Length];
-                for (int i = 0; i < source.tangents.Length; i++)
-                {
-                    tangents[i].w = source.tangents[i].w;
-                    tangents[i].x = source.tangents[i].x;
-                    tangents[i].y = source.tangents[i].y;
-                    tangents[i].z = source.tangents[i].z;
-                }
-                dest.tangents = tangents;
+            Vector4[] tangents = new Vector4[source.tangents.Length];
+            for (int i = 0; i < source.tangents.Length; i++)
+            {
+                tangents[i].w = source.tangents[i].w;
+                tangents[i].x = source.tangents[i].x;
+                tangents[i].y = source.tangents[i].y;
+                tangents[i].z = source.tangents[i].z;
+            }
+            dest.tangents = tangents;
 
-                Color[] colors = new Color[source.colors.Length];
-                for (int i = 0; i < source.colors.Length; i++)
-                {
-                    colors[i].r = source.colors[i].r;
-                    colors[i].g = source.colors[i].g;
-                    colors[i].b = source.colors[i].b;
-                    colors[i].a = source.colors[i].a;
-                }
-                dest.colors = colors;
+            Color[] colors = new Color[source.colors.Length];
+            for (int i = 0; i < source.colors.Length; i++)
+            {
+                colors[i].r = source.colors[i].r;
+                colors[i].g = source.colors[i].g;
+                colors[i].b = source.colors[i].b;
+                colors[i].a = source.colors[i].a;
+            }
+            dest.colors = colors;
 
-                Color32[] colors32 = new Color32[source.colors32.Length];
-                for (int i = 0; i < source.colors32.Length; i++)
-                {
-                    colors32[i].r = source.colors32[i].r;
-                    colors32[i].g = source.colors32[i].g;
-                    colors32[i].b = source.colors32[i].b;
-                    colors32[i].a = source.colors32[i].a;
-                }
-                dest.colors32 = colors32;
-            //}
+            Color32[] colors32 = new Color32[source.colors32.Length];
+            for (int i = 0; i < source.colors32.Length; i++)
+            {
+                colors32[i].r = source.colors32[i].r;
+                colors32[i].g = source.colors32[i].g;
+                colors32[i].b = source.colors32[i].b;
+                colors32[i].a = source.colors32[i].a;
+            }
+            dest.colors32 = colors32;
+
+            ProfileTimer.Pop("CopyMesh");
         }
         public static void DumpSSF(ScaledSpaceFader ssf)
         {

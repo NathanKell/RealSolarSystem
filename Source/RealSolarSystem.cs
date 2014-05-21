@@ -1120,6 +1120,7 @@ namespace RealSolarSystem
 	                                            {
 	                                                if (File.Exists(filePath))
 	                                                {
+                                                        ProfileTimer.Push("LoadSSM_" + body.name);
                                                         Mesh tMesh = new Mesh();
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
 
@@ -1133,6 +1134,7 @@ namespace RealSolarSystem
                                                         wrap = false;
                                                         rescale = false;
                                                         print("*RSS* Loaded " + filePath + " and wrapped.");
+                                                        ProfileTimer.Pop("LoadSSM_" + body.name);
 	                                                }
 	                                            }
 	                                            catch (Exception e)
@@ -1144,6 +1146,7 @@ namespace RealSolarSystem
 	                                                try
 	                                                {
 	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
+                                                        ProfileTimer.Push("WrapSSM_" + body.name);
                                                         Mesh tMesh = new Mesh();
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
                                                         Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
@@ -1164,6 +1167,7 @@ namespace RealSolarSystem
                                                         float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
                                                         t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 	                                                    rescale = false;
+                                                        ProfileTimer.Pop("WrapSSM_" + body.name);
 	                                                }
 	                                                catch (Exception e)
 	                                                {
