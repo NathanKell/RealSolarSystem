@@ -23,6 +23,9 @@ namespace RealSolarSystem
             int t = 0; // first tangent
             int n = 0; // first normal
             // borrowed from mesh-reading code.
+            Vector3[] vertices = new Vector3[mesh.vertices.Length];
+            Vector3[] normals = new Vector3[mesh.normals.Length];
+            Vector4[] tangents = new Vector4[mesh.tangents.Length];
             while (curLine != null && v < mesh.vertexCount)
             {
                 curLine = curLine.Trim();                           //Trim the current line
@@ -30,17 +33,17 @@ namespace RealSolarSystem
                 switch (brokenString[0])
                 {
                     case "v":
-                        mesh.vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                        vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
                                                         System.Convert.ToSingle(brokenString[3]));
                         v++;
                         break;
                     case "vn":
-                        mesh.normals[n] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                        normals[n] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
                                                         System.Convert.ToSingle(brokenString[3]));
                         n++;
                         break;
                     case "t":
-                        mesh.tangents[t] = new Vector4(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                        tangents[t] = new Vector4(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
                                                         System.Convert.ToSingle(brokenString[3]), System.Convert.ToSingle(brokenString[4]));
                         t++;
                         break;
@@ -51,6 +54,9 @@ namespace RealSolarSystem
                     curLine = curLine.Replace("  ", " ");
                 }
             }
+            mesh.vertices = vertices;
+            mesh.normals = normals;
+            mesh.tangents = tangents;
             ProfileTimer.Pop("UpdateVerts");
         }
         // based on noontz's code here: http://forum.unity3d.com/threads/38984-How-to-Calculate-Mesh-Tangents
