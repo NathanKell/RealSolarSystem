@@ -36,7 +36,8 @@ v6.2  \/
 *PQS->ScaledSpace wrapping now works and caches correctly. Wrap now defaults to false for backwards compatibility. RSS will export obj files (with extra lines using keyword t for vertex tangents) for all wrapped meshes, and import them (if they exist) instead of wrapping. NOTE: If you change any PQS settings (let alone changing RSS configs!) you MUST delete all .obj files in GameData/RealSolarSystem/PluginData! NOTE 2: If you don't already have cached meshes, and/or you delete them all, KSP WILL APPEAR TO HANG on the "Loading..." screen right before Main Menu. This is NORMAL. Let it run. It takes me about 15 minutes. After that, you'll get your usual load times.
 *regex: fixed Space Center initial camera height (for when camera is under terrain)
 *tons of launch sites from eggrobin!
-*regex: fixes for KSCSwitcher; new icon; now saves and loads selected KSC location with your persistence file.
+*regex: fixes for KSCSwitcher; new icon; now saves and loads selected KSC location with your persistence file; shows descriptions; icons hidden on zoomout; can click to set map to focus on selected location.
+
 v6.1  \/
 *Fixed only changing things if radius differs
 *Fixed to work on non-Windows platforms (regex)

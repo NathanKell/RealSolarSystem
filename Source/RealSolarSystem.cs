@@ -1078,7 +1078,7 @@ namespace RealSolarSystem
                                     bool rescale = true;
                                     bool doWrapHere = doWrap;
                                     node.TryGetValue("wrap", ref doWrapHere);
-                                    bool sphereVal = false;
+                                    bool sphereVal = spheresOnly;
                                     bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
                                     if (body.pqsController != null && doWrapHere)
                                     {
@@ -1090,7 +1090,7 @@ namespace RealSolarSystem
                                         }
                                         else
                                         {
-                                            if ((spheresOnly && !sphereHere) || sphereVal)
+                                            if (sphereVal)
                                             {
                                                 m.mesh = joolMesh.mesh;
                                                 MeshFilter nmf = new MeshFilter();
