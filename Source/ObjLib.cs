@@ -13,7 +13,7 @@ namespace RealSolarSystem
         // **** VERTEX MATCH ****
         public static void UpdateMeshFromFile(Mesh mesh, string filename)
         {
-            ProfileTimer.Push("UpdateVerts");
+            ProfileTimer.Push("UpdateMeshFromFile");
             StreamReader stream = File.OpenText(filename);
             stream.ReadLine();
             string curLine = stream.ReadLine();
@@ -26,7 +26,7 @@ namespace RealSolarSystem
             Vector3[] vertices = new Vector3[mesh.vertices.Length];
             Vector3[] normals = new Vector3[mesh.normals.Length];
             Vector4[] tangents = new Vector4[mesh.tangents.Length];
-            while (curLine != null && v < mesh.vertexCount)
+            while (curLine != null)
             {
                 curLine = curLine.Trim();                           //Trim the current line
                 brokenString = curLine.Split(splitIdentifier, 50);      //Split the line into an array, separating the original line by blank spaces
@@ -57,7 +57,7 @@ namespace RealSolarSystem
             mesh.vertices = vertices;
             mesh.normals = normals;
             mesh.tangents = tangents;
-            ProfileTimer.Pop("UpdateVerts");
+            ProfileTimer.Pop("UpdateMeshFromFile");
         }
         // based on noontz's code here: http://forum.unity3d.com/threads/38984-How-to-Calculate-Mesh-Tangents
         public static void UpdateTangents(Mesh mesh)

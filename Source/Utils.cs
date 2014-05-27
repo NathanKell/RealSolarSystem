@@ -225,6 +225,10 @@ namespace RealSolarSystem
         {
             return "(" + v.x + ", " + v.y + ", " + v.z + ")";
         }
+        public static string Vec4ToString(Vector4 v)
+        {
+            return "(" + v.x + ", " + v.y + ", " + v.z + ", " + v.w + ")";
+        }
         public static void PrintComponents(Transform t)
         {
             print("Transform " + t.name + " pos" + Vec3ToString(t.position) + ", lp" + Vec3ToString(t.localPosition) + ", scale" + Vec3ToString(t.lossyScale) +",  ls" + Vec3ToString(t.localScale) + " has components:");
