@@ -117,10 +117,14 @@ namespace RealSolarSystem
             bool updateMass = true;
             bool compressNormals = false;
             bool spheresOnly = false;
+            bool defaultAtmoScale = true;
+            float SSAtmoScale = 1.0f;
             useEpoch = RSSSettings.TryGetValue("Epoch", ref epoch);
             RSSSettings.TryGetValue("wrap", ref doWrap);
             RSSSettings.TryGetValue("compressNormals", ref compressNormals);
             RSSSettings.TryGetValue("spheresOnly", ref spheresOnly);
+            RSSSettings.TryGetValue("defaultAtmoScale", ref defaultAtmoScale);
+            RSSSettings.TryGetValue("SSAtmoScale", ref SSAtmoScale);
 
             // get spherical scaledspace mesh
             MeshFilter joolMesh = null;
@@ -1080,9 +1084,9 @@ namespace RealSolarSystem
                                     node.TryGetValue("wrap", ref doWrapHere);
                                     bool sphereVal = spheresOnly;
                                     bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
+                                    float origLocalScale = t.localScale.x;
                                     if (body.pqsController != null && doWrapHere)
                                     {
-                                        //MeshFilter[] meshes = t.GetComponentsInChildren<MeshFilter>();
                                         MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
                                         if (m == null || m.mesh == null)
                                         {
@@ -1125,10 +1129,8 @@ namespace RealSolarSystem
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
 
                                                         ObjLib.UpdateMeshFromFile(tMesh, filePath);
-                                                        m.mesh.RecalculateBounds();
-                                                        // done in UpdateFromFile
-                                                        /*m.mesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(tMesh);*/
+                                                        tMesh.RecalculateBounds();
+                                                        tMesh.RecalculateNormals();
                                                         m.mesh = tMesh;
                                                         float scaleFactor = (float)(1.0 * SSTScale);
                                                         t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
@@ -1165,7 +1167,7 @@ namespace RealSolarSystem
 	                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
 	                                                    }
 	                                                    print("*RSS*: Done wrapping and exporting. Setting scale");
-                                                        float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
+                                                        float scaleFactor = (float)(1.0 * SSTScale);
                                                         t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
 	                                                    rescale = false;
                                                         ProfileTimer.Pop("WrapSSM_" + body.name);
@@ -1190,12 +1192,20 @@ namespace RealSolarSystem
                                         if (atmo != null)
                                         {
                                             print("*RSS* found atmo transform for " + node.name);
-                                            float scaleFactor = 1.0f;
-                                            node.TryGetValue("SSAtmoScale", ref scaleFactor);
-                                            scaleFactor *= (float)((body.Radius + body.maxAtmosphereAltitude) / body.Radius);
+                                            float scaleFactor = SSAtmoScale; // default to global default
+                                            if (!node.TryGetValue("SSAtmoScale", ref scaleFactor)) // if no override multiplier
+                                            {
+                                                if (defaultAtmoScale) // use stock KSP multiplier
+                                                    scaleFactor *= 1.025f;
+                                                else // or use atmosphere height-dependent multiplier
+                                                    scaleFactor *= (float)((body.Radius + body.maxAtmosphereAltitude) / body.Radius);
+                                            }
+                                            scaleFactor *= origLocalScale / t.localScale.x * (float)(body.Radius / origRadius); // since our parent transform changed, we no longer are the same scale as the planet.
                                             atmo.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                                            print("*RSS* final scale of atmo for " + body.name + " in scaledspace: " + atmo.localScale.x);
                                         }
                                     }
+                                    print("*RSS* final scale of " + body.name + " in scaledspace: " + t.localScale.x);
                                 }
                             }
                         }

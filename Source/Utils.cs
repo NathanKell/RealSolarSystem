@@ -29,7 +29,7 @@ namespace RealSolarSystem
             }
             pqs.isBuildingMaps = false;
             mesh.vertices = vertices;
-            ProfileTimer.Push("Pop");
+            ProfileTimer.Pop("MatchVerts");
         }
         public static void CopyMesh(Mesh source, Mesh dest)
         {
@@ -221,11 +221,16 @@ namespace RealSolarSystem
                     DumpSST(t);
             }
         }
+        public static string Vec3ToString(Vector3 v)
+        {
+            return "(" + v.x + ", " + v.y + ", " + v.z + ")";
+        }
         public static void PrintComponents(Transform t)
         {
-            print("Transform " + t.name + " has components:");
+            print("Transform " + t.name + " pos" + Vec3ToString(t.position) + ", lp" + Vec3ToString(t.localPosition) + ", scale" + Vec3ToString(t.lossyScale) +",  ls" + Vec3ToString(t.localScale) + " has components:");
             foreach (Component c in t.GetComponents(typeof(Component)).ToList())
-                print(c.name + " (" + c.GetType() + ")");
+                    print(c.name + " (" + c.GetType() + ")");
+
         }
         public static void PrintTransformRecursive(Transform t)
         {

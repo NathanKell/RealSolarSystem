@@ -68,8 +68,10 @@ namespace RealSolarSystem
             Vector3[] tan1 = new Vector3[mesh.vertexCount];
             Vector3[] tan2 = new Vector3[mesh.vertexCount];
             int tri = 0;
+            Vector3 sdir = new Vector3();
+            Vector3 tdir = new Vector3();
 
-            for (int i = 0; i <= (triangleCount - 1); i++)
+            for (int i = 0; i < triangleCount; i++)
             {
 
                 int i1 = mesh.triangles[tri];
@@ -99,8 +101,15 @@ namespace RealSolarSystem
 
                 float r = 1.0f / (s1 * t2 - s2 * t1);
 
-                Vector3 sdir = new Vector3((t2 * x1 - t1 * x2) * r, (t2 * y1 - t1 * y2) * r, (t2 * z1 - t1 * z2) * r);
-                Vector3 tdir = new Vector3((s1 * x2 - s2 * x1) * r, (s1 * y2 - s2 * y1) * r, (s1 * z2 - s2 * z1) * r);
+                sdir.x = (t2 * x1 - t1 * x2);
+                sdir.y = (t2 * y1 - t1 * y2);
+                sdir.z = (t2 * z1 - t1 * z2);
+                sdir *= r;
+
+                tdir.x = (s1 * x2 - s2 * x1);
+                tdir.y = (s1 * y2 - s2 * y1);
+                tdir.z = (s1 * z2 - s2 * z1);
+                tdir *= r;
 
                 tan1[i1] += sdir;
                 tan1[i2] += sdir;
