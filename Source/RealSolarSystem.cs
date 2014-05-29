@@ -1132,7 +1132,7 @@ namespace RealSolarSystem
                                                         tMesh.RecalculateBounds();
                                                         //tMesh.RecalculateNormals();
                                                         m.mesh = tMesh;
-                                                        float scaleFactor = (float)(1.0 * SSTScale);
+                                                        float scaleFactor = SSTScale;
                                                         t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                                                         wrap = false;
                                                         rescale = false;

@@ -40,30 +40,6 @@ namespace RealSolarSystem
                             body.useLegacyAtmosphere = UseLegacyAtmosphere;
                         }
                     }
-                    /*if (node.HasNode("AtmosphereFromGround"))
-                    {
-                        ConfigNode agnode = node.GetNode("AtmosphereFromGround");
-                        foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
-                        {
-                            if (ag != null && ag.planet != null)
-                            {
-                                // generalized version of Starwaster's code. Thanks Starwaster!
-                                if (ag.planet.name.Equals(node.name))
-                                {
-                                    if (agnode.HasValue("outerRadius"))
-                                    {
-                                        if (float.TryParse(agnode.GetValue("outerRadius"), out ftmp))
-                                            ag.outerRadius = ftmp * ScaledSpace.InverseScaleFactor;
-                                    }
-                                    ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
-                                    ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
-                                    ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
-                                    ag.scaleDepth = -0.25f;
-                                    ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
-                                }
-                            }
-                        }
-                    }*/
                     if (node.HasNode("AtmosphereFromGround"))
                     {
                         ConfigNode agnode = node.GetNode("AtmosphereFromGround");
