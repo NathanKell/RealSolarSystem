@@ -130,11 +130,12 @@ namespace RealSolarSystem
             MeshFilter joolMesh = null;
             if (ScaledSpace.Instance != null)
             {
-                    foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                    {
-                        if (t.name.Equals("Jool"))
-                            joolMesh = (MeshFilter)t.GetComponent(typeof(MeshFilter));
-                    }
+                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                {
+                    if (t.name.Equals("Jool"))
+                        joolMesh = (MeshFilter)t.GetComponent(typeof(MeshFilter));
+                }
+                print("*RSS* InverseScaleFactor = " + ScaledSpace.InverseScaleFactor);
             }
             foreach (ConfigNode node in RSSSettings.nodes)
             {
