@@ -37,6 +37,8 @@ v6.2  \/
 *regex: fixed Space Center initial camera height (for when camera is under terrain)
 *tons of launch sites from eggrobin!
 *regex: fixes for KSCSwitcher; new icon; now saves and loads selected KSC location with your persistence file; shows descriptions; icons hidden on zoomout; can click to set map to focus on selected location.
+*Update to ModuleManager 2.1.5
+*tweaked Earth's horizon glow a bit
 
 v6.1  \/
 *Fixed only changing things if radius differs
