@@ -73,7 +73,7 @@ namespace RealSolarSystem {
 				Color defColor = GUI.color;
 				bool isActiveSite = false;
 				foreach(KeyValuePair<string, LaunchSite> kvp in siteLocations) {
-					isActiveSite = kvp.Value.Name.Equals(activeSite);
+					isActiveSite = kvp.Value.name.Equals(activeSite);
 					GUILayout.BeginHorizontal();
 					if(GUILayout.Button(magButtonNormal, bStyle, GUILayout.MaxWidth(28))) {
 						focusOnSite(kvp.Value.geographicLocation);
@@ -81,7 +81,7 @@ namespace RealSolarSystem {
 					if(isActiveSite) {
 						GUI.contentColor = XKCDColors.ElectricLime;
 					}
-					if(GUILayout.Button(new GUIContent(kvp.Value.Name, kvp.Value.description))) {
+					if(GUILayout.Button(new GUIContent(kvp.Value.displayName, kvp.Value.description))) {
 						if(isActiveSite) {
 							ScreenMessages.PostScreenMessage("Cannot set launch site to active site.", 2.5f, ScreenMessageStyle.LOWER_CENTER);
 						} else {
@@ -118,7 +118,7 @@ namespace RealSolarSystem {
 				Camera camera = MapView.MapCamera.camera;
 				Vector3d point = Kerbin.GetWorldSurfacePosition(kvp.Value.geographicLocation.x, kvp.Value.geographicLocation.y, 0);
 				if(!IsOccluded(point, Kerbin)) {
-					isActiveSite = kvp.Value.Name.Equals(activeSite);
+					isActiveSite = kvp.Value.name.Equals(activeSite);
 					point = ScaledSpace.LocalToScaledSpace(point);
 					point = camera.WorldToScreenPoint(point);
 					Rect iconBound = new Rect((float) point.x, (float) (Screen.height - point.y), 28f, 28f);
@@ -376,7 +376,7 @@ namespace RealSolarSystem {
 				ConfigNode[] sites = node.GetNodes("Site");
 
 				foreach(ConfigNode site in sites) {
-	                if(site.HasValue("Name")) {
+	                if(site.HasValue("name")) {
 						ConfigNode pqsCity = site.GetNode("PQSCity");
 						if(pqsCity == null) { continue; }
 						
@@ -392,8 +392,8 @@ namespace RealSolarSystem {
 		
 		public ConfigNode getSiteByName(string name) {
             foreach(ConfigNode site in Sites) {
-                if(site.HasValue("Name")) {
-                    if(site.GetValue("Name").Equals(name)) {
+                if(site.HasValue("name")) {
+                    if(site.GetValue("name").Equals(name)) {
                         return site;
                     }
                 }
@@ -408,7 +408,8 @@ namespace RealSolarSystem {
 			foreach(ConfigNode site in KSCLoader.instance.Sites.Sites) {
 				ConfigNode pqsCity = site.GetNode("PQSCity");
 				LaunchSite temp = new LaunchSite();
-				temp.Name = site.GetValue("Name");
+				temp.name = site.GetValue("name");
+				temp.displayName = site.GetValue("displayName");
 				double.TryParse(pqsCity.GetValue("latitude"), out lat);
                 double.TryParse(pqsCity.GetValue("longitude"), out lon);
 				temp.geographicLocation = new Vector2d(lat, lon);
@@ -420,12 +421,12 @@ namespace RealSolarSystem {
 						temp.availableFromUT = dtmp;
 					}
 				}
-				if(site.HasValue("availableToUT")) {
-            		if(double.TryParse(site.GetValue("availableToUT"), out dtmp)) {
-						temp.availableToUT = dtmp;
+				if(site.HasValue("availableUntilUT")) {
+            		if(double.TryParse(site.GetValue("availableUntilUT"), out dtmp)) {
+						temp.availableUntilUT = dtmp;
 					}
 				}
-				siteLocations.Add(site.GetValue("Name"), temp);
+				siteLocations.Add(temp.name, temp);
 			}
 			
 			return siteLocations;
@@ -505,17 +506,19 @@ namespace RealSolarSystem {
 	}
 	
 	public class LaunchSite {
-		public string Name { get; set; }
+        public string name { get; set; }
+        public string displayName { get; set; }
 		public string description { get; set; }
 		public Vector2d geographicLocation { get; set; }
 		public double availableFromUT { get; set; }
-		public double availableToUT { get; set; }
+		public double availableUntilUT { get; set; }
 		
 		public LaunchSite() {
-			this.Name = "";
+			this.name = "";
+            this.displayName = "";
 			this.description = "";
 			this.availableFromUT = 0.0;
-			this.availableToUT = 0.0;
+			this.availableUntilUT = 0.0;
 			this.geographicLocation = Vector2d.zero;
 		}
 	}
