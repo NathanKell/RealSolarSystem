@@ -255,6 +255,12 @@ namespace RealSolarSystem
                             onode.TryGetValue("period", ref body.orbit.period);
                             onode.TryGetValue("LAN", ref body.orbit.LAN);
                             onode.TryGetValue("argumentOfPeriapsis", ref body.orbit.argumentOfPeriapsis);
+                            if(onode.HasValue("orbitColor"))
+                            {
+                                Vector4 col = KSPUtil.ParseVector4(onode.GetValue("orbitColor"));
+                                Color c = new Color(col.x, col.y, col.z, col.w);
+                                body.GetOrbitDriver().orbitColor = c;
+                            }
                             string bodyname = "";
                             if (onode.TryGetValue("referenceBody", ref bodyname))
                             {
