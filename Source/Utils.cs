@@ -10,6 +10,17 @@ namespace RealSolarSystem
 {
     public class Utils : MonoBehaviour
     {
+        public static void ScaleVerts(Mesh mesh, float scaleFactor)
+        {
+            Vector3[] vertices = new Vector3[mesh.vertexCount];
+            for (int i = 0; i < mesh.vertexCount; i++)
+            {
+                Vector3 v = mesh.vertices[i];
+                v *= scaleFactor;
+                vertices[i] = v;
+            }
+            mesh.vertices = vertices;
+        }
         public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight)
         {
             ProfileTimer.Push("MatchVerts");

@@ -11,7 +11,7 @@ namespace RealSolarSystem
     class ObjLib
     {
         // **** VERTEX MATCH ****
-        public static void UpdateMeshFromFile(Mesh mesh, string filename)
+        public static void UpdateMeshFromFile(Mesh mesh, string filename, float scaleFactor = 1.0f)
         {
             ProfileTimer.Push("UpdateMeshFromFile");
             StreamReader stream = File.OpenText(filename);
@@ -33,8 +33,8 @@ namespace RealSolarSystem
                 switch (brokenString[0])
                 {
                     case "v":
-                        vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
-                                                        System.Convert.ToSingle(brokenString[3]));
+                        vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]) * scaleFactor, System.Convert.ToSingle(brokenString[2]) * scaleFactor,
+                                                        System.Convert.ToSingle(brokenString[3]) * scaleFactor);
                         v++;
                         break;
                     case "vn":

@@ -32,6 +32,9 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v6.3  \/
+*ScaledSpace scaling workaround until EVE and Kethane (and anything else that assumes scale) get fixed.
+
 v6.2  \/
 *PQS->ScaledSpace wrapping now works and caches correctly. Wrap now defaults to false for backwards compatibility. RSS will export obj files (with extra lines using keyword t for vertex tangents) for all wrapped meshes, and import them (if they exist) instead of wrapping. NOTE: If you change any PQS settings (let alone changing RSS configs!) you MUST delete all .obj files in GameData/RealSolarSystem/PluginData! NOTE 2: If you don't already have cached meshes, and/or you delete them all, KSP WILL APPEAR TO HANG on the "Loading..." screen right before Main Menu. This is NORMAL. Let it run. It takes me about 15 minutes. After that, you'll get your usual load times.
 *regex: fixed Space Center initial camera height (for when camera is under terrain)

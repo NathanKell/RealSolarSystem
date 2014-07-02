@@ -956,6 +956,188 @@ namespace RealSolarSystem
                                 }
                             }
                         }
+                        // Scaled space
+                        Transform scaledSpaceTransform = null;
+                        Transform atmo = null;
+                        if (ScaledSpace.Instance != null)
+                        {
+                            float SSTScale = 1.0f;
+                            node.TryGetValue("SSTScale", ref SSTScale);
+                            foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                            {
+                                if (t.name.Equals(node.name))
+                                {
+                                    scaledSpaceTransform = t;
+                                    // replace
+                                    int replaceColor = 0;
+                                    string path = "";
+                                    if (node.HasValue("SSColor"))
+                                    {
+                                        replaceColor = 1;
+                                        path = node.GetValue("SSColor");
+                                    }
+                                    if (node.HasValue("SSColor32"))
+                                    {
+                                        replaceColor = 2;
+                                        path = node.GetValue("SSColor32");
+                                    }
+                                    if (replaceColor > 0)
+                                    {
+                                        Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
+                                        map.LoadImage(System.IO.File.ReadAllBytes(path));
+                                        map.Compress(true);
+                                        map.Apply(true, true);
+                                        Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
+                                        foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                        {
+                                            if(m.GetTexture("_MainTex") == oldColor)
+                                                m.SetTexture("_MainTex", map);
+                                        }
+                                        DestroyImmediate(oldColor);
+                                        // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
+                                    }
+                                    if (node.HasValue("SSBump"))
+                                    {
+                                        Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                                        map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
+                                        if(compressNormals)
+                                            map.Compress(true);
+                                        map.Apply(true, true);
+                                        Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
+                                        if (oldBump != null)
+                                        {
+                                            foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                            {
+                                                if (m.GetTexture("_BumpMap") == oldBump)
+                                                    m.SetTexture("_BumpMap", map);
+                                            }
+                                            DestroyImmediate(oldBump);
+                                        }
+                                    }
+
+                                    // Fix mesh
+                                    bool rescale = true;
+                                    bool doWrapHere = doWrap;
+                                    node.TryGetValue("wrap", ref doWrapHere);
+                                    bool sphereVal = spheresOnly;
+                                    bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
+                                    float origLocalScale = t.localScale.x; // assume uniform scale
+                                    if (body.pqsController != null && doWrapHere)
+                                    {
+                                        MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
+                                        if (m == null || m.mesh == null)
+                                        {
+                                            print("*RSS* Failure getting SSM for " + body.pqsController.name + ": mesh is null");
+                                        }
+                                        else
+                                        {
+                                            if (sphereVal)
+                                            {
+                                                Mesh tMesh = new Mesh();
+                                                Utils.CopyMesh(joolMesh.mesh, tMesh); 
+                                                print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name);
+                                                float scaleFactor = (float)(origRadius / 6000000.0 / origLocalScale); // scale mesh to original CB's size
+                                                Utils.ScaleVerts(tMesh, scaleFactor);
+                                                tMesh.RecalculateBounds();
+                                                m.mesh = tMesh;
+                                                // do normal rescaling below.
+	                                        }
+	                                        else
+	                                        {
+	                                            char sep = System.IO.Path.DirectorySeparatorChar;
+	                                            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
+	                                                        + sep + "PluginData" + sep + t.name;
+
+                                                filePath += ".obj";
+                                                bool wrap = true;
+	                                            try
+	                                            {
+	                                                if (File.Exists(filePath))
+	                                                {
+                                                        ProfileTimer.Push("LoadSSM_" + body.name);
+                                                        Mesh tMesh = new Mesh();
+                                                        Utils.CopyMesh(joolMesh.mesh, tMesh);
+
+                                                        float scaleFactor = (float)(origRadius / body.Radius / origLocalScale); // scale mesh to original CB's size
+
+                                                        ObjLib.UpdateMeshFromFile(tMesh, filePath, scaleFactor);
+                                                        tMesh.RecalculateBounds();
+                                                        m.mesh = tMesh;
+                                                        wrap = false;
+                                                        // do normal rescaling below.
+                                                        print("*RSS* Loaded " + filePath + " and wrapped.");
+                                                        ProfileTimer.Pop("LoadSSM_" + body.name);
+	                                                }
+	                                            }
+	                                            catch (Exception e)
+	                                            {
+	                                                print("Exception loading mesh " + filePath + " for " + t.name + ": " + e.Message);
+	                                            }
+	                                            if (wrap)
+	                                            {
+	                                                try
+	                                                {
+	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
+                                                        ProfileTimer.Push("WrapSSM_" + body.name);
+                                                        Mesh tMesh = new Mesh();
+                                                        Utils.CopyMesh(joolMesh.mesh, tMesh);
+                                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
+                                                        tMesh.RecalculateNormals();
+                                                        ObjLib.UpdateTangents(tMesh);
+	                                                    print("*RSS* wrapped.");
+	                                                    try
+	                                                    {
+	                                                        ObjLib.MeshToFile(m, filePath);
+	                                                    }
+	                                                    catch (Exception e)
+	                                                    {
+	                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
+	                                                    }
+	                                                    print("*RSS*: Done wrapping and exporting. Setting scale");
+                                                        float scaleFactor = (float)(origRadius / body.Radius / origLocalScale); // scale mesh to original CB's size
+                                                        Utils.ScaleVerts(tMesh, scaleFactor);
+                                                        tMesh.RecalculateBounds();
+                                                        m.mesh = tMesh;
+                                                        // do normal rescaling below.
+                                                        ProfileTimer.Pop("WrapSSM_" + body.name);
+	                                                }
+	                                                catch (Exception e)
+	                                                {
+	                                                    print("*RSS* Exception wrapping: " + e.Message);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                        atmo = t.FindChild("Atmosphere");
+                                    }
+                                    if (rescale)
+                                    {
+                                        float scaleFactor = (float)(body.Radius / origRadius * SSTScale);
+                                        t.localScale = new Vector3(t.localScale.x * scaleFactor, t.localScale.y * scaleFactor, t.localScale.z * scaleFactor);
+                                    }
+                                    else
+                                    {
+                                        // rescale only atmo
+                                        if (atmo != null)
+                                        {
+                                            print("*RSS* found atmo transform for " + node.name);
+                                            float scaleFactor = SSAtmoScale; // default to global default
+                                            if (!node.TryGetValue("SSAtmoScale", ref scaleFactor)) // if no override multiplier
+                                            {
+                                                if (defaultAtmoScale) // use stock KSP multiplier
+                                                    scaleFactor *= 1.025f;
+                                                else // or use atmosphere height-dependent multiplier
+                                                    scaleFactor *= (float)((body.Radius + body.maxAtmosphereAltitude) / body.Radius);
+                                            }
+                                            scaleFactor *= origLocalScale / t.localScale.x * (float)(body.Radius / origRadius); // since our parent transform changed, we no longer are the same scale as the planet.
+                                            atmo.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                                            print("*RSS* final scale of atmo for " + body.name + " in scaledspace: " + atmo.localScale.x);
+                                        }
+                                    }
+                                    print("*RSS* final scale of " + body.name + " in scaledspace: " + t.localScale.x);
+                                }
+                            }
+                        }
                         foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
                         {
                             //print("*RSS* Found AG " + ag.name + " " + (ag.tag == null ? "" : ag.tag) + ". Planet " + (ag.planet == null ? "NULL" : ag.planet.name));
@@ -1026,193 +1208,6 @@ namespace RealSolarSystem
                                     setMaterial.Invoke(ag, new object[] { true });
 
                                     print("Atmo updated");
-                                }
-                            }
-                        }
-                        // Scaled space
-                        if (ScaledSpace.Instance != null)
-                        {
-                            float SSTScale = 1.0f;
-                            node.TryGetValue("SSTScale", ref SSTScale);
-                            foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                            {
-                                if (t.name.Equals(node.name))
-                                {
-                                    // replace
-                                    int replaceColor = 0;
-                                    string path = "";
-                                    if (node.HasValue("SSColor"))
-                                    {
-                                        replaceColor = 1;
-                                        path = node.GetValue("SSColor");
-                                    }
-                                    if (node.HasValue("SSColor32"))
-                                    {
-                                        replaceColor = 2;
-                                        path = node.GetValue("SSColor32");
-                                    }
-                                    if (replaceColor > 0)
-                                    {
-                                        Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
-                                        map.LoadImage(System.IO.File.ReadAllBytes(path));
-                                        map.Compress(true);
-                                        map.Apply(true, true);
-                                        Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
-                                        foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
-                                        {
-                                            if(m.GetTexture("_MainTex") == oldColor)
-                                                m.SetTexture("_MainTex", map);
-                                        }
-                                        DestroyImmediate(oldColor);
-                                        // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
-                                    }
-                                    if (node.HasValue("SSBump"))
-                                    {
-                                        Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                                        map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
-                                        if(compressNormals)
-                                            map.Compress(true);
-                                        map.Apply(true, true);
-                                        Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
-                                        if (oldBump != null)
-                                        {
-                                            foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
-                                            {
-                                                if (m.GetTexture("_BumpMap") == oldBump)
-                                                    m.SetTexture("_BumpMap", map);
-                                            }
-                                            DestroyImmediate(oldBump);
-                                        }
-                                    }
-
-                                    // Fix mesh
-                                    bool rescale = true;
-                                    bool doWrapHere = doWrap;
-                                    node.TryGetValue("wrap", ref doWrapHere);
-                                    bool sphereVal = spheresOnly;
-                                    bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
-                                    float origLocalScale = t.localScale.x;
-                                    if (body.pqsController != null && doWrapHere)
-                                    {
-                                        MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
-                                        if (m == null || m.mesh == null)
-                                        {
-                                            print("*RSS* Failure getting SSM for " + body.pqsController.name + ": mesh is null");
-                                        }
-                                        else
-                                        {
-                                            if (sphereVal)
-                                            {
-                                                m.mesh = joolMesh.mesh;
-                                                MeshFilter nmf = new MeshFilter();
-                                                print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name);
-                                                float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
-                                                t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                                rescale = false;
-	                                        }
-	                                        else
-	                                        {
-	                                            char sep = System.IO.Path.DirectorySeparatorChar;
-	                                            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
-	                                                        + sep + "PluginData" + sep + t.name;
-
-                                                //string fp2 = filePath + "_orig.obj";
-                                                filePath += ".obj";
-                                                /*try
-                                                {
-                                                    ObjLib.MeshToFile(m, fp2);
-                                                }
-                                                catch (Exception e)
-                                                {
-                                                    print("*RSS* Exception saving orig mesh " + filePath + ": " + e.Message);
-                                                }*/
-                                                bool wrap = true;
-	                                            try
-	                                            {
-	                                                if (File.Exists(filePath))
-	                                                {
-                                                        ProfileTimer.Push("LoadSSM_" + body.name);
-                                                        Mesh tMesh = new Mesh();
-                                                        Utils.CopyMesh(joolMesh.mesh, tMesh);
-
-                                                        ObjLib.UpdateMeshFromFile(tMesh, filePath);
-                                                        tMesh.RecalculateBounds();
-                                                        //tMesh.RecalculateNormals();
-                                                        m.mesh = tMesh;
-                                                        float scaleFactor = SSTScale;
-                                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                                        wrap = false;
-                                                        rescale = false;
-                                                        print("*RSS* Loaded " + filePath + " and wrapped.");
-                                                        ProfileTimer.Pop("LoadSSM_" + body.name);
-	                                                }
-	                                            }
-	                                            catch (Exception e)
-	                                            {
-	                                                print("Exception loading mesh " + filePath + " for " + t.name + ": " + e.Message);
-	                                            }
-	                                            if (wrap)
-	                                            {
-	                                                try
-	                                                {
-	                                                    print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
-                                                        ProfileTimer.Push("WrapSSM_" + body.name);
-                                                        Mesh tMesh = new Mesh();
-                                                        Utils.CopyMesh(joolMesh.mesh, tMesh);
-                                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
-                                                        tMesh.RecalculateBounds();
-                                                        tMesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(tMesh);
-                                                        m.mesh = tMesh;
-	                                                    print("*RSS* wrapped.");
-	                                                    try
-	                                                    {
-	                                                        ObjLib.MeshToFile(m, filePath);
-	                                                    }
-	                                                    catch (Exception e)
-	                                                    {
-	                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
-	                                                    }
-	                                                    print("*RSS*: Done wrapping and exporting. Setting scale");
-                                                        float scaleFactor = (float)(1.0 * SSTScale);
-                                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-	                                                    rescale = false;
-                                                        ProfileTimer.Pop("WrapSSM_" + body.name);
-	                                                }
-	                                                catch (Exception e)
-	                                                {
-	                                                    print("*RSS* Exception wrapping: " + e.Message);
-                                                    }
-                                                }
-                                            }
-                                        }
-                                    }
-                                    if (rescale)
-                                    {
-                                        float scaleFactor = (float)(body.Radius / origRadius * SSTScale);
-                                        t.localScale = new Vector3(t.localScale.x * scaleFactor, t.localScale.y * scaleFactor, t.localScale.z * scaleFactor);
-                                    }
-                                    else
-                                    {
-                                        // rescale only atmo
-                                        Transform atmo = t.FindChild("Atmosphere");
-                                        if (atmo != null)
-                                        {
-                                            print("*RSS* found atmo transform for " + node.name);
-                                            float scaleFactor = SSAtmoScale; // default to global default
-                                            if (!node.TryGetValue("SSAtmoScale", ref scaleFactor)) // if no override multiplier
-                                            {
-                                                if (defaultAtmoScale) // use stock KSP multiplier
-                                                    scaleFactor *= 1.025f;
-                                                else // or use atmosphere height-dependent multiplier
-                                                    scaleFactor *= (float)((body.Radius + body.maxAtmosphereAltitude) / body.Radius);
-                                            }
-                                            scaleFactor *= origLocalScale / t.localScale.x * (float)(body.Radius / origRadius); // since our parent transform changed, we no longer are the same scale as the planet.
-                                            atmo.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                            print("*RSS* final scale of atmo for " + body.name + " in scaledspace: " + atmo.localScale.x);
-                                        }
-                                    }
-                                    print("*RSS* final scale of " + body.name + " in scaledspace: " + t.localScale.x);
                                 }
                             }
                         }
