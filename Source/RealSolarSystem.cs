@@ -534,14 +534,19 @@ namespace RealSolarSystem
                                                     }
                                                     if (modNode.HasValue("heightMap"))
                                                     {
-                                                        Texture2D map = new Texture2D(4,4, TextureFormat.Alpha8, false);
-                                                        map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
-                                                        //print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
-                                                        //System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
-                                                        //DestroyImmediate(mod.heightMap);
-                                                        //mod.heightMap = ScriptableObject.CreateInstance<MapSO>();
-                                                        mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
-                                                        DestroyImmediate(map);
+                                                        if (File.Exists(KSPUtil.ApplicationRootPath + "/" + modNode.GetValue("heightMap")))
+                                                        {
+                                                            Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
+                                                            map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
+                                                            //print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
+                                                            //System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
+                                                            //DestroyImmediate(mod.heightMap);
+                                                            //mod.heightMap = ScriptableObject.CreateInstance<MapSO>();
+                                                            mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
+                                                            DestroyImmediate(map);
+                                                        }
+                                                        else
+                                                            print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("heightMap"));
                                                     }
                                                     mod.OnSetup();
                                                 }
@@ -894,37 +899,43 @@ namespace RealSolarSystem
                                             {
                                                 if (modNode.name.Equals("PQSMod_VertexColorMapBlend"))
                                                 {
-                                                    /*CelestialBody cbDuna = null;
-                                                    foreach (CelestialBody b in FlightGlobals.Bodies)
-                                                        if (b.name.Equals("Duna"))
-                                                            cbDuna = b;
+                                                    if (File.Exists(KSPUtil.ApplicationRootPath + "/" + modNode.GetValue("vertexColorMap")))
+                                                    {
+                                                        /*CelestialBody cbDuna = null;
+                                                        foreach (CelestialBody b in FlightGlobals.Bodies)
+                                                            if (b.name.Equals("Duna"))
+                                                                cbDuna = b;
 
-                                                    PQSMod_VertexColorMapBlend dunaColor = cbDuna.transform.GetComponentInChildren<PQSMod_VertexColorMapBlend>();*/
-                                                    GameObject tempObj = new GameObject();
+                                                        PQSMod_VertexColorMapBlend dunaColor = cbDuna.transform.GetComponentInChildren<PQSMod_VertexColorMapBlend>();*/
+                                                        GameObject tempObj = new GameObject();
 
 
-                                                    PQSMod_VertexColorMapBlend colorMap = (PQSMod_VertexColorMapBlend)tempObj.AddComponent(typeof(PQSMod_VertexColorMapBlend));
+                                                        PQSMod_VertexColorMapBlend colorMap = (PQSMod_VertexColorMapBlend)tempObj.AddComponent(typeof(PQSMod_VertexColorMapBlend));
 
-                                                    tempObj.transform.parent = p.gameObject.transform;
-                                                    colorMap.sphere = p;
+                                                        tempObj.transform.parent = p.gameObject.transform;
+                                                        colorMap.sphere = p;
 
-                                                    Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
-                                                    map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("vertexColorMap")));
-                                                    colorMap.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
-                                                    colorMap.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
-                                                        
-                                                    colorMap.blend = 1.0f;
-                                                    if (modNode.HasValue("blend"))
-                                                        if (float.TryParse(modNode.GetValue("blend"), out ftmp))
-                                                            colorMap.blend = ftmp;
-                                                        
-                                                    colorMap.order = 9999993;
-                                                    if (modNode.HasValue("order"))
-                                                        if (int.TryParse(modNode.GetValue("order"), out itmp))
-                                                            colorMap.order = itmp;
+                                                        Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
+                                                        map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("vertexColorMap")));
+                                                        colorMap.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
+                                                        colorMap.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
 
-                                                    colorMap.modEnabled = true;
-                                                    DestroyImmediate(map);
+                                                        colorMap.blend = 1.0f;
+                                                        if (modNode.HasValue("blend"))
+                                                            if (float.TryParse(modNode.GetValue("blend"), out ftmp))
+                                                                colorMap.blend = ftmp;
+
+                                                        colorMap.order = 9999993;
+                                                        if (modNode.HasValue("order"))
+                                                            if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                                colorMap.order = itmp;
+
+                                                        colorMap.modEnabled = true;
+                                                        DestroyImmediate(map);
+                                                    }
+                                                    else
+                                                        print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
+
                                                 }
                                             }
                                         }
@@ -983,36 +994,46 @@ namespace RealSolarSystem
                                     }
                                     if (replaceColor > 0)
                                     {
-                                        Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
-                                        map.LoadImage(System.IO.File.ReadAllBytes(path));
-                                        map.Compress(true);
-                                        map.Apply(true, true);
-                                        Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
-                                        foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                        if (File.Exists(KSPUtil.ApplicationRootPath + "/" + path))
                                         {
-                                            if(m.GetTexture("_MainTex") == oldColor)
-                                                m.SetTexture("_MainTex", map);
+                                            Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
+                                            map.LoadImage(System.IO.File.ReadAllBytes(path));
+                                            map.Compress(true);
+                                            map.Apply(true, true);
+                                            Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
+                                            foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                            {
+                                                if(m.GetTexture("_MainTex") == oldColor)
+                                                    m.SetTexture("_MainTex", map);
+                                            }
+                                            DestroyImmediate(oldColor);
+                                            // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
                                         }
-                                        DestroyImmediate(oldColor);
-                                        // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
+                                        else
+                                            print("*RSS* *ERROR* texture does not exist! " + path);
                                     }
                                     if (node.HasValue("SSBump"))
                                     {
-                                        Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                                        map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
-                                        if(compressNormals)
-                                            map.Compress(true);
-                                        map.Apply(true, true);
-                                        Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
-                                        if (oldBump != null)
+                                        if (File.Exists(KSPUtil.ApplicationRootPath + "/" + node.GetValue("SSBump")))
                                         {
-                                            foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                            Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                                            map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
+                                            if(compressNormals)
+                                                map.Compress(true);
+                                            map.Apply(true, true);
+                                            Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
+                                            if (oldBump != null)
                                             {
-                                                if (m.GetTexture("_BumpMap") == oldBump)
-                                                    m.SetTexture("_BumpMap", map);
+                                                foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                                {
+                                                    if (m.GetTexture("_BumpMap") == oldBump)
+                                                        m.SetTexture("_BumpMap", map);
+                                                }
+                                                DestroyImmediate(oldBump);
                                             }
-                                            DestroyImmediate(oldBump);
                                         }
+                                        else
+                                            print("*RSS* *ERROR* texture does not exist! " + node.HasValue("SSBump"));
                                     }
 
                                     // Fix mesh
