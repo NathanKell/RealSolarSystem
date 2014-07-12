@@ -361,7 +361,7 @@ namespace RealSolarSystem
                 LastKSC.fetch.lastSite = activeSite;
                 ScreenMessages.PostScreenMessage("Launch site changed to " + name, 2.5f, ScreenMessageStyle.LOWER_CENTER);
                 showWindow = false;
-                RSSCameraFix.shouldCameraBeReset = true;
+                KSCReset.shouldCameraBeReset = true;
                 print("*RSS* Launch site updated.  Camera reset set to true");
             }
         }
