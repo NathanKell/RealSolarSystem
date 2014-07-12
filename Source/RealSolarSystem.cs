@@ -9,12 +9,18 @@ using System.IO;
 
 namespace RealSolarSystem
 {
-    [KSPAddonFixed(KSPAddon.Startup.SpaceCentre, true, typeof(RSSCameraFix))]
+    [KSPAddonFixed(KSPAddon.Startup.SpaceCentre, false, typeof(RSSCameraFix))]
     public class RSSCameraFix : MonoBehaviour
     {
+        public static bool shouldCameraBeReset = true;
         public void Start()
         {
-            HighLogic.LoadScene(GameScenes.SPACECENTER);
+            if (shouldCameraBeReset)
+            {
+                print("*RSS* Resetting scene to spacecenter");
+                HighLogic.LoadScene(GameScenes.SPACECENTER);
+                shouldCameraBeReset = false;
+            }
         }
     }
     [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(RealSolarSystem))]
