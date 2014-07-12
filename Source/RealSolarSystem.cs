@@ -9,8 +9,8 @@ using System.IO;
 
 namespace RealSolarSystem
 {
-    [KSPAddonFixed(KSPAddon.Startup.SpaceCentre, false, typeof(KSCReset))]
-    public class KSCReset : MonoBehaviour
+    [KSPAddonFixed(KSPAddon.Startup.SpaceCentre, false, typeof(RSSCameraFix))]
+    public class RSSCameraFix : MonoBehaviour
     {
         public static bool shouldCameraBeReset = true;
         public void Start()
