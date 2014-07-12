@@ -9,6 +9,20 @@ using System.IO;
 
 namespace RealSolarSystem
 {
+    [KSPAddonFixed(KSPAddon.Startup.SpaceCentre, false, typeof(KSCReset))]
+    public class KSCReset : MonoBehaviour
+    {
+        public static bool shouldCameraBeReset = true;
+        public void Start()
+        {
+            if (shouldCameraBeReset)
+            {
+                print("*RSS* Resetting scene to spacecenter");
+                HighLogic.LoadScene(GameScenes.SPACECENTER);
+                shouldCameraBeReset = false;
+            }
+        }
+    }
     [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(RealSolarSystem))]
     public class RealSolarSystem : MonoBehaviour
     {
