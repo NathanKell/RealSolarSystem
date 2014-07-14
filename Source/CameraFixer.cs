@@ -124,4 +124,19 @@ namespace RealSolarSystem
             }
         }
     }
+    //Agathorn
+    [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+    public class KSCReset : MonoBehaviour
+    {
+        public static bool shouldCameraBeReset = true;
+        public void Start()
+        {
+            if (shouldCameraBeReset)
+            {
+                HighLogic.LoadScene(GameScenes.SPACECENTER);
+                shouldCameraBeReset = false;
+            }
+        }
+    }
+
 }
