@@ -133,7 +133,8 @@ namespace RealSolarSystem
         {
             if (shouldCameraBeReset)
             {
-                HighLogic.LoadScene(GameScenes.SPACECENTER);
+                //HighLogic.LoadScene(GameScenes.SPACECENTER);
+                // Disabled until further testing; causes Exception-spam from the KSC hit detector.
                 shouldCameraBeReset = false;
             }
         }

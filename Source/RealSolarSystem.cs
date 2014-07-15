@@ -534,7 +534,7 @@ namespace RealSolarSystem
                                                     }
                                                     if (modNode.HasValue("heightMap"))
                                                     {
-                                                        if (File.Exists(KSPUtil.ApplicationRootPath + "/" + modNode.GetValue("heightMap")))
+                                                        if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
                                                         {
                                                             Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
                                                             map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
@@ -899,7 +899,7 @@ namespace RealSolarSystem
                                             {
                                                 if (modNode.name.Equals("PQSMod_VertexColorMapBlend"))
                                                 {
-                                                    if (File.Exists(KSPUtil.ApplicationRootPath + "/" + modNode.GetValue("vertexColorMap")))
+                                                    if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
                                                     {
                                                         /*CelestialBody cbDuna = null;
                                                         foreach (CelestialBody b in FlightGlobals.Bodies)
@@ -994,7 +994,7 @@ namespace RealSolarSystem
                                     }
                                     if (replaceColor > 0)
                                     {
-                                        if (File.Exists(KSPUtil.ApplicationRootPath + "/" + path))
+                                        if (File.Exists(KSPUtil.ApplicationRootPath + path))
                                         {
                                             Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
                                             map.LoadImage(System.IO.File.ReadAllBytes(path));
@@ -1014,7 +1014,7 @@ namespace RealSolarSystem
                                     }
                                     if (node.HasValue("SSBump"))
                                     {
-                                        if (File.Exists(KSPUtil.ApplicationRootPath + "/" + node.GetValue("SSBump")))
+                                        if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
                                         {
                                             Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
                                             map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
@@ -1066,7 +1066,7 @@ namespace RealSolarSystem
 	                                        else
 	                                        {
 	                                            char sep = System.IO.Path.DirectorySeparatorChar;
-	                                            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
+	                                            string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
 	                                                        + sep + "PluginData" + sep + t.name;
 
                                                 filePath += ".obj";
@@ -1308,8 +1308,8 @@ namespace RealSolarSystem
                                         oceanColor = new Color(col.x, col.y, col.z);
                                     }
                                     Texture2D[] outputMaps = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "1.png", outputMaps[0].EncodeToPNG());
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + System.IO.Path.DirectorySeparatorChar + body.name + "2.png", outputMaps[1].EncodeToPNG());
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "1.png", outputMaps[0].EncodeToPNG());
+                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "2.png", outputMaps[1].EncodeToPNG());
                                 }
                             }
                             catch (Exception e)
