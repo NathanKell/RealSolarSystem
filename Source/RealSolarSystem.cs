@@ -891,6 +891,30 @@ namespace RealSolarSystem
                                                     }
                                                     mod.OnSetup();
                                                 }
+                                                if (modNode.name.Equals("PQSMod_VertexColorMapBlend") && m.GetType().ToString().Equals(modNode.name))
+                                                {
+                                                    PQSMod_VertexColorMapBlend mod = m as PQSMod_VertexColorMapBlend;
+                                                    if (modNode.HasValue("blend"))
+                                                        if (float.TryParse(modNode.GetValue("blend"), out ftmp))
+                                                            mod.blend = ftmp;
+
+                                                    if (modNode.HasValue("order"))
+                                                        if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                            mod.order = itmp;
+
+                                                    if (modNode.HasValue("vertexColorMap") && File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
+                                                    {
+                                                        // for now don't destroy old map, use GC.
+                                                        Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
+                                                        map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
+                                                        mod.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
+                                                        mod.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
+                                                        DestroyImmediate(map);
+                                                    }
+                                                    else
+                                                        print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
+
+                                                }
                                             }
                                         }
                                         if (pqsNode.HasNode("Add"))
@@ -916,7 +940,7 @@ namespace RealSolarSystem
                                                         colorMap.sphere = p;
 
                                                         Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
-                                                        map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("vertexColorMap")));
+                                                        map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
                                                         colorMap.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
                                                         colorMap.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
 
