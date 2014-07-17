@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<config>
+    <rect name="WindowPosition">
+        <xmin>178</xmin>
+        <xmax>528</xmax>
+        <ymin>574</ymin>
+        <ymax>1064</ymax>
+    </rect>
+    <bool name="WindowMinimized">1</bool>
+    <rect name="MapPosition">
+        <xmin>553</xmin>
+        <xmax>603</xmax>
+        <ymin>260</ymin>
+        <ymax>270</ymax>
+    </rect>
+    <bool name="MapMinimized">1</bool>
+    <int name="WindowTab">0</int>
+    <string name="DefaultSets">23test|Basic;RPL|Basic;scenarios|Disable;stock|Basic;T2|Basic;training|Disable;UKS|Basic;zt|Basic;</string>
+</config>
