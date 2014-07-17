@@ -25,8 +25,6 @@ namespace RealSolarSystem
         {
             ProfileTimer.Push("MatchVerts");
             char sep = System.IO.Path.DirectorySeparatorChar;
-            string filePath = KSPUtil.ApplicationRootPath + sep + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
-                        + sep + "PluginData" + sep + pqs.name + "_match.txt";
             pqs.isBuildingMaps = true;
 
             Vector3[] vertices = new Vector3[mesh.vertexCount];
@@ -36,7 +34,7 @@ namespace RealSolarSystem
                 double height = pqs.GetSurfaceHeight(v);
                 if (height < oceanHeight)
                     height = oceanHeight;
-                vertices[i] = v.normalized * (float)(1000.0 / 6000000.0 * height);
+                vertices[i] = v.normalized * (float)(1000.0 * height / pqs.radius);
             }
             pqs.isBuildingMaps = false;
             mesh.vertices = vertices;

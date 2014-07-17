@@ -143,7 +143,7 @@ namespace RealSolarSystem
                 {
                     if (body.name.Equals(node.name))
                     {
-                        print("Fixing CB " + node.name);
+                        print("Fixing CB " + node.name + " of radius " + body.Radius);
                         double dtmp;
                         float ftmp;
                         int itmp;
@@ -1002,6 +1002,7 @@ namespace RealSolarSystem
                             {
                                 if (t.name.Equals(node.name))
                                 {
+                                    print("*RSS* Found scaledspace transform for " + t.name + ", scale " + t.localScale.x);
                                     scaledSpaceTransform = t;
                                     // replace
                                     int replaceColor = 0;
@@ -1080,8 +1081,8 @@ namespace RealSolarSystem
                                             {
                                                 Mesh tMesh = new Mesh();
                                                 Utils.CopyMesh(joolMesh.mesh, tMesh); 
-                                                print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name);
-                                                float scaleFactor = (float)(origRadius / 6000000.0 / origLocalScale); // scale mesh to original CB's size
+                                                float scaleFactor = (1f / origLocalScale); // scale mesh to original CB's size
+                                                print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name + ". Vertex Scale " + scaleFactor);
                                                 Utils.ScaleVerts(tMesh, scaleFactor);
                                                 tMesh.RecalculateBounds();
                                                 m.mesh = tMesh;
@@ -1100,11 +1101,22 @@ namespace RealSolarSystem
 	                                                if (File.Exists(filePath))
 	                                                {
                                                         ProfileTimer.Push("LoadSSM_" + body.name);
+                                                        /*try
+                                                        {
+                                                            ObjLib.MeshToFile(m, filePath+".old");
+                                                        }
+
+                                                        catch (Exception e)
+                                                        {
+                                                            print("*RSS* Exception saving old mesh " + filePath + ".old: " + e.Message);
+                                                        }*/
+
                                                         Mesh tMesh = new Mesh();
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
 
-                                                        float scaleFactor = (float)(origRadius / body.Radius / origLocalScale); // scale mesh to original CB's size
-
+                                                        float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
+                                                        // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
+                                                        print("Loading from file, Vertex Scale " + scaleFactor);
                                                         ObjLib.UpdateMeshFromFile(tMesh, filePath, scaleFactor);
                                                         tMesh.RecalculateBounds();
                                                         m.mesh = tMesh;
@@ -1116,7 +1128,7 @@ namespace RealSolarSystem
 	                                            }
 	                                            catch (Exception e)
 	                                            {
-	                                                print("Exception loading mesh " + filePath + " for " + t.name + ": " + e.Message);
+	                                                print("*RSS* Exception loading mesh " + filePath + " for " + t.name + ": " + e.Message);
 	                                            }
 	                                            if (wrap)
 	                                            {
@@ -1139,7 +1151,8 @@ namespace RealSolarSystem
 	                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
 	                                                    }
 	                                                    print("*RSS*: Done wrapping and exporting. Setting scale");
-                                                        float scaleFactor = (float)(origRadius / body.Radius / origLocalScale); // scale mesh to original CB's size
+                                                        float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
+                                                        // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
                                                         Utils.ScaleVerts(tMesh, scaleFactor);
                                                         tMesh.RecalculateBounds();
                                                         m.mesh = tMesh;
@@ -1191,7 +1204,7 @@ namespace RealSolarSystem
                                 // generalized version of Starwaster's code. Thanks Starwaster!
                                 if (ag.planet.name.Equals(node.name))
                                 {
-                                    print("Found atmo for " + node.name + ": " + ag.name);
+                                    print("Found atmo for " + node.name + ": " + ag.name + ", has localScale " + ag.transform.localScale.x);
                                     if (node.HasNode("AtmosphereFromGround"))
                                     {
                                         ConfigNode modNode = node.GetNode("AtmosphereFromGround");
@@ -1207,6 +1220,9 @@ namespace RealSolarSystem
                                         {
                                             ag.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
                                         }
+                                        else
+                                            // the default
+                                            ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
 
                                         if (modNode.TryGetValue("innerRadius", ref ag.innerRadius))
                                         {
@@ -1216,6 +1232,9 @@ namespace RealSolarSystem
                                         {
                                             ag.innerRadius *= ag.outerRadius;
                                         }
+                                        else
+                                            ag.innerRadius = ag.outerRadius * 0.975f;
+
                                         modNode.TryGetValue("doScale", ref ag.doScale);
                                         if (modNode.HasValue("transformScale"))
                                         {
