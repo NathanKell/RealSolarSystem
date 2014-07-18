@@ -24,6 +24,11 @@ namespace RealSolarSystem
         public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight)
         {
             ProfileTimer.Push("MatchVerts");
+            if (pqs == null)
+            {
+                MonoBehaviour.print("ERROR matching verts: pqs is null!");
+                return;
+            }
             char sep = System.IO.Path.DirectorySeparatorChar;
             pqs.isBuildingMaps = true;
 
