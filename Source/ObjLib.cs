@@ -23,7 +23,7 @@ namespace RealSolarSystem
             int t = 0; // first tangent
             int n = 0; // first normal
             // borrowed from mesh-reading code.
-            Vector3[] vertices = new Vector3[mesh.vertices.Length];
+            Vector3[] vertices = new Vector3[mesh.vertexCount];
             Vector3[] normals = new Vector3[mesh.normals.Length];
             Vector4[] tangents = new Vector4[mesh.tangents.Length];
 
@@ -59,8 +59,8 @@ namespace RealSolarSystem
                     curLine = curLine.Replace("  ", " ");
                 }
             }
-            mesh.vertices = vertices;
-            mesh.normals = normals;
+            //mesh.vertices = vertices;
+            //mesh.normals = normals;
             mesh.tangents = tangents;
             ProfileTimer.Pop("UpdateMeshFromFile");
         }

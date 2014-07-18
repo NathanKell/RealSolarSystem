@@ -1185,7 +1185,10 @@ namespace RealSolarSystem
                                                         float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
                                                         // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
                                                         print("Loading from file, Vertex Scale " + scaleFactor);
+                                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
+                                                        tMesh.RecalculateNormals();
                                                         ObjLib.UpdateMeshFromFile(tMesh, filePath, scaleFactor);
+                                                        Utils.ScaleVerts(tMesh, scaleFactor);
                                                         tMesh.RecalculateBounds();
                                                         m.mesh = tMesh;
                                                         wrap = false;
