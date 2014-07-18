@@ -35,12 +35,14 @@ Changelog
 v7.0  \/
 *ScaledSpace scaling workaround until EVE and Kethane (and anything else that assumes scale) get fixed.
 *regex: support changing orbitColor in Orbit nodes (as standard float RGBA color).
+*fix to display the Display Name of the launch site when showing the icons on the planet in Tracking Station view.
 *Fail gracefully when textures are missing.
-*Include Custom Biomes, stock.
-*Include configs for Custom Asteroids
-*Support new images for every planet.
+*Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by Subcidal. Only Kerbin supported so far.
+*Include Custom Asteroids. Custom Asteroids by Starfighter42, config by SpacedInvader
+*Support new images for every planet by default (will fail gracefully if not found)
 *Fixed math errors in scaled space mesh resizing. This requires a rebuild of cached OBJs
 *Compiled for 0.24 x64
+*Added ability to edit and add more PQSMods
 
 v6.2  \/
 *PQS->ScaledSpace wrapping now works and caches correctly. Wrap now defaults to false for backwards compatibility. RSS will export obj files (with extra lines using keyword t for vertex tangents) for all wrapped meshes, and import them (if they exist) instead of wrapping. NOTE: If you change any PQS settings (let alone changing RSS configs!) you MUST delete all .obj files in GameData/RealSolarSystem/PluginData! NOTE 2: If you don't already have cached meshes, and/or you delete them all, KSP WILL APPEAR TO HANG on the "Loading..." screen right before Main Menu. This is NORMAL. Let it run. It takes me about 15 minutes. After that, you'll get your usual load times.
