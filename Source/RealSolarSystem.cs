@@ -143,6 +143,7 @@ namespace RealSolarSystem
                 {
                     if (body.name.Equals(node.name))
                     {
+                        #region CBChanges
                         print("Fixing CB " + node.name + " of radius " + body.Radius);
                         double dtmp;
                         float ftmp;
@@ -150,7 +151,9 @@ namespace RealSolarSystem
                         bool btmp;
                         double origRadius = body.Radius;
                         double origAtmo = body.maxAtmosphereAltitude;
-                        
+
+                        #region CBMassRadius
+
                         node.TryGetValue("bodyName", ref body.bodyName);
                         node.TryGetValue("bodyDescription", ref body.bodyDescription);
                         node.TryGetValue("Radius", ref body.Radius);
@@ -170,7 +173,9 @@ namespace RealSolarSystem
                             GravParamToOthers(body);
                             updateMass = false;
                         }
+                        #endregion
 
+                        #region CBAtmosphereTemperature
                         node.TryGetValue("atmosphere", ref body.atmosphere);
                         node.TryGetValue("atmosphereScaleHeight", ref body.atmosphereScaleHeight);
                         node.TryGetValue("atmosphereMultiplier", ref body.atmosphereMultiplier);
@@ -214,12 +219,16 @@ namespace RealSolarSystem
                                 }
                             }
                         }
+                        #endregion
+
+                        #region CBRotation
                         node.TryGetValue("rotationPeriod", ref body.rotationPeriod);
                         node.TryGetValue("tidallyLocked", ref body.tidallyLocked);
                         node.TryGetValue("initialRotation", ref body.initialRotation);
                         node.TryGetValue("inverseRotation", ref body.inverseRotation);
-                        
-                        if(updateMass)
+                        #endregion
+
+                        if (updateMass)
                             GeeASLToOthers(body);
 
                         /*if (node.HasValue("axialTilt"))
@@ -231,7 +240,7 @@ namespace RealSolarSystem
                             }
                         }*/
 
-
+                        #region CBOrbit
                         ConfigNode onode = node.GetNode("Orbit");
                         if (body.orbitDriver != null && body.orbit != null && onode != null)
                         {
@@ -291,6 +300,7 @@ namespace RealSolarSystem
                         }
                         // SOI and HillSphere done at end
                         body.CBUpdate();
+                        #endregion
 
                         // Scaled space fader
                         float SSFMult = 1.0f;
@@ -634,6 +644,21 @@ namespace RealSolarSystem
                                                     }
                                                     mod.OnSetup();
                                                 }
+                                                if (modNode.name.Equals("PQSMod_VertexHeightNoise") && m.GetType().ToString().Equals(modNode.name))
+                                                {
+                                                    PQSMod_VertexHeightNoise mod = m as PQSMod_VertexHeightNoise;
+                                                    if (modNode.HasValue("deformity"))
+                                                    {
+                                                        if (float.TryParse(modNode.GetValue("deformity"), out ftmp))
+                                                            mod.deformity = ftmp;
+                                                    }
+                                                    if (modNode.HasValue("frequency"))
+                                                    {
+                                                        if (float.TryParse(modNode.GetValue("frequency"), out ftmp))
+                                                            mod.frequency = ftmp;
+                                                    }
+                                                    mod.OnSetup();
+                                                }
                                                 if (modNode.name.Equals("PQSLandControl") && m.GetType().ToString().Equals(modNode.name))
                                                 {
                                                     PQSLandControl mod = m as PQSLandControl;
@@ -955,6 +980,41 @@ namespace RealSolarSystem
                                                                 colorMap.order = itmp;
 
                                                         colorMap.modEnabled = true;
+                                                        DestroyImmediate(map);
+                                                    }
+                                                    else
+                                                        print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
+
+                                                }
+                                                if (modNode.name.Equals("PQSMod_VertexHeightMap"))
+                                                {
+                                                    if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
+                                                    {
+                                                        GameObject tempObj = new GameObject();
+
+
+                                                        PQSMod_VertexHeightMap heightMap = (PQSMod_VertexHeightMap)tempObj.AddComponent(typeof(PQSMod_VertexColorMapBlend));
+                                                        tempObj.transform.parent = p.gameObject.transform;
+                                                        heightMap.sphere = p;
+
+                                                        Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
+                                                        map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")));
+                                                        heightMap.heightMap = ScriptableObject.CreateInstance<MapSO>();
+                                                        heightMap.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
+
+                                                        heightMap.heightMapOffset = 0.0f;
+                                                        modNode.TryGetValue("heightMapOffset", ref heightMap.heightMapOffset);
+                                                        
+                                                        heightMap.heightMapDeformity = 100.0f;
+                                                        modNode.TryGetValue("heightMapDeformity", ref heightMap.heightMapDeformity);
+
+                                                        heightMap.scaleDeformityByRadius = false;
+                                                        modNode.TryGetValue("scaleDeformityByRadius", ref heightMap.scaleDeformityByRadius);
+
+                                                        heightMap.order = 10;
+                                                        modNode.TryGetValue("order", ref heightMap.order);
+
+                                                        heightMap.modEnabled = true;
                                                         DestroyImmediate(map);
                                                     }
                                                     else
