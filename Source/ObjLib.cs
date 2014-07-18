@@ -26,15 +26,20 @@ namespace RealSolarSystem
             Vector3[] vertices = new Vector3[mesh.vertices.Length];
             Vector3[] normals = new Vector3[mesh.normals.Length];
             Vector4[] tangents = new Vector4[mesh.tangents.Length];
+
+            //bool log = filename.Contains("un.obj");
+            //if(log) MonoBehaviour.print("*RSSOBJ* Loading " + filename);
             while (curLine != null)
             {
                 curLine = curLine.Trim();                           //Trim the current line
                 brokenString = curLine.Split(splitIdentifier, 50);      //Split the line into an array, separating the original line by blank spaces
+                //if(log) MonoBehaviour.print(curLine);
                 switch (brokenString[0])
                 {
                     case "v":
                         vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]) * scaleFactor, System.Convert.ToSingle(brokenString[2]) * scaleFactor,
                                                         System.Convert.ToSingle(brokenString[3]) * scaleFactor);
+                        //if (log) MonoBehaviour.print("v " + Utils.Vec3ToString(vertices[v]));
                         v++;
                         break;
                     case "vn":
@@ -163,23 +168,27 @@ namespace RealSolarSystem
             StringBuilder sb = new StringBuilder();
 
             sb.Append("g ").Append(mf.name).Append("\n");
-            foreach (Vector3 v in m.vertices)
+            for(int i = 0; i < m.vertexCount; i++)
             {
+                Vector3 v = m.vertices[i];
                 sb.Append(string.Format("v {0} {1} {2}\n", v.x, v.y, v.z));
             }
             sb.Append("\n");
-            foreach (Vector3 v in m.normals)
+            for(int i = 0; i < m.normals.Length; i++)
             {
+                Vector3 v = m.normals[i];
                 sb.Append(string.Format("vn {0} {1} {2}\n", v.x, v.y, v.z));
             }
             sb.Append("\n");
-            foreach (Vector3 v in m.uv)
+            for (int i = 0; i < m.uv.Length; i++)
             {
+                Vector2 v = m.uv[i];
                 sb.Append(string.Format("vt {0} {1}\n", v.x, v.y));
             }
             sb.Append("\n"); // extend to include tangent output
-            foreach (Vector4 t in m.tangents)
+            for (int i = 0; i < m.tangents.Length; i++ )
             {
+                Vector4 t = m.tangents[i];
                 sb.Append(string.Format("t {0} {1} {2} {3}\n", t.x, t.y, t.z, t.w));
             }
             for (int material = 0; material < m.subMeshCount; material++)
