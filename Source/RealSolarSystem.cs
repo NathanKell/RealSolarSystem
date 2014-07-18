@@ -157,6 +157,7 @@ namespace RealSolarSystem
                         node.TryGetValue("bodyName", ref body.bodyName);
                         node.TryGetValue("bodyDescription", ref body.bodyDescription);
                         node.TryGetValue("Radius", ref body.Radius);
+                        print("Radius ratio: " + body.Radius / origRadius);
                         
                         if (node.TryGetValue("Mass", ref body.Mass))
                         {
@@ -301,7 +302,9 @@ namespace RealSolarSystem
                         // SOI and HillSphere done at end
                         body.CBUpdate();
                         #endregion
+                        #endregion
 
+                        #region SSPQSFade
                         // Scaled space fader
                         float SSFMult = 1.0f;
                         float SSFStart = -1, SSFEnd = -1;
@@ -361,7 +364,9 @@ namespace RealSolarSystem
                             }
                         }
                         print("Did CBT for " + node.name);
+                        #endregion
 
+                        #region PQS
                         // the Planet Quadtree Sphere
                         List<string> PQSs = new List<string>();
                         bool custom = false;
@@ -1051,6 +1056,9 @@ namespace RealSolarSystem
                                 }
                             }
                         }
+                        #endregion
+
+                        #region ScaledSpace
                         // Scaled space
                         Transform scaledSpaceTransform = null;
                         Transform atmo = null;
@@ -1256,6 +1264,7 @@ namespace RealSolarSystem
                                 }
                             }
                         }
+                        #region AtmosphereFromGround
                         foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
                         {
                             //print("*RSS* Found AG " + ag.name + " " + (ag.tag == null ? "" : ag.tag) + ". Planet " + (ag.planet == null ? "NULL" : ag.planet.name));
@@ -1335,7 +1344,10 @@ namespace RealSolarSystem
                                 }
                             }
                         }
+                        #endregion
+                        #endregion
 
+                        #region Science
                         // Science
                         if (node.HasNode("CelestialBodyScienceParams"))
                         {
@@ -1360,7 +1372,9 @@ namespace RealSolarSystem
                                 }
                             }
                         }
-                            
+                        #endregion
+
+                        #region Export
                         // texture rebuild
                         if (node.HasNode("Export"))
                         {
@@ -1420,6 +1434,7 @@ namespace RealSolarSystem
                                 print("Export for " + node.name + " failed: " + e.Message);
                             }
                         }
+                        #endregion
                     }
                 }
             }
