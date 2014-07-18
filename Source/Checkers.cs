@@ -32,7 +32,7 @@ using UnityEngine;
 /*-----------------------------------------*\
 |   SUBSTITUTE YOUR MOD'S NAMESPACE HERE.   |
 \*-----------------------------------------*/
-namespace Compatibility
+namespace RealSolarSystem
 {
 
     /**
@@ -81,7 +81,6 @@ namespace Compatibility
             //
             if (Application.unityVersion.Equals("4.5.2f1"))
                 return true;
-            print("*RSS*: Unity version is " + Application.unityVersion);
             return false;
 
             /*-----------------------------------------------*\
