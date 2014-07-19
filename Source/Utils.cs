@@ -23,7 +23,7 @@ namespace RealSolarSystem
             mesh.vertices = vertices;
             ProfileTimer.Pop("ScaleVerts");
         }
-        public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight)
+        public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight, float scaleFactor)
         {
             ProfileTimer.Push("MatchVerts");
             if (pqs == null)
@@ -49,7 +49,7 @@ namespace RealSolarSystem
         }
         public static void CopyMesh(Mesh source, Mesh dest)
         {
-            ProfileTimer.Push("CopyMesh");
+            //ProfileTimer.Push("CopyMesh");
             Vector3[] verts = new Vector3[source.vertexCount];
             source.vertices.CopyTo(verts, 0);
             dest.vertices = verts;
@@ -82,7 +82,7 @@ namespace RealSolarSystem
             source.colors32.CopyTo(colors32, 0);
             dest.colors32 = colors32;
 
-            ProfileTimer.Pop("CopyMesh");
+            //ProfileTimer.Pop("CopyMesh");
         }
         public static void DumpSSF(ScaledSpaceFader ssf)
         {
