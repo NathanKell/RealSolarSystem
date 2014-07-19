@@ -6,7 +6,11 @@ Thanks to asmi for kicking me into to doing this and offering so much help along
 
 License: CC-BY-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source) and stupid_chris (ConfigNodeExtensions, licensed CC-BY-NC-SA). Used with permission.
-Also included: Module Manager (by sarbian and ialdabaoth). See Module Manager thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/55219
+Also included:
+Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/55219
+Custom Biomes by Trueborn. See thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/66256
+Custom Asteriods by Starstrider42. See thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/80483
+
 
 INSTALLATION:
 Extract to KSP/GameData.
@@ -34,11 +38,12 @@ Pluto is represented by Vall
 Changelog
 v7.0  \/
 *ScaledSpace scaling workaround until EVE and Kethane (and anything else that assumes scale) get fixed.
+*No longer require OBJ files (tangents are left unchanged due to an issue with .24x64).
 *regex: support changing orbitColor in Orbit nodes (as standard float RGBA color).
-*fix to display the Display Name of the launch site when showing the icons on the planet in Tracking Station view.
+*Fix to display the Display Name of the launch site when showing the icons on the planet in Tracking Station view.
 *Fail gracefully when textures are missing.
-*Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by Subcidal. Only Kerbin supported so far.
-*Include Custom Asteroids. Custom Asteroids by Starfighter42, config by SpacedInvader
+*Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by Subcidal. Only Earth supported so far.
+*Include Custom Asteroids. Custom Asteroids by Starstrider42, config by SpacedInvader
 *Support new images for every planet by default (will fail gracefully if not found)
 *Fixed math errors in scaled space mesh resizing. This requires a rebuild of cached OBJs
 *Compiled for 0.24 x64
