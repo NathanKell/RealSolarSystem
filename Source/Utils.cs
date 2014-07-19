@@ -12,6 +12,7 @@ namespace RealSolarSystem
     {
         public static void ScaleVerts(Mesh mesh, float scaleFactor)
         {
+            ProfileTimer.Push("ScaleVerts");
             Vector3[] vertices = new Vector3[mesh.vertexCount];
             for (int i = 0; i < mesh.vertexCount; i++)
             {
@@ -20,6 +21,7 @@ namespace RealSolarSystem
                 vertices[i] = v;
             }
             mesh.vertices = vertices;
+            ProfileTimer.Pop("ScaleVerts");
         }
         public static void MatchVerts(Mesh mesh, PQS pqs, double oceanHeight)
         {

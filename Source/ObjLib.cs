@@ -59,8 +59,9 @@ namespace RealSolarSystem
                     curLine = curLine.Replace("  ", " ");
                 }
             }
-            //mesh.vertices = vertices;
+            mesh.vertices = vertices;
             //mesh.normals = normals;
+            mesh.RecalculateNormals();
             mesh.tangents = tangents;
             ProfileTimer.Pop("UpdateMeshFromFile");
         }
@@ -209,10 +210,12 @@ namespace RealSolarSystem
 
         public static void MeshToFile(MeshFilter mf, string filename)
         {
+            ProfileTimer.Pop("Mesh to file");
             using (StreamWriter sw = new StreamWriter(filename))
             {
                 sw.Write(MeshToString(mf));
             }
+            ProfileTimer.Pop("Mesh to file");
         }
 
         // **** IMPORT ****

@@ -1166,7 +1166,7 @@ namespace RealSolarSystem
                                                 bool wrap = true;
 	                                            try
 	                                            {
-	                                                if (File.Exists(filePath))
+	                                                if (false && File.Exists(filePath))
 	                                                {
                                                         ProfileTimer.Push("LoadSSM_" + body.name);
                                                         /*try
@@ -1185,10 +1185,7 @@ namespace RealSolarSystem
                                                         float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
                                                         // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
                                                         print("Loading from file, Vertex Scale " + scaleFactor);
-                                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
-                                                        tMesh.RecalculateNormals();
                                                         ObjLib.UpdateMeshFromFile(tMesh, filePath, scaleFactor);
-                                                        Utils.ScaleVerts(tMesh, scaleFactor);
                                                         tMesh.RecalculateBounds();
                                                         m.mesh = tMesh;
                                                         wrap = false;
@@ -1210,17 +1207,19 @@ namespace RealSolarSystem
                                                         Mesh tMesh = new Mesh();
                                                         Utils.CopyMesh(joolMesh.mesh, tMesh);
                                                         Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0);
+                                                        ProfileTimer.Push("Recalc Normals");
                                                         tMesh.RecalculateNormals();
-                                                        ObjLib.UpdateTangents(tMesh);
+                                                        ProfileTimer.Pop("Recalc Normals");
+                                                        //ObjLib.UpdateTangents(tMesh);
 	                                                    print("*RSS* wrapped.");
-	                                                    try
+	                                                    /*try
 	                                                    {
 	                                                        ObjLib.MeshToFile(m, filePath);
 	                                                    }
 	                                                    catch (Exception e)
 	                                                    {
 	                                                        print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
-	                                                    }
+	                                                    }*/
 	                                                    print("*RSS*: Done wrapping and exporting. Setting scale");
                                                         float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
                                                         // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
@@ -1241,8 +1240,8 @@ namespace RealSolarSystem
                                     }
                                     if (rescale)
                                     {
-                                        float scaleFactor = (float)(body.Radius / origRadius * SSTScale);
-                                        t.localScale = new Vector3(t.localScale.x * scaleFactor, t.localScale.y * scaleFactor, t.localScale.z * scaleFactor);
+                                        float scaleFactor = (float)((double)t.localScale.x * body.Radius / origRadius * SSTScale);
+                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                                     }
                                     else
                                     {
