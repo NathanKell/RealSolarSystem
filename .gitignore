@@ -5,6 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
+RealSolarSystem/Plugins/PluginData/
 
 # Build results
 
