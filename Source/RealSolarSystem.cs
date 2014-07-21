@@ -14,6 +14,82 @@ namespace RealSolarSystem
     {
         public static bool doneRSS = false;
 
+        public static void UpdateAFG(CelestialBody body, AtmosphereFromGround ag, ConfigNode modNode = null)
+        {
+            if(modNode != null)
+            {
+                float ftmp;
+                if (modNode.TryGetValue("outerRadius", ref ag.outerRadius))
+                {
+                    ag.outerRadius *= ScaledSpace.InverseScaleFactor;
+                }
+                else if (modNode.HasValue("outerRadiusAtmo"))
+                {
+                    ag.outerRadius = ((float)body.Radius + body.maxAtmosphereAltitude) * ScaledSpace.InverseScaleFactor;
+                }
+                else if (modNode.TryGetValue("outerRadiusMult", ref ag.outerRadius))
+                {
+                    ag.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
+                }
+                else
+                    // the default
+                    ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+
+                if (modNode.TryGetValue("innerRadius", ref ag.innerRadius))
+                {
+                    ag.innerRadius *= ScaledSpace.InverseScaleFactor;
+                }
+                else if (modNode.TryGetValue("innerRadiusMult", ref ag.innerRadius))
+                {
+                    ag.innerRadius *= ag.outerRadius;
+                }
+                else
+                    ag.innerRadius = ag.outerRadius * 0.975f;
+
+                modNode.TryGetValue("doScale", ref ag.doScale);
+                if (modNode.HasValue("transformScale"))
+                {
+                    if (float.TryParse(modNode.GetValue("transformScale"), out ftmp) && ag.transform != null)
+                        ag.transform.localScale = new Vector3(ftmp, ftmp, ftmp);
+                }
+                else if (modNode.HasValue("transformAtmo"))
+                {
+                    ag.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
+                }
+
+                if (modNode.HasValue("invWaveLength"))
+                {
+                    Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
+                    ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
+                }
+                if (modNode.HasValue("waveLength"))
+                {
+                    Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
+                    ag.waveLength = new Color(col.x, col.y, col.z, col.w);
+                }
+            }
+            else
+            {
+                // the defaults
+                ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                ag.innerRadius = ag.outerRadius * 0.975f;
+            }
+            ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
+            ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
+            ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
+            ag.scaleDepth = -0.25f;
+            ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
+            try
+            {
+                MethodInfo setMaterial = ag.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
+                setMaterial.Invoke(ag, new object[] { true });
+            }
+            catch (Exception e)
+            {
+                print("*RSS* *ERROR* setting AtmosphereFromGround " + ag.name + " for body " + body.name + ": " + e);
+            }
+        }
+
         public static Vector3 LLAtoECEF(double lat, double lon, double alt, double radius)
         {
             const double degreesToRadians =  Math.PI / 180.0;
@@ -955,12 +1031,6 @@ namespace RealSolarSystem
                                                 {
                                                     if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
                                                     {
-                                                        /*CelestialBody cbDuna = null;
-                                                        foreach (CelestialBody b in FlightGlobals.Bodies)
-                                                            if (b.name.Equals("Duna"))
-                                                                cbDuna = b;
-
-                                                        PQSMod_VertexColorMapBlend dunaColor = cbDuna.transform.GetComponentInChildren<PQSMod_VertexColorMapBlend>();*/
                                                         GameObject tempObj = new GameObject();
 
 
@@ -990,6 +1060,37 @@ namespace RealSolarSystem
                                                     else
                                                         print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
 
+                                                }
+                                                if (modNode.name.Equals("PQSMod_VertexColorSolid"))
+                                                {
+                                                    GameObject tempObj = new GameObject();
+
+
+                                                    PQSMod_VertexColorSolid vertColor = (PQSMod_VertexColorSolid)tempObj.AddComponent(typeof(PQSMod_VertexColorSolid));
+
+                                                    tempObj.transform.parent = p.gameObject.transform;
+                                                    vertColor.sphere = p;
+
+
+
+                                                    vertColor.blend = 1.0f;
+                                                    if (modNode.HasValue("blend"))
+                                                        if (float.TryParse(modNode.GetValue("blend"), out ftmp))
+                                                            vertColor.blend = ftmp;
+
+                                                    vertColor.order = 9999992;
+                                                    if (modNode.HasValue("order"))
+                                                        if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                            vertColor.order = itmp;
+
+                                                    if (modNode.HasValue("color"))
+                                                    {
+                                                        Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("color"));
+                                                        Color c = new Color(col.x, col.y, col.z, col.w);
+                                                        vertColor.color = c;
+                                                    }
+
+                                                    vertColor.modEnabled = true;
                                                 }
                                                 if (modNode.name.Equals("PQSMod_VertexHeightMap"))
                                                 {
@@ -1243,72 +1344,7 @@ namespace RealSolarSystem
                                 if (ag.planet.name.Equals(node.name))
                                 {
                                     print("Found atmo for " + node.name + ": " + ag.name + ", has localScale " + ag.transform.localScale.x);
-                                    if (node.HasNode("AtmosphereFromGround"))
-                                    {
-                                        ConfigNode modNode = node.GetNode("AtmosphereFromGround");
-                                        if (modNode.TryGetValue("outerRadius", ref ag.outerRadius))
-                                        {
-                                            ag.outerRadius *= ScaledSpace.InverseScaleFactor;
-                                        }
-                                        else if (modNode.HasValue("outerRadiusAtmo"))
-                                        {
-                                            ag.outerRadius = ((float)body.Radius + body.maxAtmosphereAltitude) * ScaledSpace.InverseScaleFactor;
-                                        }
-                                        else if (modNode.TryGetValue("outerRadiusMult", ref ag.outerRadius))
-                                        {
-                                            ag.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
-                                        }
-                                        else
-                                            // the default
-                                            ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
-
-                                        if (modNode.TryGetValue("innerRadius", ref ag.innerRadius))
-                                        {
-                                            ag.innerRadius *= ScaledSpace.InverseScaleFactor;
-                                        }
-                                        else if (modNode.TryGetValue("innerRadiusMult", ref ag.innerRadius))
-                                        {
-                                            ag.innerRadius *= ag.outerRadius;
-                                        }
-                                        else
-                                            ag.innerRadius = ag.outerRadius * 0.975f;
-
-                                        modNode.TryGetValue("doScale", ref ag.doScale);
-                                        if (modNode.HasValue("transformScale"))
-                                        {
-                                            if (float.TryParse(modNode.GetValue("transformScale"), out ftmp) && ag.transform != null)
-                                                ag.transform.localScale = new Vector3(ftmp, ftmp, ftmp);
-                                        }
-                                        else if (modNode.HasValue("transformAtmo"))
-                                        {
-                                            ag.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
-                                        }
-
-                                        if (modNode.HasValue("invWaveLength"))
-                                        {
-                                            Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
-                                            ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
-                                        }
-                                        if (modNode.HasValue("waveLength"))
-                                        {
-                                            Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
-                                            ag.waveLength = new Color(col.x, col.y, col.z, col.w);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        // the defaults
-                                        ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
-                                        ag.innerRadius = ag.outerRadius * 0.975f;
-                                    }
-                                    ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
-                                    ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
-                                    ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
-                                    ag.scaleDepth = -0.25f;
-                                    ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
-                                    MethodInfo setMaterial = ag.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
-                                    setMaterial.Invoke(ag, new object[] { true });
-
+                                    UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
                                     print("Atmo updated");
                                 }
                             }
