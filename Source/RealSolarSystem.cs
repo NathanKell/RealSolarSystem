@@ -1148,8 +1148,9 @@ namespace RealSolarSystem
                                             if (sphereVal)
                                             {
                                                 Mesh tMesh = new Mesh();
-                                                Utils.CopyMesh(joolMesh.mesh, tMesh); 
-                                                float scaleFactor = (1f / origLocalScale); // scale mesh to original CB's size
+                                                Utils.CopyMesh(joolMesh.mesh, tMesh);
+                                                float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
+                                                // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
                                                 print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name + ". Vertex Scale " + scaleFactor);
                                                 Utils.ScaleVerts(tMesh, scaleFactor);
                                                 tMesh.RecalculateBounds();
