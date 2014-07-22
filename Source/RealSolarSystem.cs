@@ -1077,6 +1077,31 @@ namespace RealSolarSystem
                                                         print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
 
                                                 }
+                                                if (modNode.name.Equals("PQSMod_VertexColorSolid") && m.GetType().ToString().Equals(modNode.name))
+                                                {
+                                                    PQSMod_VertexColorSolid mod = m as PQSMod_VertexColorSolid;
+                                                    if (modNode.HasValue("blend"))
+                                                        if (float.TryParse(modNode.GetValue("blend"), out ftmp))
+                                                            mod.blend = ftmp;
+
+                                                    if (modNode.HasValue("order"))
+                                                        if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                            mod.order = itmp;
+
+                                                    if (modNode.HasValue("color"))
+                                                    {
+                                                        try
+                                                        {
+                                                            Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("color"));
+                                                            Color c = new Color(col.x, col.y, col.z, col.w);
+                                                            mod.color = c;
+                                                        }
+                                                        catch (Exception e)
+                                                        {
+                                                            print("*RSS* Error parsing as vec4: original text: " + modNode.GetValue("color") + " --- exception " + e.Message);
+                                                        }
+                                                    }
+                                                }
                                             }
                                         }
                                         if (pqsNode.HasNode("Add"))
@@ -1149,7 +1174,7 @@ namespace RealSolarSystem
                                                         }
                                                         catch(Exception e)
                                                         {
-                                                            print("*RSS* Error parsing as vec3: original text: " + modNode.GetValue("color") + " --- exception " + e.Message);
+                                                            print("*RSS* Error parsing as vec4: original text: " + modNode.GetValue("color") + " --- exception " + e.Message);
                                                         }
                                                     }
 
@@ -1208,10 +1233,13 @@ namespace RealSolarSystem
                                                 else
                                                 {
                                                     int idx = 0;
+                                                    bool doAll = false;
                                                     if (mName.Contains(","))
                                                     {
                                                         string[] splt = mName.Split(',');
                                                         mName = splt[0];
+                                                        if(splt[1][0].Equals('*'))
+                                                            doAll = true;
                                                         int.TryParse(splt[1], out idx);
                                                     }
                                                     int cur = 0;
@@ -1219,7 +1247,7 @@ namespace RealSolarSystem
                                                     {
                                                         if (modNode.name.Equals(m.GetType().Name))
                                                         {
-                                                            if (cur == idx)
+                                                            if (cur == idx || doAll)
                                                                 m.GetType().GetField("modEnabled").SetValue(m, false);
                                                             else
                                                                 cur++;
