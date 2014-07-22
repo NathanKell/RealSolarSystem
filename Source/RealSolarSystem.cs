@@ -542,6 +542,7 @@ namespace RealSolarSystem
                                         var mods = p.transform.GetComponentsInChildren(typeof(PQSMod), true);
                                         foreach (var m in mods)
                                         {
+                                            print("Processing " + m.GetType().Name);
                                             foreach (ConfigNode modNode in pqsNode.nodes)
                                             {
                                                 if (modNode.name.Equals("PQSMod_VertexSimplexHeightAbsolute") && m.GetType().ToString().Equals(modNode.name))
@@ -1108,6 +1109,7 @@ namespace RealSolarSystem
                                         {
                                             foreach (ConfigNode modNode in pqsNode.GetNode("Add").nodes)
                                             {
+                                                print("Adding " + modNode.name);
                                                 if (modNode.name.Equals("PQSMod_VertexColorMapBlend"))
                                                 {
                                                     if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
@@ -1187,7 +1189,7 @@ namespace RealSolarSystem
                                                         GameObject tempObj = new GameObject();
 
 
-                                                        PQSMod_VertexHeightMap heightMap = (PQSMod_VertexHeightMap)tempObj.AddComponent(typeof(PQSMod_VertexColorMapBlend));
+                                                        PQSMod_VertexHeightMap heightMap = (PQSMod_VertexHeightMap)tempObj.AddComponent(typeof(PQSMod_VertexHeightMap));
                                                         tempObj.transform.parent = p.gameObject.transform;
                                                         heightMap.sphere = p;
 
@@ -1222,6 +1224,7 @@ namespace RealSolarSystem
                                             foreach (ConfigNode modNode in pqsNode.GetNode("Disable").nodes)
                                             {
                                                 string mName = modNode.name;
+                                                print("Disabling " + mName);
                                                 if (mName.Equals("PQSLandControl"))
                                                 {
                                                     List<PQSLandControl> modList = p.transform.GetComponentsInChildren<PQSLandControl>(true).ToList();
@@ -1240,15 +1243,20 @@ namespace RealSolarSystem
                                                         mName = splt[0];
                                                         if(splt[1][0].Equals('*'))
                                                             doAll = true;
-                                                        int.TryParse(splt[1], out idx);
+                                                        else
+                                                            int.TryParse(splt[1], out idx);
                                                     }
+                                                    print("Generic disable: " + mName + " with idx: " + idx + "; doAll: " + doAll);
                                                     int cur = 0;
                                                     foreach (var m in mods)
                                                     {
                                                         if (modNode.name.Equals(m.GetType().Name))
                                                         {
                                                             if (cur == idx || doAll)
+                                                            {
                                                                 m.GetType().GetField("modEnabled").SetValue(m, false);
+                                                                print("Found and disabled " + m.GetType().Name);
+                                                            }
                                                             else
                                                                 cur++;
                                                         }
