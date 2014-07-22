@@ -1196,12 +1196,34 @@ namespace RealSolarSystem
                                         {
                                             foreach (ConfigNode modNode in pqsNode.GetNode("Disable").nodes)
                                             {
-                                                if (modNode.name.Equals("PQSLandControl"))
+                                                string mName = modNode.name;
+                                                if (mName.Equals("PQSLandControl"))
                                                 {
                                                     List<PQSLandControl> modList = p.transform.GetComponentsInChildren<PQSLandControl>(true).ToList();
                                                     foreach (PQSLandControl m in modList)
                                                     {
                                                         m.modEnabled = false;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    int idx = 0;
+                                                    if (mName.Contains(","))
+                                                    {
+                                                        string[] splt = mName.Split(',');
+                                                        mName = splt[0];
+                                                        int.TryParse(splt[1], out idx);
+                                                    }
+                                                    int cur = 0;
+                                                    foreach (var m in mods)
+                                                    {
+                                                        if (modNode.name.Equals(m.GetType().Name))
+                                                        {
+                                                            if (cur == idx)
+                                                                m.GetType().GetField("modEnabled").SetValue(m, false);
+                                                            else
+                                                                cur++;
+                                                        }
                                                     }
                                                 }
                                             }
