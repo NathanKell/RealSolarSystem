@@ -188,6 +188,8 @@ namespace RealSolarSystem
 
         public void Start()
         {
+            // Constants
+            double DEG2RAD = Math.PI / 180.0;
 
             ConfigNode RSSSettings = null;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
@@ -348,7 +350,7 @@ namespace RealSolarSystem
                             }
                             if (onode.TryGetValue("meanAnomalyAtEpochD", ref body.orbit.meanAnomalyAtEpoch))
                             {
-                                body.orbit.meanAnomalyAtEpoch *= 0.0174532925199433;
+                                body.orbit.meanAnomalyAtEpoch *= DEG2RAD;
                                 anomFix = true;
                             }
                             onode.TryGetValue("inclination", ref body.orbit.inclination);
