@@ -13,40 +13,59 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class RSSWatchDog : MonoBehaviour
     {
-        CelestialBody body = FlightGlobals.getMainBody();
-
+        ConfigNode RSSSettings = null;
         public void Start()
         {
-            ConfigNode RSSSettings = null;
-            bool UseLegacyAtmosphere;
-
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
+            
 
+            UpdateAtmospheres();
+            GameEvents.onVesselSOIChanged.Add(OnVesselSOIChanged);
+        }
+        public void OnDestroy()
+        {
+            GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
+        }
+
+        public void OnVesselSOIChanged(GameEvents.HostedFromToAction<Vessel, CelestialBody> evt)
+        {
+
+        }
+        public void UpdateAtmospheres()
+        {
             if (RSSSettings != null)
             {
-                if (RSSSettings.HasNode(body.GetName()))
+                AtmosphereFromGround[] AFGs = (AtmosphereFromGround[])Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround));
+                foreach (ConfigNode node in RSSSettings.nodes)
                 {
-                    ConfigNode node = RSSSettings.GetNode(body.GetName());
-                    print("*RSS* checking useLegacyAtmosphere for " + body.GetName());
-                    if (node.HasValue("useLegacyAtmosphere"))
+                    foreach (CelestialBody body in FlightGlobals.Bodies)
                     {
-                        bool.TryParse(node.GetValue("useLegacyAtmosphere"), out UseLegacyAtmosphere);
-                        print("*RSSWatchDog* " + body.GetName() + ".useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
-                        if (UseLegacyAtmosphere != body.useLegacyAtmosphere)
+                        print("*RSS* checking useLegacyAtmosphere for " + body.GetName());
+                        if (node.HasValue("useLegacyAtmosphere"))
                         {
-                            print("*RSSWatchDog* resetting useLegacyAtmosphere to " + UseLegacyAtmosphere.ToString());
-                            body.useLegacyAtmosphere = UseLegacyAtmosphere;
-                        }
-                    }
-                    foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
-                    {
-                        if (ag != null && ag.planet != null)
-                        {
-                            // generalized version of Starwaster's code. Thanks Starwaster!
-                            if (ag.planet.name.Equals(node.name))
+                            bool UseLegacyAtmosphere = true;
+                            bool.TryParse(node.GetValue("useLegacyAtmosphere"), out UseLegacyAtmosphere);
+                            //print("*RSSWatchDog* " + body.GetName() + ".useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
+                            if (UseLegacyAtmosphere != body.useLegacyAtmosphere)
                             {
-                                RealSolarSystem.UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
+                                print("*RSSWatchDog* resetting useLegacyAtmosphere to " + UseLegacyAtmosphere.ToString());
+                                body.useLegacyAtmosphere = UseLegacyAtmosphere;
+                            }
+                        }
+                        if (node.HasNode("AtmosphereFromGround"))
+                        {
+                            foreach (AtmosphereFromGround ag in AFGs)
+                            {
+                                if (ag != null && ag.planet != null)
+                                {
+                                    // generalized version of Starwaster's code. Thanks Starwaster!
+                                    if (ag.planet.name.Equals(node.name))
+                                    {
+                                        RealSolarSystem.UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
+                                        print("*RSSWatchDog* reapplying AtmosphereFromGround settings");
+                                    }
+                                }
                             }
                         }
                     }
