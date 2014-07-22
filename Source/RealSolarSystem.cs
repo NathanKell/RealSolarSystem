@@ -59,13 +59,27 @@ namespace RealSolarSystem
 
                 if (modNode.HasValue("invWaveLength"))
                 {
-                    Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
-                    ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
+                    try
+                    {
+                        Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
+                        ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
+                    }
+                    catch(Exception e)
+                    {
+                        print("*RSS* Error parsing as color4: original text: " + modNode.GetValue("invWaveLength") + " --- exception " + e.Message);
+                    }
                 }
                 if (modNode.HasValue("waveLength"))
                 {
-                    Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
-                    ag.waveLength = new Color(col.x, col.y, col.z, col.w);
+                    try
+                    {
+                        Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
+                        ag.waveLength = new Color(col.x, col.y, col.z, col.w);
+                    }
+                    catch(Exception e)
+                    {
+                        print("*RSS* Error parsing as color4: original text: " + modNode.GetValue("waveLength") + " --- exception " + e.Message);
+                    }
                 }
             }
             else
@@ -343,9 +357,16 @@ namespace RealSolarSystem
                             onode.TryGetValue("argumentOfPeriapsis", ref body.orbit.argumentOfPeriapsis);
                             if(onode.HasValue("orbitColor"))
                             {
-                                Vector4 col = KSPUtil.ParseVector4(onode.GetValue("orbitColor"));
-                                Color c = new Color(col.x, col.y, col.z, col.w);
-                                body.GetOrbitDriver().orbitColor = c;
+                                try
+                                {
+                                    Vector4 col = KSPUtil.ParseVector4(onode.GetValue("orbitColor"));
+                                    Color c = new Color(col.x, col.y, col.z, col.w);
+                                    body.GetOrbitDriver().orbitColor = c;
+                                }
+                                catch(Exception e)
+                                {
+                                    print("*RSS* Error parsing as color4: original text: " + onode.GetValue("orbitColor") + " --- exception " + e.Message);
+                                }
                             }
                             string bodyname = "";
                             if (onode.TryGetValue("referenceBody", ref bodyname))
@@ -805,13 +826,27 @@ namespace RealSolarSystem
                                                                 found = true;
                                                                 if (lcNode.HasValue("color"))
                                                                 {
-                                                                    Vector4 col = KSPUtil.ParseVector4(lcNode.GetValue("color"));
-                                                                    lc.color = new Color(col.x, col.y, col.z, col.w);
+                                                                    try
+                                                                    {
+                                                                        Vector4 col = KSPUtil.ParseVector4(lcNode.GetValue("color"));
+                                                                        lc.color = new Color(col.x, col.y, col.z, col.w);
+                                                                    }                                                
+                                                                    catch(Exception e)
+                                                                    {
+                                                                        print("*RSS* Error parsing as color4: original text: " + lcNode.GetValue("color") + " --- exception " + e.Message);
+                                                                    }
                                                                 }
                                                                 if (lcNode.HasValue("noiseColor"))
                                                                 {
-                                                                    Vector4 col = KSPUtil.ParseVector4(lcNode.GetValue("noiseColor"));
-                                                                    lc.noiseColor = new Color(col.x, col.y, col.z, col.w);
+                                                                    try
+                                                                    {
+                                                                        Vector4 col = KSPUtil.ParseVector4(lcNode.GetValue("noiseColor"));
+                                                                        lc.noiseColor = new Color(col.x, col.y, col.z, col.w);
+                                                                    }                                               
+                                                                    catch(Exception e)
+                                                                    {
+                                                                        print("*RSS* Error parsing as color4: original text: " + lcNode.GetValue("noiseColor") + " --- exception " + e.Message);
+                                                                    }
                                                                 }
 
                                                                 // ranges
@@ -898,7 +933,14 @@ namespace RealSolarSystem
 
                                                     if (modNode.HasValue("repositionRadial"))
                                                     {
-                                                        mod.repositionRadial = KSPUtil.ParseVector3(modNode.GetValue("repositionRadial"));
+                                                        try
+                                                        {
+                                                            mod.repositionRadial = KSPUtil.ParseVector3(modNode.GetValue("repositionRadial"));
+                                                        }                                                
+                                                        catch(Exception e)
+                                                        {
+                                                            print("*RSS* Error parsing as vec3: original text: " + modNode.GetValue("repositionRadial") + " --- exception " + e.Message);
+                                                        }
                                                     }
                                                     if (modNode.HasValue("latitude") && modNode.HasValue("longitude"))
                                                     {
@@ -910,7 +952,14 @@ namespace RealSolarSystem
                                                     }
                                                     if (modNode.HasValue("reorientInitialUp"))
                                                     {
-                                                        mod.reorientInitialUp = KSPUtil.ParseVector3(modNode.GetValue("reorientInitialUp"));
+                                                        try
+                                                        {
+                                                            mod.reorientInitialUp = KSPUtil.ParseVector3(modNode.GetValue("reorientInitialUp"));
+                                                        }                                                
+                                                        catch(Exception e)
+                                                        {
+                                                            print("*RSS* Error parsing as vec3: original text: " + modNode.GetValue("reorientInitialUp") + " --- exception " + e.Message);
+                                                        }
                                                     }
                                                     if (modNode.HasValue("repositionToSphere"))
                                                     {
@@ -959,7 +1008,14 @@ namespace RealSolarSystem
                                                     PQSMod_MapDecalTangent mod = m as PQSMod_MapDecalTangent;
                                                     if (modNode.HasValue("position"))
                                                     {
-                                                        mod.position = KSPUtil.ParseVector3(modNode.GetValue("position"));
+                                                        try
+                                                        {
+                                                            mod.position = KSPUtil.ParseVector3(modNode.GetValue("position"));
+                                                        }
+                                                        catch(Exception e)
+                                                        {
+                                                            print("*RSS* Error parsing as vec3: original text: " + modNode.GetValue("position") + " --- exception " + e.Message);
+                                                        }
                                                     }
                                                     if (modNode.HasValue("radius"))
                                                     {
@@ -1085,9 +1141,16 @@ namespace RealSolarSystem
 
                                                     if (modNode.HasValue("color"))
                                                     {
-                                                        Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("color"));
-                                                        Color c = new Color(col.x, col.y, col.z, col.w);
-                                                        vertColor.color = c;
+                                                        try
+                                                        {
+                                                            Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("color"));
+                                                            Color c = new Color(col.x, col.y, col.z, col.w);
+                                                            vertColor.color = c;
+                                                        }
+                                                        catch(Exception e)
+                                                        {
+                                                            print("*RSS* Error parsing as vec3: original text: " + modNode.GetValue("color") + " --- exception " + e.Message);
+                                                        }
                                                     }
 
                                                     vertColor.modEnabled = true;
@@ -1227,7 +1290,39 @@ namespace RealSolarSystem
                                             }
                                         }
                                         else
-                                            print("*RSS* *ERROR* texture does not exist! " + node.HasValue("SSBump"));
+                                            print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
+                                    }
+                                    if (node.HasValue("SSRamp"))
+                                    {
+                                        Texture2D map = GameDatabase.Instance.GetTexture(path + "ramp_red", false);
+                                        if(map == null)
+                                        {
+                                            if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSRamp")))
+                                            {
+                                                map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSRamp")));
+                                                map.Compress(true);
+                                                map.Apply(true, true);
+                                            }
+                                        }
+                                        if(map != null)
+                                        {
+                                            t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
+                                        }
+                                        else
+                                            print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
+                                    }
+                                    if (node.HasValue("SSSpec"))
+                                    {
+                                        try
+                                        {
+                                            Vector4 col = KSPUtil.ParseVector4(node.GetValue("SSSpec"));
+                                            Color c = new Color(col.x, col.y, col.z, col.w);
+                                            t.gameObject.renderer.material.SetColor("_SpecColor", c);
+                                        }
+                                        catch(Exception e)
+                                        {
+                                            print("*RSS* Error reading SSSpec as color4: original text: " + node.GetValue("SSSpec") + " --- exception " + e.Message);
+                                        }
                                     }
 
                                     // Fix mesh
@@ -1425,9 +1520,16 @@ namespace RealSolarSystem
                                     }
                                     if (exportNode.HasValue("oceanColor"))
                                     {
-                                        ocean = true;
-                                        Vector3 col = KSPUtil.ParseVector3(exportNode.GetValue("oceanColor"));
-                                        oceanColor = new Color(col.x, col.y, col.z);
+                                        try
+                                        {
+                                            ocean = true;
+                                            Vector4 col = KSPUtil.ParseVector4(exportNode.GetValue("oceanColor"));
+                                            oceanColor = new Color(col.x, col.y, col.z, col.w);
+                                        }
+                                        catch(Exception e)
+                                        {
+                                            print("*RSS* Error parsing as col3: original text: " + exportNode.GetValue("oceanColor") + " --- exception " + e.Message);
+                                        }
                                     }
                                     Texture2D[] outputMaps = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
                                     System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "1.png", outputMaps[0].EncodeToPNG());

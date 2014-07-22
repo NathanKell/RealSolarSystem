@@ -45,9 +45,13 @@ v7.0  \/
 *Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by Subcidal. Only Earth supported so far.
 *Include Custom Asteroids. Custom Asteroids by Starstrider42, config by SpacedInvader
 *Support new images for every planet by default (will fail gracefully if not found)
-*Fixed math errors in scaled space mesh resizing. This requires a rebuild of cached OBJs
+*Fixed math errors in scaled space mesh resizing. To work with .24, OBJ files are no longer needed (for now).
 *Compiled for 0.24 x64
 *Added ability to edit and add more PQSMods
+*Changed oceanColor (in Export node) to use 4-value color.
+*Added ability to change the color ramp on the rim of scaled space shaders
+*Added ability to change specular color of scaled space shader
+*Refactored AtmosphereFromGround code to hopefully work better.
 
 v6.2  \/
 *PQS->ScaledSpace wrapping now works and caches correctly. Wrap now defaults to false for backwards compatibility. RSS will export obj files (with extra lines using keyword t for vertex tangents) for all wrapped meshes, and import them (if they exist) instead of wrapping. NOTE: If you change any PQS settings (let alone changing RSS configs!) you MUST delete all .obj files in GameData/RealSolarSystem/PluginData! NOTE 2: If you don't already have cached meshes, and/or you delete them all, KSP WILL APPEAR TO HANG on the "Loading..." screen right before Main Menu. This is NORMAL. Let it run. It takes me about 15 minutes. After that, you'll get your usual load times.
