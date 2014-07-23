@@ -1354,7 +1354,8 @@ namespace RealSolarSystem
                                     }
                                     if (node.HasValue("SSRamp"))
                                     {
-                                        Texture2D map = GameDatabase.Instance.GetTexture(path + "ramp_red", false);
+                                        Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSRamp"), false);
+                                        bool localLoad = false;
                                         if(map == null)
                                         {
                                             if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSRamp")))
@@ -1362,11 +1363,16 @@ namespace RealSolarSystem
                                                 map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSRamp")));
                                                 map.Compress(true);
                                                 map.Apply(true, true);
+                                                localLoad = true;
                                             }
                                         }
                                         if(map != null)
                                         {
-                                            t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
+                                            if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                                                t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
+                                            else
+                                                if (localLoad)
+                                                    DestroyImmediate(map);
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));

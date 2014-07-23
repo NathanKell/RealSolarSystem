@@ -11,14 +11,21 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
     public class OrbitDumper : MonoBehaviour
     {
-        public void Start()
+        double counter = 0;
+        public void FixedUpdate()
         {
+            counter += TimeWarp.fixedDeltaTime;
+            if(counter < 3600)
+                return;
+            counter = 0;
             if (FlightGlobals.Bodies == null)
             {
                 print("**RSS OBTDUMP*** - null body list!");
                 return;
             }
             print("**RSS OBTDUMP***");
+            int time = (int)Planetarium.GetUniversalTime();
+            print("At time " + time + ", " + KSPUtil.PrintDate(time, true, true));
             for(int i = 0; i < FlightGlobals.Bodies.Count; i++)
             {
                 CelestialBody body = FlightGlobals.Bodies[i];

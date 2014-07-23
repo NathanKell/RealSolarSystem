@@ -15,5 +15,6 @@
     </rect>
     <bool name="MapMinimized">1</bool>
     <int name="WindowTab">0</int>
-    <string name="DefaultSets">23test|Basic;RPL|Basic;scenarios|Disable;stock|Basic;T2|Basic;training|Disable;UKS|Basic;zt|Basic;</string>
+    <string name="DefaultSets">COM|Basic;scenarios|Disable;test|Basic;training|Disable;</string>
+    <bool name="GUIEnabled">1</bool>
 </config>
