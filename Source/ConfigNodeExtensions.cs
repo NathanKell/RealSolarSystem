@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -78,6 +79,31 @@ namespace RealSolarSystem
             {
                 value = result;
                 return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns true if the ConfigNode has the specified value and stores it in the ref value if it is parsable. Value is left unchanged if not.
+        /// </summary>
+        /// <param name="name">Name of the value to searched for</param>
+        /// <param name="value">Value to assign</param>
+        public static bool TryGetValue(this ConfigNode node, string name, ref Color value)
+        {
+            Color result;
+            if (node.HasValue(name))
+            {
+                try
+                {
+                    Vector4 col = KSPUtil.ParseVector4(node.GetValue(name));
+                    result = new Color(col.x, col.y, col.z, col.w);
+                    value = result;
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    MonoBehaviour.print("Exception: Error parsing as color4: original text: " + node.GetValue("name") + " --- exception " + e.Message);
+                }
             }
             return false;
         }
