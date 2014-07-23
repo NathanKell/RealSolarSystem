@@ -52,6 +52,7 @@ namespace RealSolarSystem
     public class RSSWatchDog : MonoBehaviour
     {
         ConfigNode RSSSettings = null;
+        int updateCount = 0;
         public void Start()
         {
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
@@ -64,6 +65,29 @@ namespace RealSolarSystem
         public void OnDestroy()
         {
             GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
+        }
+
+        public void Update()
+        {
+            /*if(updateCount > 30)
+                return;*/
+            updateCount++;
+            if(updateCount < 20 || !Input.GetKeyDown(KeyCode.P))
+                return;
+            
+            Camera[] cameras = Camera.allCameras;
+            string msg = "Far clip planes now";
+            foreach (Camera cam in cameras)
+            {
+                if (cam.name == "Camera 01" || cam.name == "Camera 00")
+                {
+                    string bodyName = FlightGlobals.getMainBody().name;
+                    //if(RSSSettings.HasNode(bodyName) && RSSSettings.GetNode(bodyName).HasValue("camFarClip"))
+                    cam.farClipPlane *= 1.5f;
+                    msg += "  (" + cam.name + "): " + cam.farClipPlane + ".";
+                }
+            }
+            ScreenMessages.PostScreenMessage(msg, 5.0f, ScreenMessageStyle.UPPER_CENTER);
         }
 
         public void OnVesselSOIChanged(GameEvents.HostedFromToAction<Vessel, CelestialBody> evt)
