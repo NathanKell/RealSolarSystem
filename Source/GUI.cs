@@ -99,6 +99,8 @@ namespace RealSolarSystem
             string ESunt;
             string Krt;
             string Kmt;
+            string inner;
+            string outer;
 
 
             GUILayout.BeginVertical();
@@ -126,6 +128,14 @@ namespace RealSolarSystem
             GUILayout.Label("Km");
             Kmt = GUILayout.TextField(afg.Km.ToString(), 10);
             GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("InnerR/6000");
+            inner = GUILayout.TextField(afg.innerRadius.ToString(), 15);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("OuterR/6000");
+            outer = GUILayout.TextField(afg.outerRadius.ToString(), 15);
+            GUILayout.EndHorizontal();
             GUILayout.EndVertical();
 
             if (GUI.changed)
@@ -136,6 +146,8 @@ namespace RealSolarSystem
                 float.TryParse(ESunt, out afg.ESun);
                 float.TryParse(Krt, out afg.Kr);
                 float.TryParse(Kmt, out afg.Km);
+                float.TryParse(inner, out afg.innerRadius);
+                float.TryParse(outer, out afg.outerRadius);
             }
             //afg.waveLength = waveLength;
             //afg.ESun = eSun;
@@ -149,6 +161,14 @@ namespace RealSolarSystem
 
             try
             {
+                // compute relations
+                afg.scale = 1f / (afg.outerRadius - afg.innerRadius);
+                afg.scaleDepth = -0.25f;
+                afg.scaleOverScaleDepth = afg.scale / afg.scaleDepth;
+                afg.outerRadius2 = afg.outerRadius * afg.outerRadius;
+                afg.innerRadius2 = afg.innerRadius * afg.innerRadius;
+
+                // set params
                 MethodInfo setMaterial = afg.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
                 setMaterial.Invoke(afg, new object[] { true });
             }

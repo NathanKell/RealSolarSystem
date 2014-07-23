@@ -273,6 +273,7 @@ namespace RealSolarSystem
                         #endregion
 
                         #region CBAtmosphereTemperature
+                        node.TryGetValue("atmosphericAmbientColor", ref body.atmosphericAmbientColor);
                         node.TryGetValue("atmosphere", ref body.atmosphere);
                         node.TryGetValue("atmosphereScaleHeight", ref body.atmosphereScaleHeight);
                         node.TryGetValue("atmosphereMultiplier", ref body.atmosphereMultiplier);
@@ -1215,6 +1216,7 @@ namespace RealSolarSystem
 
                                                         heightMap.order = 10;
                                                         modNode.TryGetValue("order", ref heightMap.order);
+                                                        heightMap.scaleDeformityByRadius = false;
 
                                                         heightMap.modEnabled = true;
                                                         DestroyImmediate(map);
