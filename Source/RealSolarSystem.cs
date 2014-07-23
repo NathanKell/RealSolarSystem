@@ -57,12 +57,16 @@ namespace RealSolarSystem
                     ag.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
                 }
 
+                
                 if (modNode.HasValue("invWaveLength"))
                 {
+                    //will be recomputed by SQUAD anyway so no point.
+                    // so instead, compute waveLength from it
                     try
                     {
                         Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
                         ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
+                        ag.waveLength = new Color((float)Math.Pow(1/col.x, 0.25), (float)Math.Pow(1/col.y, 0.25), (float)Math.Pow(1/col.z, 0.25), 1f);
                     }
                     catch(Exception e)
                     {

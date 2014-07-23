@@ -146,6 +146,17 @@ namespace RealSolarSystem
             //GUILayout.Label("innerRadiusScale");
 
             //GUILayout.EndVertical();
+
+            try
+            {
+                MethodInfo setMaterial = afg.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
+                setMaterial.Invoke(afg, new object[] { true });
+            }
+            catch (Exception e)
+            {
+                print("*RSS* *ERROR* setting AtmosphereFromGround " + afg.name + " for body " + FlightGlobals.getMainBody().name + ": " + e);
+            }
+
             GUI.DragWindow();
         }
     }

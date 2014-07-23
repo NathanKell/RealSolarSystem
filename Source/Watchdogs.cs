@@ -97,7 +97,6 @@ namespace RealSolarSystem
                             {
                                 if (ag != null && ag.planet != null)
                                 {
-                                    // generalized version of Starwaster's code. Thanks Starwaster!
                                     if (ag.planet.name.Equals(node.name))
                                     {
                                         RealSolarSystem.UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
