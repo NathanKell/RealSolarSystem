@@ -8,6 +8,37 @@ using System.IO;
 
 namespace RealSolarSystem
 {
+    [KSPAddon(KSPAddon.Startup.TrackingStation, false)]
+    public class OrbitDumper : MonoBehaviour
+    {
+        public void Start()
+        {
+            if (FlightGlobals.Bodies == null)
+            {
+                print("**RSS OBTDUMP*** - null body list!");
+                return;
+            }
+            print("**RSS OBTDUMP***");
+            for(int i = 0; i < FlightGlobals.Bodies.Count; i++)
+            {
+                CelestialBody body = FlightGlobals.Bodies[i];
+                if ( body == null || body.orbitDriver == null)
+                    continue;
+                if(body.orbitDriver.orbit == null)
+                    continue;
+                Orbit o = body.orbitDriver.orbit;
+                print("********* BODY **********");
+                print("name = " + body.name + "(" + i + ")");
+                Type oType = o.GetType();
+                foreach (FieldInfo f in oType.GetFields())
+                {
+                    if (f == null || f.GetValue(o) == null)
+                        continue;
+                    print(f.Name + " = " + f.GetValue(o));
+                }
+            }
+        }
+    }
     // Checks to make sure useLegacyAtmosphere didn't get munged with
     // Could become a general place to prevent RSS changes from being reverted when our back is turned.
     [KSPAddon(KSPAddon.Startup.Flight, false)]
