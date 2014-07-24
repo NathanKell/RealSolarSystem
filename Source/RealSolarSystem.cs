@@ -347,17 +347,9 @@ namespace RealSolarSystem
 
                             onode.TryGetValue("semiMajorAxis", ref body.orbit.semiMajorAxis);
                             onode.TryGetValue("eccentricity", ref body.orbit.eccentricity);
-                            
-                            bool anomFix = false;
-                            if (onode.TryGetValue("meanAnomalyAtEpoch", ref body.orbit.meanAnomalyAtEpoch))
-                            {
-                                anomFix = true;
-                            }
+                            onode.TryGetValue("meanAnomalyAtEpoch", ref body.orbit.meanAnomalyAtEpoch);
                             if (onode.TryGetValue("meanAnomalyAtEpochD", ref body.orbit.meanAnomalyAtEpoch))
-                            {
                                 body.orbit.meanAnomalyAtEpoch *= DEG2RAD;
-                                anomFix = true;
-                            }
                             onode.TryGetValue("inclination", ref body.orbit.inclination);
                             onode.TryGetValue("period", ref body.orbit.period);
                             onode.TryGetValue("LAN", ref body.orbit.LAN);
@@ -1350,6 +1342,17 @@ namespace RealSolarSystem
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
+                                    }
+                                    if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                                    {
+                                        try
+                                        {
+                                            System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "Ramp.png", ((Texture2D)t.gameObject.renderer.material.GetTexture("_rimColorRamp")).EncodeToPNG());
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            print("*RSS* Failed to get/write ramp for " + body.name + ", exception: " + e.Message);
+                                        }
                                     }
                                     if (node.HasValue("SSRamp"))
                                     {

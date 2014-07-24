@@ -21,6 +21,21 @@ namespace RealSolarSystem
             if (Input.GetKeyDown(KeyCode.G) && Input.GetKey(KeyCode.LeftAlt))
             {
                 GUIOpen = !GUIOpen;
+                if(GUIOpen)
+                {
+                    afg = findAFG();
+                    if(afg != null)
+                    {
+                        rt = afg.waveLength.r.ToString();
+                        gt = afg.waveLength.g.ToString();
+                        bt = afg.waveLength.b.ToString();
+                        ESunt = afg.ESun.ToString();
+                        Krt = afg.Kr.ToString();
+                        Kmt = afg.Km.ToString();
+                        innert = afg.innerRadius.ToString();
+                        outert = afg.outerRadius.ToString();
+                    }
+                }
             }
         }
         public void Awake()
@@ -61,6 +76,15 @@ namespace RealSolarSystem
             return afg;
         }
 
+        string rt;
+        string gt;
+        string bt;
+        string ESunt;
+        string Krt;
+        string Kmt;
+        string innert;
+        string outert;
+
         private void ShowGUI(int windowID)
         {
             GUILayout.BeginVertical();
@@ -94,14 +118,6 @@ namespace RealSolarSystem
                 GUILayout.EndVertical();
                 */
 
-                string rt;
-                string gt;
-                string bt;
-                string ESunt;
-                string Krt;
-                string Kmt;
-                string inner;
-                string outer;
                 float rf;
                 float gf;
                 float bf;
@@ -113,65 +129,53 @@ namespace RealSolarSystem
 
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Red");
-                rt = GUILayout.TextField(afg.waveLength.r.ToString(), 10);
+                rt = GUILayout.TextField(rt, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Green");
-                gt = GUILayout.TextField(afg.waveLength.g.ToString(), 10);
+                gt = GUILayout.TextField(gt, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Blue");
-                bt = GUILayout.TextField(afg.waveLength.b.ToString(), 10);
+                bt = GUILayout.TextField(bt, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("ESun");
-                ESunt = GUILayout.TextField(afg.ESun.ToString(), 10);
+                ESunt = GUILayout.TextField(ESunt, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Kr");
-                Krt = GUILayout.TextField(afg.Kr.ToString(), 10);
+                Krt = GUILayout.TextField(Krt, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Km");
-                Kmt = GUILayout.TextField(afg.Km.ToString(), 10);
+                Kmt = GUILayout.TextField(Kmt, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("InnerR");
-                inner = GUILayout.TextField(afg.innerRadius.ToString(), 15);
+                innert = GUILayout.TextField(innert, 15);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("OuterR");
-                outer = GUILayout.TextField(afg.outerRadius.ToString(), 15);
+                outert = GUILayout.TextField(outert, 15);
                 GUILayout.EndHorizontal();
 
-
-                /*if (GUI.changed)
-                {*/
-                    float.TryParse(rt, out rf);
-                    float.TryParse(gt, out gf);
-                    float.TryParse(bt, out bf);
-                    float.TryParse(ESunt, out Esunf);
-                    float.TryParse(Krt, out Krf);
-                    float.TryParse(Kmt, out Kmf);
-                    float.TryParse(inner, out innerf);
-                    float.TryParse(outer, out outerf);
-                //}
                 if (GUILayout.Button("Apply"))
                 {
                     try
                     {
-                        afg.waveLength.r = rf;
-                        afg.waveLength.g = gf;
-                        afg.waveLength.b = bf;
-                        afg.ESun = Esunf;
-                        afg.Km = Kmf;
-                        afg.Kr = Krf;
+                        if(float.TryParse(rt, out rf)) afg.waveLength.r = rf;
+                        if (float.TryParse(gt, out gf)) afg.waveLength.g = gf;
+                        if (float.TryParse(bt, out bf)) afg.waveLength.b = bf;
+                        if (float.TryParse(ESunt, out Esunf)) afg.ESun = Esunf;
+                        if (float.TryParse(Krt, out Krf)) afg.Kr = Krf;
+                        if (float.TryParse(Kmt, out Kmf)) afg.Km = Kmf;
                         afg.KrESun = Krf * Esunf;
                         afg.KmESun = Kmf * Esunf;
                         afg.Kr4PI = Krf * 4f * (float)Math.PI;
                         afg.Km4PI = Kmf * 4f * (float)Math.PI;
-                        afg.innerRadius = innerf * ScaledSpace.InverseScaleFactor;
-                        afg.outerRadius = outerf * ScaledSpace.InverseScaleFactor;
+                        if (float.TryParse(innert, out innerf)) afg.innerRadius = innerf * ScaledSpace.InverseScaleFactor;
+                        if (float.TryParse(outert, out outerf)) afg.outerRadius = outerf * ScaledSpace.InverseScaleFactor;
 
                         // compute relations
                         afg.scale = 1f / (afg.outerRadius - afg.innerRadius);
