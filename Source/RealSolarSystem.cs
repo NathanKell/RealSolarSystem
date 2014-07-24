@@ -234,8 +234,12 @@ namespace RealSolarSystem
             MeshFilter joolMesh = null;
             if (ScaledSpace.Instance != null)
             {
+                print("*RSS* Printing ScaledSpace Transforms");
                 foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
                 {
+                    print("***** TRANSFROM: " + t.name);
+                    Utils.PrintTransformUp(t);
+                    Utils.PrintTransformRecursive(t);
                     if (t.name.Equals("Jool"))
                         joolMesh = (MeshFilter)t.GetComponent(typeof(MeshFilter));
                 }
@@ -1447,11 +1451,11 @@ namespace RealSolarSystem
                                                 // **** No longer exporting and importing
                                                 // Now I just do everything except tangents each time. Tangents don't seem necessary to fix, and
                                                 // the rest is fast enough...and something in .24/64 broke importing for *some* planets. WEIRD.
-	                                            /*char sep = System.IO.Path.DirectorySeparatorChar;
+	                                            char sep = System.IO.Path.DirectorySeparatorChar;
 	                                            string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
 	                                                        + sep + "PluginData" + sep + t.name;
 
-                                                filePath += ".obj";*/
+                                                filePath += ".obj";
                                                 
 	                                            try
 	                                            {
@@ -1492,7 +1496,7 @@ namespace RealSolarSystem
                                     }
                                     if (rescale)
                                     {
-                                        float scaleFactor = (float)((double)t.localScale.x * body.Radius / origRadius * SSTScale);
+                                        float scaleFactor = (float)((double)origLocalScale * body.Radius / origRadius * SSTScale);
                                         t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
                                     }
                                     else
