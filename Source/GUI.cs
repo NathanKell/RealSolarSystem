@@ -32,8 +32,8 @@ namespace RealSolarSystem
                         ESunt = afg.ESun.ToString();
                         Krt = afg.Kr.ToString();
                         Kmt = afg.Km.ToString();
-                        innert = afg.innerRadius.ToString();
-                        outert = afg.outerRadius.ToString();
+                        innert = (afg.innerRadius * ScaledSpace.ScaleFactor).ToString();
+                        outert = (afg.outerRadius * ScaledSpace.ScaleFactor).ToString();
                     }
                 }
             }
