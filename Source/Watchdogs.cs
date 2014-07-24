@@ -37,7 +37,7 @@ namespace RealSolarSystem
 
         public void Update()
         {
-            if(!useKeypressClip && updateCount > 30)
+            if(!useKeypressClip && updateCount > 22)
                 return;
             updateCount++;
             if(updateCount < 20 || (useKeypressClip && !Input.GetKeyDown(KeyCode.P)))
@@ -45,21 +45,37 @@ namespace RealSolarSystem
             
             Camera[] cameras = Camera.allCameras;
             string msg = "Far clip planes now";
+            string bodyName = FlightGlobals.getMainBody().name;
             foreach (Camera cam in cameras)
             {
                 if (cam.name == "Camera 01" || cam.name == "Camera 00")
                 {
-                    string bodyName = FlightGlobals.getMainBody().name;
                     if (useKeypressClip)
                         cam.farClipPlane *= 1.5f;
                     else
-                        if (RSSSettings.HasNode(bodyName) && RSSSettings.GetNode(bodyName).HasValue("camFarClip"))
-                            return;
-                    
+                    {
+                        float farClip = -1;
+                        if (cam.name.Equals("Camera 00"))
+                        {
+                            RSSSettings.TryGetValue("cam00FarClip", ref farClip);
+                            if (RSSSettings.HasNode(bodyName))
+                                RSSSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
+                        }
+                        else
+                        {
+                            RSSSettings.TryGetValue("cam01FarClip", ref farClip);
+                            if (RSSSettings.HasNode(bodyName))
+                                RSSSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
+                        }
+                        if (farClip > 0)
+                            cam.farClipPlane = farClip;
+                    }
+
                     msg += "  (" + cam.name + "): " + cam.farClipPlane + ".";
                 }
             }
-            ScreenMessages.PostScreenMessage(msg, 5.0f, ScreenMessageStyle.UPPER_CENTER);
+            if(useKeypressClip)
+                ScreenMessages.PostScreenMessage(msg, 5.0f, ScreenMessageStyle.UPPER_CENTER);
         }
 
         double counter = 0;

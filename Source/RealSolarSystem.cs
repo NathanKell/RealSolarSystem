@@ -14,6 +14,14 @@ namespace RealSolarSystem
     {
         public static bool doneRSS = false;
 
+        Texture GetRamp(string bodyName)
+        {
+            foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                if (t.name.Equals(bodyName))
+                    return t.gameObject.renderer.material.GetTexture("_rimColorRamp");
+            return null;
+        }
+
         public static void UpdateAFG(CelestialBody body, AtmosphereFromGround ag, ConfigNode modNode = null)
         {
             if(modNode != null)
@@ -1354,11 +1362,24 @@ namespace RealSolarSystem
                                             print("*RSS* Failed to get/write ramp for " + body.name + ", exception: " + e.Message);
                                         }
                                     }
+                                    if (node.HasValue("SSRampRef"))
+                                    {
+                                        //if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                                        //{
+                                        // for now try setting anyway.
+                                            Texture map = null;
+                                            GetRamp(node.GetValue("SSRampRef"));
+                                            if(map != null)
+                                                t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
+                                        //}
+                                        else
+                                            print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
+                                    }
                                     if (node.HasValue("SSRamp"))
                                     {
                                         Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSRamp"), false);
                                         bool localLoad = false;
-                                        if(map == null)
+                                        if (map == null)
                                         {
                                             if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSRamp")))
                                             {
@@ -1368,7 +1389,7 @@ namespace RealSolarSystem
                                                 localLoad = true;
                                             }
                                         }
-                                        if(map != null)
+                                        if (map != null)
                                         {
                                             if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
                                                 t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
