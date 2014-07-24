@@ -395,13 +395,6 @@ namespace RealSolarSystem
                                     }
                                 }
                             }
-                            if (anomFix)
-                            {
-                                // assume eccentricity < 1.0
-                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch; // let KSP handle epoch
-                                body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / 6.2831853071795862;
-                                body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
-                            }
                         }
                         // SOI and HillSphere done at end
                         body.CBUpdate();
@@ -1632,6 +1625,19 @@ namespace RealSolarSystem
                                 body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
 
                             body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
+                            if (body.orbit.eccentricity <= 1.0)
+                            {
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
+                                body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / (Math.PI * 2);
+                                body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
+                            }
+                            else
+                            {
+                                // ignores this body's own mass for this one...
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
+                                body.orbit.ObT = Math.Pow(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3.0) / body.orbit.referenceBody.gravParameter, 0.5) * body.orbit.meanAnomaly;
+                                body.orbit.ObTAtEpoch = body.orbit.ObT;
+                            }
                         }
                         else
                         {
