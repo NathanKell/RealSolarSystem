@@ -57,6 +57,7 @@ v7.0  \/
 *Include atmospher changes for all bodies
 *Bug in initial orbital positions of all bodies is fixed. Note that craft in the SOI of the Sun will be off course, so BE CAREFUL. You may have to wait until your craft reach their destination SOIs before using v7.
 *Added support for changing flight camera clipping distances (for use with EVE).
+*Lowered max atmosphere altitudes to match approximate height of 1Pa dynamic pressure at 12,000m/s. Earth is now 130km, for example.
 *Compiled for 0.24.1 x64
 
 v6.2  \/
