@@ -1380,13 +1380,11 @@ namespace RealSolarSystem
                                     if (node.HasValue("SSRampRef"))
                                     {
                                         //if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
-                                        //{
                                         // for now try setting anyway.
-                                            Texture map = null;
-                                            GetRamp(node.GetValue("SSRampRef"));
-                                            if(map != null)
-                                                t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
-                                        //}
+                                        Texture map = null;
+                                        map = GetRamp(node.GetValue("SSRampRef"));
+                                        if(map != null)
+                                            t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
                                     }
