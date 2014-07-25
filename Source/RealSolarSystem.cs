@@ -22,47 +22,47 @@ namespace RealSolarSystem
             return null;
         }
 
-        public static void UpdateAFG(CelestialBody body, AtmosphereFromGround ag, ConfigNode modNode = null)
+        public static void UpdateAFG(CelestialBody body, AtmosphereFromGround afg, ConfigNode modNode = null)
         {
             if(modNode != null)
             {
                 float ftmp;
-                if (modNode.TryGetValue("outerRadius", ref ag.outerRadius))
+                if (modNode.TryGetValue("outerRadius", ref afg.outerRadius))
                 {
-                    ag.outerRadius *= ScaledSpace.InverseScaleFactor;
+                    afg.outerRadius *= ScaledSpace.InverseScaleFactor;
                 }
                 else if (modNode.HasValue("outerRadiusAtmo"))
                 {
-                    ag.outerRadius = ((float)body.Radius + body.maxAtmosphereAltitude) * ScaledSpace.InverseScaleFactor;
+                    afg.outerRadius = ((float)body.Radius + body.maxAtmosphereAltitude) * ScaledSpace.InverseScaleFactor;
                 }
-                else if (modNode.TryGetValue("outerRadiusMult", ref ag.outerRadius))
+                else if (modNode.TryGetValue("outerRadiusMult", ref afg.outerRadius))
                 {
-                    ag.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
+                    afg.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
                 }
                 else
                     // the default
-                    ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                    afg.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
 
-                if (modNode.TryGetValue("innerRadius", ref ag.innerRadius))
+                if (modNode.TryGetValue("innerRadius", ref afg.innerRadius))
                 {
-                    ag.innerRadius *= ScaledSpace.InverseScaleFactor;
+                    afg.innerRadius *= ScaledSpace.InverseScaleFactor;
                 }
-                else if (modNode.TryGetValue("innerRadiusMult", ref ag.innerRadius))
+                else if (modNode.TryGetValue("innerRadiusMult", ref afg.innerRadius))
                 {
-                    ag.innerRadius *= ag.outerRadius;
+                    afg.innerRadius *= afg.outerRadius;
                 }
                 else
-                    ag.innerRadius = ag.outerRadius * 0.975f;
+                    afg.innerRadius = afg.outerRadius * 0.975f;
 
-                modNode.TryGetValue("doScale", ref ag.doScale);
+                modNode.TryGetValue("doScale", ref afg.doScale);
                 if (modNode.HasValue("transformScale"))
                 {
-                    if (float.TryParse(modNode.GetValue("transformScale"), out ftmp) && ag.transform != null)
-                        ag.transform.localScale = new Vector3(ftmp, ftmp, ftmp);
+                    if (float.TryParse(modNode.GetValue("transformScale"), out ftmp) && afg.transform != null)
+                        afg.transform.localScale = new Vector3(ftmp, ftmp, ftmp);
                 }
                 else if (modNode.HasValue("transformAtmo"))
                 {
-                    ag.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
+                    afg.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
                 }
 
                 
@@ -73,8 +73,8 @@ namespace RealSolarSystem
                     try
                     {
                         Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
-                        ag.invWaveLength = new Color(col.x, col.y, col.z, col.w);
-                        ag.waveLength = new Color((float)Math.Pow(1/col.x, 0.25), (float)Math.Pow(1/col.y, 0.25), (float)Math.Pow(1/col.z, 0.25), 1f);
+                        afg.invWaveLength = new Color(col.x, col.y, col.z, col.w);
+                        afg.waveLength = new Color((float)Math.Pow(1/col.x, 0.25), (float)Math.Pow(1/col.y, 0.25), (float)Math.Pow(1/col.z, 0.25), 1f);
                     }
                     catch(Exception e)
                     {
@@ -86,7 +86,7 @@ namespace RealSolarSystem
                     try
                     {
                         Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
-                        ag.waveLength = new Color(col.x, col.y, col.z, col.w);
+                        afg.waveLength = new Color(col.x, col.y, col.z, col.w);
                     }
                     catch(Exception e)
                     {
@@ -97,22 +97,33 @@ namespace RealSolarSystem
             else
             {
                 // the defaults
-                ag.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
-                ag.innerRadius = ag.outerRadius * 0.975f;
+                afg.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
+                afg.innerRadius = afg.outerRadius * 0.975f;
             }
-            ag.outerRadius2 = ag.outerRadius * ag.outerRadius;
-            ag.innerRadius2 = ag.innerRadius * ag.innerRadius;
-            ag.scale = 1f / (ag.outerRadius - ag.innerRadius);
-            ag.scaleDepth = -0.25f;
-            ag.scaleOverScaleDepth = ag.scale / ag.scaleDepth;
+            modNode.TryGetValue("Kr", ref afg.Kr);
+            modNode.TryGetValue("Km", ref afg.Km);
+            modNode.TryGetValue("ESun", ref afg.ESun);
+            modNode.TryGetValue("g", ref afg.g);
+            modNode.TryGetValue("samples", ref afg.samples);
+
+            afg.KrESun = afg.Kr * afg.ESun;
+            afg.KmESun = afg.Km * afg.ESun;
+            afg.Kr4PI = afg.Kr * 4f * (float)Math.PI;
+            afg.Km4PI = afg.Km * 4f * (float)Math.PI;
+            afg.g2 = afg.g * afg.g;
+            afg.outerRadius2 = afg.outerRadius * afg.outerRadius;
+            afg.innerRadius2 = afg.innerRadius * afg.innerRadius;
+            afg.scale = 1f / (afg.outerRadius - afg.innerRadius);
+            afg.scaleDepth = -0.25f;
+            afg.scaleOverScaleDepth = afg.scale / afg.scaleDepth;
             try
             {
-                MethodInfo setMaterial = ag.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
-                setMaterial.Invoke(ag, new object[] { true });
+                MethodInfo setMaterial = afg.GetType().GetMethod("SetMaterial", BindingFlags.NonPublic | BindingFlags.Instance);
+                setMaterial.Invoke(afg, new object[] { true });
             }
             catch (Exception e)
             {
-                print("*RSS* *ERROR* setting AtmosphereFromGround " + ag.name + " for body " + body.name + ": " + e);
+                print("*RSS* *ERROR* setting AtmosphereFromGround " + afg.name + " for body " + body.name + ": " + e);
             }
         }
 

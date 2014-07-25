@@ -12,7 +12,7 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class AFGEditor : MonoBehaviour
     {
-        private static Rect windowPosition = new Rect(64, 64, Screen.width / 8, Screen.height / 4);
+        private static Rect windowPosition = new Rect(64, 64, 320, 640);
         private static GUIStyle windowStyle = null;
         private AtmosphereFromGround afg = null;
         private Boolean GUIOpen;

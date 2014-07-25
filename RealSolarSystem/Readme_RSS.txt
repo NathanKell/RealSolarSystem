@@ -3,20 +3,24 @@ This mod will convert the Kerbol System into the Solar System, rescaling, moving
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
+Supreme thanks to regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS. RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions.
 
-License: CC-BY-SA
+License: CC-BY-NC-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source) and stupid_chris (ConfigNodeExtensions, licensed CC-BY-NC-SA). Used with permission.
+Includes artwork by dimonnomid and SpacedInvader.
+Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
+
 Also included:
-Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/55219
-Custom Biomes by Trueborn. See thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/66256
-Custom Asteriods by Starstrider42. See thread for details and license and source: http://forum.kerbalspaceprogram.com/threads/80483
+Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
+Custom Biomes by Trueborn. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/66256
+Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
 
 
 INSTALLATION:
 Extract to KSP/GameData.
 NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
-Planets included (no new graphics for now, excepting Earth and the Moon)
+Planets included:
 Mercury is represented by Moho
 Venus is represented by Eve
 Earth is represented by Kerbin
@@ -37,21 +41,23 @@ Pluto is represented by Vall
 ===========================
 Changelog
 v7.0  \/
-*ScaledSpace scaling workaround until EVE and Kethane (and anything else that assumes scale) get fixed.
-*No longer require OBJ files (tangents are left unchanged due to an issue with .24x64).
-*regex: support changing orbitColor in Orbit nodes (as standard float RGBA color).
+*Scaled Space scaling/wrapping now plays nice with other mods and does not require OBJ files. Loads fast.
+*regex: support changing orbitColor in Orbit nodes (as standard float RGBA color). dimonnomid adds colors for all RSS bodies.
 *Fix to display the Display Name of the launch site when showing the icons on the planet in Tracking Station view.
 *Fail gracefully when textures are missing.
 *Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by Subcidal. Only Earth supported so far.
 *Include Custom Asteroids. Custom Asteroids by Starstrider42, config by SpacedInvader
 *Support new images for every planet by default (will fail gracefully if not found)
-*Fixed math errors in scaled space mesh resizing. To work with .24, OBJ files are no longer needed (for now).
-*Compiled for 0.24 x64
-*Added ability to edit and add more PQSMods
+*Added ability to edit and add more PQSMods, and to disable any PQSMod.
 *Changed oceanColor (in Export node) to use 4-value color.
-*Added ability to change the color ramp on the rim of scaled space shaders
-*Added ability to change specular color of scaled space shader
-*Refactored AtmosphereFromGround code to hopefully work better.
+*Added ability to change the color ramp on the rim of scaled space shaders, either by specifying a file via SSRamp, or another body's by SSRampRef.
+*Added ability to change specular color of scaled space shader via SSSpec.
+*Refactored AtmosphereFromGround code to work better, allow changing more values, etc.
+*Include new textures for all bodies thanks to SpacedInvader, dimonnomid, and the sources (see above)
+*Include atmospher changes for all bodies
+*Bug in initial orbital positions of all bodies is fixed. Note that craft in the SOI of the Sun will be off course, so BE CAREFUL. You may have to wait until your craft reach their destination SOIs before using v7.
+*Added support for changing flight camera clipping distances (for use with EVE).
+*Compiled for 0.24.1 x64
 
 v6.2  \/
 *PQS->ScaledSpace wrapping now works and caches correctly. Wrap now defaults to false for backwards compatibility. RSS will export obj files (with extra lines using keyword t for vertex tangents) for all wrapped meshes, and import them (if they exist) instead of wrapping. NOTE: If you change any PQS settings (let alone changing RSS configs!) you MUST delete all .obj files in GameData/RealSolarSystem/PluginData! NOTE 2: If you don't already have cached meshes, and/or you delete them all, KSP WILL APPEAR TO HANG on the "Loading..." screen right before Main Menu. This is NORMAL. Let it run. It takes me about 15 minutes. After that, you'll get your usual load times.
