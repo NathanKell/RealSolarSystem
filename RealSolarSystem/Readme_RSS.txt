@@ -1,4 +1,5 @@
 Real Solar System
+NathanKell
 This mod will convert the Kerbol System into the Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
@@ -57,8 +58,8 @@ v7.0  \/
 *Include atmospher changes for all bodies
 *Bug in initial orbital positions of all bodies is fixed. Note that craft in the SOI of the Sun will be off course, so BE CAREFUL. You may have to wait until your craft reach their destination SOIs before using v7.
 *Added support for changing flight camera clipping distances (for use with EVE).
-*Lowered max atmosphere altitudes to match approximate height of 1Pa dynamic pressure at 12,000m/s. Earth is now 130km, for example.
-*Compiled for 0.24.1 x64
+*Lowered max atmosphere altitudes to match approximate height of 1Pa dynamic pressure at 12,000m/s. Earth's is now 130km, for example.
+*Compiled for 0.24.2 x64
 
 v6.2  \/
 *PQS->ScaledSpace wrapping now works and caches correctly. Wrap now defaults to false for backwards compatibility. RSS will export obj files (with extra lines using keyword t for vertex tangents) for all wrapped meshes, and import them (if they exist) instead of wrapping. NOTE: If you change any PQS settings (let alone changing RSS configs!) you MUST delete all .obj files in GameData/RealSolarSystem/PluginData! NOTE 2: If you don't already have cached meshes, and/or you delete them all, KSP WILL APPEAR TO HANG on the "Loading..." screen right before Main Menu. This is NORMAL. Let it run. It takes me about 15 minutes. After that, you'll get your usual load times.
