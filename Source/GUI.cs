@@ -29,6 +29,7 @@ namespace RealSolarSystem
                         rt = afg.waveLength.r.ToString();
                         gt = afg.waveLength.g.ToString();
                         bt = afg.waveLength.b.ToString();
+                        at = afg.waveLength.a.ToString();
                         ESunt = afg.ESun.ToString();
                         Krt = afg.Kr.ToString();
                         Kmt = afg.Km.ToString();
@@ -79,6 +80,7 @@ namespace RealSolarSystem
         string rt;
         string gt;
         string bt;
+        string at;
         string ESunt;
         string Krt;
         string Kmt;
@@ -121,6 +123,7 @@ namespace RealSolarSystem
                 float rf;
                 float gf;
                 float bf;
+                float af;
                 float Esunf;
                 float Krf;
                 float Kmf;
@@ -138,6 +141,10 @@ namespace RealSolarSystem
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("Blue");
                 bt = GUILayout.TextField(bt, 10);
+                GUILayout.EndHorizontal();
+                GUILayout.BeginHorizontal();
+                GUILayout.Label("Alpha");
+                at = GUILayout.TextField(at, 10);
                 GUILayout.EndHorizontal();
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("ESun");
@@ -167,6 +174,7 @@ namespace RealSolarSystem
                         if(float.TryParse(rt, out rf)) afg.waveLength.r = rf;
                         if (float.TryParse(gt, out gf)) afg.waveLength.g = gf;
                         if (float.TryParse(bt, out bf)) afg.waveLength.b = bf;
+                        if (float.TryParse(bt, out af)) afg.waveLength.a = af;
                         if (float.TryParse(ESunt, out Esunf)) afg.ESun = Esunf;
                         if (float.TryParse(Krt, out Krf)) afg.Kr = Krf;
                         if (float.TryParse(Kmt, out Kmf)) afg.Km = Kmf;
