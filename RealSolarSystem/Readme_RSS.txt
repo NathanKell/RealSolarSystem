@@ -1,6 +1,6 @@
 Real Solar System
 NathanKell
-This mod will convert the Kerbol System into the Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
+This mod will convert the Kerbol System into the (Real) Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
@@ -19,9 +19,13 @@ Custom Asteriods by Starstrider42. See thread for details, license, and source: 
 
 INSTALLATION:
 Extract to KSP/GameData.
+
+TEXTURE INSTALLATION
+Now, you must select a texture resolution. You may download a premade pack (8192, 4096, or 2048), or pick and choose. Any planets which do not have textures will not have their coloration, features, etc., changed, although they will be made larger.
+
 NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
-Planets included:
+List of planets:
 Mercury is represented by Moho
 Venus is represented by Eve
 Earth is represented by Kerbin
