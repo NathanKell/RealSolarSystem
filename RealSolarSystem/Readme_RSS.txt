@@ -22,6 +22,7 @@ Extract to KSP/GameData.
 
 TEXTURE INSTALLATION
 Now, you must select a texture resolution. You may download a premade pack (8192, 4096, or 2048), or pick and choose. Any planets which do not have textures will not have their coloration, features, etc., changed, although they will be made larger.
+You can get the textures from: https://nabaal.net/files/ksp/nathankell/RealSolarSystem/Textures/
 
 NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
