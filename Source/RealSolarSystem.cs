@@ -93,6 +93,11 @@ namespace RealSolarSystem
                         print("*RSS* Error parsing as color4: original text: " + modNode.GetValue("waveLength") + " --- exception " + e.Message);
                     }
                 }
+                modNode.TryGetValue("Kr", ref afg.Kr);
+                modNode.TryGetValue("Km", ref afg.Km);
+                modNode.TryGetValue("ESun", ref afg.ESun);
+                modNode.TryGetValue("g", ref afg.g);
+                modNode.TryGetValue("samples", ref afg.samples);
             }
             else
             {
@@ -100,11 +105,6 @@ namespace RealSolarSystem
                 afg.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
                 afg.innerRadius = afg.outerRadius * 0.975f;
             }
-            modNode.TryGetValue("Kr", ref afg.Kr);
-            modNode.TryGetValue("Km", ref afg.Km);
-            modNode.TryGetValue("ESun", ref afg.ESun);
-            modNode.TryGetValue("g", ref afg.g);
-            modNode.TryGetValue("samples", ref afg.samples);
 
             afg.KrESun = afg.Kr * afg.ESun;
             afg.KmESun = afg.Km * afg.ESun;
@@ -1158,6 +1158,28 @@ namespace RealSolarSystem
                                                     else
                                                         print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
 
+                                                }
+                                                if (modNode.name.Equals("PQSMod_VertexSimplexNoiseColor"))
+                                                {
+                                                    GameObject tempObj = new GameObject();
+                                                    PQSMod_VertexSimplexNoiseColor vertColor = (PQSMod_VertexSimplexNoiseColor)tempObj.AddComponent(typeof(PQSMod_VertexSimplexNoiseColor));
+
+                                                    tempObj.transform.parent = p.gameObject.transform;
+                                                    vertColor.sphere = p;
+
+                                                    vertColor.blend = 1.0f;
+                                                    modNode.TryGetValue("blend", ref vertColor.blend);
+
+                                                    vertColor.order = 9999994;
+                                                    modNode.TryGetValue("order", ref vertColor.order);
+                                                    modNode.TryGetValue("octaves", ref vertColor.octaves);
+                                                    modNode.TryGetValue("persistence", ref vertColor.persistence);
+                                                    modNode.TryGetValue("frequency", ref vertColor.frequency);
+                                                    modNode.TryGetValue("colorStart", ref vertColor.colorStart);
+                                                    modNode.TryGetValue("colorEnd", ref vertColor.colorEnd);
+                                                    modNode.TryGetValue("frequency", ref vertColor.seed);
+                                                    
+                                                    vertColor.modEnabled = true;
                                                 }
                                                 if (modNode.name.Equals("PQSMod_VertexColorSolid"))
                                                 {
