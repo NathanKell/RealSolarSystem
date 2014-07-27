@@ -46,6 +46,11 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v7.1  \/
+*Update to Custom Biomes 1.6.4
+*Give Earth's terrain more texture
+*fix AFG bug.
+
 v7.0  \/
 *Scaled Space scaling/wrapping now plays nice with other mods and does not require OBJ files. Loads fast.
 *regex: support changing orbitColor in Orbit nodes (as standard float RGBA color). dimonnomid adds colors for all RSS bodies.
