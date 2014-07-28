@@ -14,6 +14,48 @@ namespace RealSolarSystem
     {
         public static bool doneRSS = false;
 
+        public bool showGUI = false;
+        private string guiMajor = "";
+        private string guiMinor = "";
+        private string guiExtra = "";
+        private Rect screenRect;
+        private int GuiIdx = -1;
+        private GUISkin skins = HighLogic.Skin;
+
+        /*public void OnGui()
+        {
+            if(showGUI)
+            {
+                if(GuiIdx < 0)
+                    GuiIdx = "RealSolarSystem".GetHashCode();
+               screenRect = new Rect(100, 200, 300, 220);
+               GUILayout.Window(GuiIdx, screenRect, RSSGUI, "RealSolarSystem Status", skins.window);
+            }
+
+        }
+
+        public void RSSGUI(int GuiIdx)
+        {
+            GUILayout.BeginVertical();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(guiMajor, skins.label);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(guiMinor, skins.label);
+            GUILayout.EndHorizontal();
+            GUILayout.BeginHorizontal();
+            GUILayout.Label(guiExtra, skins.label);
+            GUILayout.EndHorizontal();
+            if (doneRSS)
+            {
+                GUILayout.BeginHorizontal();
+                if (GUILayout.Button("OK"))
+                    showGUI = false;
+                GUILayout.EndHorizontal();
+            }
+            GUILayout.EndVertical();
+        }*/
+
         Texture GetRamp(string bodyName)
         {
             foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
@@ -211,8 +253,11 @@ namespace RealSolarSystem
 
         public void Start()
         {
+            if (doneRSS)
+                return;
             // Constants
             double DEG2RAD = Math.PI / 180.0;
+            string guiMajorBase = "";
 
             ConfigNode RSSSettings = null;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
@@ -256,14 +301,21 @@ namespace RealSolarSystem
                 }
                 //print("*RSS* InverseScaleFactor = " + ScaledSpace.InverseScaleFactor);
             }
+            showGUI = true;
+            guiMajorBase = "Editing Body: ";
+            //OnGui();
             foreach (ConfigNode node in RSSSettings.nodes)
             {
                 foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
                 {
                     if (body.name.Equals(node.name))
                     {
+                        guiMajor = guiMajorBase + node.name;
+                        //OnGui();
                         #region CBChanges
                         print("Fixing CB " + node.name + " of radius " + body.Radius);
+                        guiMinor = "CelestialBody";
+                        //OnGui();
                         double dtmp;
                         float ftmp;
                         int itmp;
@@ -479,6 +531,8 @@ namespace RealSolarSystem
                         #endregion
 
                         #region PQS
+                        guiMinor = "PQS";
+                        //OnGui();
                         // the Planet Quadtree Sphere
                         List<string> PQSs = new List<string>();
                         bool custom = false;
@@ -506,6 +560,8 @@ namespace RealSolarSystem
                                     if (body.pqsController != p)
                                         if (body.pqsController != p.parentSphere)
                                             continue;
+                                    guiMinor = "PQS " + p.name;
+                                    //OnGui();
                                     p.radius = body.Radius;
                                     print("Editing PQS " + pName + ", radius = " + p.radius);
                                     if (custom) // YES, THIS IS SILLY
@@ -558,6 +614,8 @@ namespace RealSolarSystem
                                         foreach (var m in mods)
                                         {
                                             print("Processing " + m.GetType().Name);
+                                            guiExtra = m.GetType().Name;
+                                            //OnGui();
                                             foreach (ConfigNode modNode in pqsNode.nodes)
                                             {
                                                 if (modNode.name.Equals("PQSMod_VertexSimplexHeightAbsolute") && m.GetType().ToString().Equals(modNode.name))
@@ -1125,6 +1183,8 @@ namespace RealSolarSystem
                                             foreach (ConfigNode modNode in pqsNode.GetNode("Add").nodes)
                                             {
                                                 print("Adding " + modNode.name);
+                                                guiExtra = "Add " + modNode.name;
+                                                //OnGui();
                                                 if (modNode.name.Equals("PQSMod_VertexColorMapBlend"))
                                                 {
                                                     if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
@@ -1263,6 +1323,8 @@ namespace RealSolarSystem
                                             {
                                                 string mName = modNode.name;
                                                 print("Disabling " + mName);
+                                                guiExtra = "Disable " + mName;
+                                                //OnGui();
                                                 if (mName.Equals("PQSLandControl"))
                                                 {
                                                     List<PQSLandControl> modList = p.transform.GetComponentsInChildren<PQSLandControl>(true).ToList();
@@ -1306,6 +1368,8 @@ namespace RealSolarSystem
                                     try
                                     {
                                         print("Rebuilding sphere " + p.name);
+                                        guiExtra = "Rebuilding " + p.name;
+                                        //OnGui();
                                         //p.ResetSphere();
                                         p.RebuildSphere();
                                     }
@@ -1316,12 +1380,16 @@ namespace RealSolarSystem
                                 }
                             }
                         }
+                        guiExtra = "";
+                        //OnGui();
                         #endregion
 
                         #region ScaledSpace
                         // Scaled space
                         Transform scaledSpaceTransform = null;
                         Transform atmo = null;
+                        guiMinor = "Scaled Space";
+                        //OnGui();
                         if (ScaledSpace.Instance != null)
                         {
                             float SSTScale = 1.0f;
@@ -1347,6 +1415,8 @@ namespace RealSolarSystem
                                     }
                                     if (replaceColor > 0)
                                     {
+                                        guiExtra = "Color map";
+                                        //OnGui();
                                         if (File.Exists(KSPUtil.ApplicationRootPath + path))
                                         {
                                             Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
@@ -1364,11 +1434,16 @@ namespace RealSolarSystem
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + path);
+
+                                        guiExtra = "";
+                                        //OnGui();
                                     }
                                     if (node.HasValue("SSBump"))
                                     {
                                         if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
                                         {
+                                            guiExtra = "Normal Map";
+                                            //OnGui();
                                             Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
                                             map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
                                             if(compressNormals)
@@ -1387,6 +1462,9 @@ namespace RealSolarSystem
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
+                                        
+                                        guiExtra = "";
+                                        //OnGui();
                                     }
                                     if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
                                     {
@@ -1465,6 +1543,8 @@ namespace RealSolarSystem
                                         }
                                         else
                                         {
+                                            guiExtra = "Mesh";
+                                            //OnGui();
                                             if (sphereVal)
                                             {
                                                 Mesh tMesh = new Mesh();
@@ -1522,9 +1602,13 @@ namespace RealSolarSystem
 	                                                print("*RSS* Exception wrapping: " + e.Message);
                                                 }
                                             }
+                                            guiExtra = "";
+                                            //OnGui();
                                         }
                                         atmo = t.FindChild("Atmosphere");
                                     }
+                                    guiExtra = "";
+                                    //OnGui();
                                     if (rescale)
                                     {
                                         float scaleFactor = (float)((double)origLocalScale * body.Radius / origRadius * SSTScale);
@@ -1575,6 +1659,8 @@ namespace RealSolarSystem
                         // Science
                         if (node.HasNode("CelestialBodyScienceParams"))
                         {
+                            guiMinor = "Science";
+                            //OnGui();
                             ConfigNode spNode = node.GetNode("CelestialBodyScienceParams");
                             if (body.scienceValues != null)
                             {
@@ -1595,6 +1681,8 @@ namespace RealSolarSystem
                                     spNode.TryGetValue("spaceAltitudeThreshold", ref body.scienceValues.spaceAltitudeThreshold);
                                 }
                             }
+                            guiMinor = "";
+                            //OnGui();
                         }
                         #endregion
 
@@ -1604,6 +1692,8 @@ namespace RealSolarSystem
                         {
                             try
                             {
+                                guiMinor = "Exporting maps";
+                                //OnGui();
                                 int res = 2048;
                                 bool ocean = false;
                                 Color oceanColor;
@@ -1664,16 +1754,22 @@ namespace RealSolarSystem
                             {
                                 print("Export for " + node.name + " failed: " + e.Message);
                             }
+                            guiMinor = "";
+                            //OnGui();
                         }
                         #endregion
                     }
                 }
             }
             // do final update for all SoIs and hillSpheres and periods
+            guiMajorBase = "Fixing orbit: ";
+            //OnGui();
             foreach (CelestialBody body in FlightGlobals.fetch.bodies)
             {
                 try
                 {
+                    guiMajor = guiMajorBase + body.name;
+                    //OnGui();
                     if (body.orbitDriver != null)
                     {
                         if (body.referenceBody != null)
@@ -1720,6 +1816,9 @@ namespace RealSolarSystem
                 }
             }
             print("*RSS* Done loading!");
+            guiExtra = "";
+            guiMinor = "";
+            guiMajor = "Done!";
             doneRSS = true;
         }
     }
