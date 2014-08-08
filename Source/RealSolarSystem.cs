@@ -576,7 +576,14 @@ namespace RealSolarSystem
                                             if (int.TryParse(pqsNode.GetValue("maxLevel"), out itmp))
                                             {
                                                 p.maxLevel = itmp;
-                                                PQSCache.PresetList.GetPreset(p.name).maxSubdivision = itmp;
+                                                try
+                                                {
+                                                    PQSCache.PresetList.GetPreset(p.name).maxSubdivision = itmp;
+                                                }
+                                                catch (Exception e)
+                                                {
+                                                    print("*RSS* ERROR: Applying change to preset for " + p.name + ", exception: " + e.Message);
+                                                }
                                             }
                                         }
                                         if (pqsNode.HasValue("maxQuadLenghtsPerFrame"))
@@ -1466,7 +1473,7 @@ namespace RealSolarSystem
                                         guiExtra = "";
                                         //OnGui();
                                     }
-                                    if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                                    /*if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
                                     {
                                         try
                                         {
@@ -1476,7 +1483,7 @@ namespace RealSolarSystem
                                         {
                                             print("*RSS* Failed to get/write ramp for " + body.name + ", exception: " + e.Message);
                                         }
-                                    }
+                                    }*/
                                     if (node.HasValue("SSRampRef"))
                                     {
                                         //if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
