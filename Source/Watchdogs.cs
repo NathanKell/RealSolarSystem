@@ -129,28 +129,31 @@ namespace RealSolarSystem
                 {
                     foreach (CelestialBody body in FlightGlobals.Bodies)
                     {
-                        print("*RSS* checking useLegacyAtmosphere for " + body.GetName());
-                        if (node.HasValue("useLegacyAtmosphere"))
+                        if (body.name.Equals(node.name))
                         {
-                            bool UseLegacyAtmosphere = true;
-                            bool.TryParse(node.GetValue("useLegacyAtmosphere"), out UseLegacyAtmosphere);
-                            //print("*RSSWatchDog* " + body.GetName() + ".useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
-                            if (UseLegacyAtmosphere != body.useLegacyAtmosphere)
+                            print("*RSS* checking useLegacyAtmosphere for " + body.GetName());
+                            if (node.HasValue("useLegacyAtmosphere"))
                             {
-                                print("*RSSWatchDog* resetting useLegacyAtmosphere to " + UseLegacyAtmosphere.ToString());
-                                body.useLegacyAtmosphere = UseLegacyAtmosphere;
-                            }
-                        }
-                        if (node.HasNode("AtmosphereFromGround"))
-                        {
-                            foreach (AtmosphereFromGround ag in AFGs)
-                            {
-                                if (ag != null && ag.planet != null)
+                                bool UseLegacyAtmosphere = true;
+                                bool.TryParse(node.GetValue("useLegacyAtmosphere"), out UseLegacyAtmosphere);
+                                //print("*RSSWatchDog* " + body.GetName() + ".useLegacyAtmosphere = " + body.useLegacyAtmosphere.ToString());
+                                if (UseLegacyAtmosphere != body.useLegacyAtmosphere)
                                 {
-                                    if (ag.planet.name.Equals(node.name))
+                                    print("*RSSWatchDog* resetting useLegacyAtmosphere to " + UseLegacyAtmosphere.ToString());
+                                    body.useLegacyAtmosphere = UseLegacyAtmosphere;
+                                }
+                            }
+                            if (node.HasNode("AtmosphereFromGround"))
+                            {
+                                foreach (AtmosphereFromGround ag in AFGs)
+                                {
+                                    if (ag != null && ag.planet != null)
                                     {
-                                        RealSolarSystem.UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
-                                        print("*RSSWatchDog* reapplying AtmosphereFromGround settings");
+                                        if (ag.planet.name.Equals(node.name))
+                                        {
+                                            RealSolarSystem.UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
+                                            print("*RSSWatchDog* reapplying AtmosphereFromGround settings for " + body.name);
+                                        }
                                     }
                                 }
                             }

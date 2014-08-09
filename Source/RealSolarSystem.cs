@@ -69,6 +69,8 @@ namespace RealSolarSystem
             if(modNode != null)
             {
                 float ftmp;
+                // the default
+                afg.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
                 if (modNode.TryGetValue("outerRadius", ref afg.outerRadius))
                 {
                     afg.outerRadius *= ScaledSpace.InverseScaleFactor;
@@ -81,10 +83,9 @@ namespace RealSolarSystem
                 {
                     afg.outerRadius *= (float)body.Radius * ScaledSpace.InverseScaleFactor;
                 }
-                else
-                    // the default
-                    afg.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
 
+                // the default
+                afg.innerRadius = afg.outerRadius * 0.975f;
                 if (modNode.TryGetValue("innerRadius", ref afg.innerRadius))
                 {
                     afg.innerRadius *= ScaledSpace.InverseScaleFactor;
@@ -93,8 +94,6 @@ namespace RealSolarSystem
                 {
                     afg.innerRadius *= afg.outerRadius;
                 }
-                else
-                    afg.innerRadius = afg.outerRadius * 0.975f;
 
                 modNode.TryGetValue("doScale", ref afg.doScale);
                 if (modNode.HasValue("transformScale"))
@@ -147,7 +146,6 @@ namespace RealSolarSystem
                 afg.outerRadius = (float)body.Radius * 1.025f * ScaledSpace.InverseScaleFactor;
                 afg.innerRadius = afg.outerRadius * 0.975f;
             }
-
             afg.KrESun = afg.Kr * afg.ESun;
             afg.KmESun = afg.Km * afg.ESun;
             afg.Kr4PI = afg.Kr * 4f * (float)Math.PI;
