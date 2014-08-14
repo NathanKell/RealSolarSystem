@@ -46,6 +46,15 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v7.2 \/
+*Add camera clip distance changing to the inflight GUI (ALT+G)
+*Moved to using a ModuleManager patch for Custom Asteroids, since it has some issues in .24.2. Use CustomAsteroids only if you want...
+*Change the name of the Mercury heightmap in the cfg; the texture has a typo in its name, and rather than having everyone redownload textures, I merely changed the cfg to not have an i in the filename.
+*Fix big bug with Watchdog (no more black skies)
+*Add patch for (forthcoming) RealHeat for RSS atmospheres.
+*Change Earth atmosphere and surface coloration a bit
+*Add metaphor's curves for Venus, Mars, and Titan.
+
 v7.1  \/
 *Update to Custom Biomes 1.6.4
 *Give Earth's terrain more texture
