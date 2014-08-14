@@ -42,6 +42,7 @@ namespace RealSolarSystem
             
             public CameraWrapper()
             {
+                layerCullDistances = new List<string>();
             }
             
             public void Apply()
@@ -108,12 +109,18 @@ namespace RealSolarSystem
                         {
                             Debug.Log("Found " + cam.name + " depth: " + cam.depth + ", near " + cam.nearClipPlane + ", far " + cam.farClipPlane + ", count layercull " + cam.layerCullDistances.Length);
                             CameraWrapper thisCam = new CameraWrapper();
-                            thisCam.name = "" + cam.name;
+                            Debug.Log("Created wrapper");
+                            thisCam.name = cam.name;
+                            Debug.Log("set name");
+                            thisCam.depth = "" + cam.depth;
+                            Debug.Log("Set depth");
+                            thisCam.farClipPlane = "" + cam.farClipPlane;
+                            Debug.Log("Set far");
+                            thisCam.nearClipPlane = "" + cam.nearClipPlane;
+                            Debug.Log("Set set near");
                             for (int i = 0; i < cam.layerCullDistances.Length; i++)
                                 thisCam.layerCullDistances.Add("" + cam.layerCullDistances[i]);
-                            thisCam.depth = "" + cam.depth;
-                            thisCam.farClipPlane = "" + cam.farClipPlane;
-                            thisCam.nearClipPlane = "" + cam.nearClipPlane;
+                            Debug.Log("Set culls");
                         }
                         catch (Exception e)
                         {
