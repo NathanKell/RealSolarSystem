@@ -54,6 +54,7 @@ v7.2 \/
 *Add patch for (forthcoming) RealHeat for RSS atmospheres.
 *Change Earth atmosphere and surface coloration a bit
 *Add metaphor's curves for Venus, Mars, and Titan.
+*Do garbage collection during RSS run (thanks Addie!). RSS should work at higher memory loads in 32bit.
 
 v7.1  \/
 *Update to Custom Biomes 1.6.4

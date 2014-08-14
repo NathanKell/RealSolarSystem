@@ -1768,6 +1768,7 @@ namespace RealSolarSystem
                             //OnGui();
                         }
                         #endregion
+                        print("*RSS* Memory now " + GC.GetTotalMemory(true)); // Free memory
                     }
                 }
             }
