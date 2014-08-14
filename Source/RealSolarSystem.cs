@@ -253,6 +253,11 @@ namespace RealSolarSystem
         {
             if (doneRSS)
                 return;
+
+            // First, run GC.
+            ProfileTimer.Push("RSS_FirstGC");
+            print("*RSS*: Total memory in use: " + GC.GetTotalMemory(true));
+            ProfileTimer.Pop("RSS_FirstGC");
             // Constants
             double DEG2RAD = Math.PI / 180.0;
             string guiMajorBase = "";
