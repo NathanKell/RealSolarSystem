@@ -18,8 +18,8 @@ namespace RealSolarSystem
         private string guiMajor = "";
         private string guiMinor = "";
         private string guiExtra = "";
-        private Rect screenRect;
-        private int GuiIdx = -1;
+        /*private Rect screenRect;
+        private int GuiIdx = -1;*/
         private GUISkin skins = HighLogic.Skin;
 
         /*public void OnGui()

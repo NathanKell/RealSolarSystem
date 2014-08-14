@@ -28,48 +28,100 @@ namespace RealSolarSystem
         string innert;
         string outert;
 
+        double counter = 0;
+
         // camera params
-        List<CameraWrapper> cams;
-        public class CameraWrapper
+        List<CameraWrapper> cams = null;
+        public class CameraWrapper : MonoBehaviour
         {
             public string depth;
             public string farClipPlane;
             public List<string> layerCullDistances;
             public string nearClipPlane;
-            public Camera cam;
-
-            public CameraWrapper(Camera cam)
+            public string camName;
+            
+            public CameraWrapper()
             {
-                depth = cam.depth.ToString();
-                farClipPlane = cam.farClipPlane.ToString();
-
-                layerCullDistances = new List<string>();
-                foreach (float f in cam.layerCullDistances)
-                    layerCullDistances.Add(f.ToString());
-                nearClipPlane = cam.nearClipPlane.ToString();
             }
+            
             public void Apply()
             {
+                Camera[] cameras = Camera.allCameras;
                 float ftmp;
-                if(float.TryParse(depth, out ftmp))
-                    cam.depth = ftmp;
-                if (float.TryParse(farClipPlane, out ftmp))
-                    cam.farClipPlane = ftmp;
-                List<float> culls = new List<float>();
-                for (int i = 0; i < layerCullDistances.Count; i++)
+                try
                 {
-                    if (float.TryParse(layerCullDistances[i], out ftmp))
-                        culls.Add(ftmp);
-                    else
-                        culls.Add(0f);
+                    bool notFound = true;
+                    foreach (Camera cam in cameras)
+                    {
+                        if (camName.Equals(cam.name))
+                        {
+                            if (float.TryParse(depth, out ftmp))
+                                cam.depth = ftmp;
+
+                            if (float.TryParse(farClipPlane, out ftmp))
+                                cam.farClipPlane = ftmp;
+
+                            List<float> culls = new List<float>();
+                            for (int i = 0; i < layerCullDistances.Count; i++)
+                            {
+                                if (float.TryParse(layerCullDistances[i], out ftmp))
+                                    culls.Add(ftmp);
+                                else
+                                    culls.Add(0f);
+                            }
+                            cam.layerCullDistances = culls.ToArray();
+
+                            if (float.TryParse(nearClipPlane, out ftmp))
+                                cam.nearClipPlane = ftmp;
+                            notFound = false;
+                        }
+                    }
+                    if (notFound)
+                        Debug.Log("*RSSGUI* Could not find camera " + camName + " when applying settings.");
                 }
-                cam.layerCullDistances = culls.ToArray();
-                if (float.TryParse(nearClipPlane, out ftmp))
-                    cam.nearClipPlane = ftmp;
+                catch (Exception e)
+                {
+                    Debug.Log("*RSSGUI* Error applying to camera " + camName + ": exception " + e.Message);
+                }
             }
         }
         public void Update()
         {
+            if (counter < 5)
+            {
+                counter += TimeWarp.fixedDeltaTime;
+                return;
+            }
+            if (cams == null)
+            {
+                cams = new List<CameraWrapper>();
+
+                Camera[] cameras = Camera.allCameras;
+
+                Debug.Log("Found all cameras: " + cameras.Length);
+                foreach (Camera cam in cameras)
+                {
+                    if (cam.name == "Camera 00" || cam.name == "Camera 01")
+                    {
+                        
+                        try
+                        {
+                            Debug.Log("Found " + cam.name + " depth: " + cam.depth + ", near " + cam.nearClipPlane + ", far " + cam.farClipPlane + ", count layercull " + cam.layerCullDistances.Length);
+                            CameraWrapper thisCam = new CameraWrapper();
+                            thisCam.name = "" + cam.name;
+                            for (int i = 0; i < cam.layerCullDistances.Length; i++)
+                                thisCam.layerCullDistances.Add("" + cam.layerCullDistances[i]);
+                            thisCam.depth = "" + cam.depth;
+                            thisCam.farClipPlane = "" + cam.farClipPlane;
+                            thisCam.nearClipPlane = "" + cam.nearClipPlane;
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.Log("*Exception " + e.Message);
+                        }
+                    }
+                }
+            }
             if (Input.GetKeyDown(KeyCode.G) && Input.GetKey(KeyCode.LeftAlt))
             {
                 GUIOpen = !GUIOpen;
@@ -91,6 +143,7 @@ namespace RealSolarSystem
                 }
             }
         }
+
         public void Awake()
         {
             RenderingManager.AddToPostDrawQueue(0, OnDraw);
@@ -110,24 +163,10 @@ namespace RealSolarSystem
             if (afg == null)
                 afg = findAFG();
             //print("[AFGEditor] Start()");
-
-            cams = new List<CameraWrapper>();
-            // camera section
-            Camera[] cameras = Camera.allCameras;
-            foreach (Camera cam in cameras)
-            {
-                if (cam.name == "Camera 01")
-                {
-                    cams.Add(new CameraWrapper(cam));
-                }
-                else if (cam.name == "Camera 00")
-                {
-                    cams.Add(new CameraWrapper(cam));
-                }
-            }
             windowStyle = new GUIStyle(HighLogic.Skin.window);
             windowStyle.stretchHeight = true;
         }
+
         public AtmosphereFromGround findAFG()
         {
 
@@ -268,41 +307,44 @@ namespace RealSolarSystem
                 GUILayout.Label("for current body");
                 GUILayout.EndHorizontal();
             }
-            GUILayout.BeginHorizontal();
-            GUILayout.Label("Cameras");
-            GUILayout.EndHorizontal();
-            foreach (CameraWrapper cam in cams)
+            if (cams != null)
             {
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("Camera: " + cam.cam.name);
+                GUILayout.Label("CAMERA EDITOR");
                 GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Depth");
-                cam.depth = GUILayout.TextField(cam.depth, 10);
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Far Clip");
-                cam.farClipPlane = GUILayout.TextField(cam.farClipPlane, 10);
-                GUILayout.EndHorizontal();
-
-                GUILayout.BeginHorizontal();
-                GUILayout.Label("Near Clip");
-                cam.nearClipPlane = GUILayout.TextField(cam.nearClipPlane, 10);
-                GUILayout.EndHorizontal();
-
-                for(int i = 0; i < cam.layerCullDistances.Count; i++)
+                foreach (CameraWrapper cam in cams)
                 {
                     GUILayout.BeginHorizontal();
-                    GUILayout.Label("Cull Dist " + i);
-                    cam.layerCullDistances[i] = GUILayout.TextField(cam.layerCullDistances[i], 10);
+                    GUILayout.Label("Camera: " + cam.camName);
                     GUILayout.EndHorizontal();
-                }
 
-                if (GUILayout.Button("Apply to " + cam.cam.name))
-                {
-                    cam.Apply();
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Depth");
+                    cam.depth = GUILayout.TextField(cam.depth, 10);
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Far Clip");
+                    cam.farClipPlane = GUILayout.TextField(cam.farClipPlane, 10);
+                    GUILayout.EndHorizontal();
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("Near Clip");
+                    cam.nearClipPlane = GUILayout.TextField(cam.nearClipPlane, 10);
+                    GUILayout.EndHorizontal();
+
+                    for (int i = 0; i < cam.layerCullDistances.Count; i++)
+                    {
+                        GUILayout.BeginHorizontal();
+                        GUILayout.Label("Cull Dist " + i);
+                        cam.layerCullDistances[i] = GUILayout.TextField(cam.layerCullDistances[i], 10);
+                        GUILayout.EndHorizontal();
+                    }
+
+                    if (GUILayout.Button("Apply to " + cam.camName))
+                    {
+                        cam.Apply();
+                    }
                 }
             }
             GUILayout.EndVertical();
