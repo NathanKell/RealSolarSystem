@@ -30,6 +30,8 @@ namespace RealSolarSystem
 
         double counter = 0;
 
+        Vector2 scrollPos;
+
         // camera params
         List<CameraWrapper> cams = null;
         public class CameraWrapper : MonoBehaviour
@@ -63,7 +65,7 @@ namespace RealSolarSystem
                             if (float.TryParse(farClipPlane, out ftmp))
                                 cam.farClipPlane = ftmp;
 
-                            List<float> culls = new List<float>();
+                            /*List<float> culls = new List<float>();
                             for (int i = 0; i < layerCullDistances.Count; i++)
                             {
                                 if (float.TryParse(layerCullDistances[i], out ftmp))
@@ -71,10 +73,15 @@ namespace RealSolarSystem
                                 else
                                     culls.Add(0f);
                             }
-                            cam.layerCullDistances = culls.ToArray();
+                            cam.layerCullDistances = culls.ToArray();*/
 
                             if (float.TryParse(nearClipPlane, out ftmp))
                                 cam.nearClipPlane = ftmp;
+
+                            depth = cam.depth.ToString();
+                            nearClipPlane = cam.nearClipPlane.ToString();
+                            farClipPlane = cam.farClipPlane.ToString();
+
                             notFound = false;
                         }
                     }
@@ -100,33 +107,24 @@ namespace RealSolarSystem
 
                 Camera[] cameras = Camera.allCameras;
 
-                Debug.Log("Found all cameras: " + cameras.Length);
                 foreach (Camera cam in cameras)
                 {
-                    if (cam.name == "Camera 00" || cam.name == "Camera 01")
+                    try
                     {
-                        
-                        try
-                        {
-                            Debug.Log("Found " + cam.name + " depth: " + cam.depth + ", near " + cam.nearClipPlane + ", far " + cam.farClipPlane + ", count layercull " + cam.layerCullDistances.Length);
-                            CameraWrapper thisCam = new CameraWrapper();
-                            Debug.Log("Created wrapper");
-                            thisCam.name += cam.name.ToString();
-                            Debug.Log("set name");
-                            thisCam.depth += cam.depth.ToString();
-                            Debug.Log("Set depth");
-                            thisCam.farClipPlane += cam.farClipPlane.ToString();
-                            Debug.Log("Set far");
-                            thisCam.nearClipPlane += cam.nearClipPlane.ToString();
-                            Debug.Log("Set set near");
-                            for (int i = 0; i < cam.layerCullDistances.Length; i++)
-                                thisCam.layerCullDistances.Add("" + cam.layerCullDistances[i]);
-                            Debug.Log("Set culls");
-                        }
-                        catch (Exception e)
-                        {
-                            Debug.Log("*Exception\n" + e);
-                        }
+                        CameraWrapper thisCam = new CameraWrapper();
+                        thisCam.camName = cam.name.ToString();
+                        thisCam.depth = cam.depth.ToString();
+                        thisCam.farClipPlane += cam.farClipPlane.ToString();
+                        thisCam.nearClipPlane += cam.nearClipPlane.ToString();
+                        // layer cull appears unused by relevant cameras.
+                        /*for (int i = 0; i < cam.layerCullDistances.Length; i++)
+                            thisCam.layerCullDistances.Add("" + cam.layerCullDistances[i]);*/
+
+                        cams.Add(thisCam);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log("*RSSGUI* Exception getting camera " + cam.name + "\n" + e);
                     }
                 }
             }
@@ -194,6 +192,8 @@ namespace RealSolarSystem
         private void ShowGUI(int windowID)
         {
             GUILayout.BeginVertical();
+            scrollPos = GUILayout.BeginScrollView(scrollPos);
+
             GUILayout.BeginHorizontal();
             GUILayout.Label("AFG EDITOR");
             GUILayout.EndHorizontal();
@@ -341,13 +341,13 @@ namespace RealSolarSystem
                     cam.nearClipPlane = GUILayout.TextField(cam.nearClipPlane, 10);
                     GUILayout.EndHorizontal();
 
-                    for (int i = 0; i < cam.layerCullDistances.Count; i++)
+                    /*for (int i = 0; i < cam.layerCullDistances.Count; i++)
                     {
                         GUILayout.BeginHorizontal();
                         GUILayout.Label("Cull Dist " + i);
                         cam.layerCullDistances[i] = GUILayout.TextField(cam.layerCullDistances[i], 10);
                         GUILayout.EndHorizontal();
-                    }
+                    }*/
 
                     if (GUILayout.Button("Apply to " + cam.camName))
                     {
@@ -355,6 +355,7 @@ namespace RealSolarSystem
                     }
                 }
             }
+            GUILayout.EndScrollView();
             GUILayout.EndVertical();
             GUI.DragWindow();
         }
