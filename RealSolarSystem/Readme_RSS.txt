@@ -66,7 +66,7 @@ v7.0  \/
 *regex: support changing orbitColor in Orbit nodes (as standard float RGBA color). dimonnomid adds colors for all RSS bodies.
 *Fix to display the Display Name of the launch site when showing the icons on the planet in Tracking Station view.
 *Fail gracefully when textures are missing.
-*Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by Subcidal. Only Earth supported so far.
+*Include Custom Biomes and configs. Custom Biomes by Trueborn. Biome map by amo28. Only Earth supported so far.
 *Include Custom Asteroids. Custom Asteroids by Starstrider42, config by SpacedInvader
 *Support new images for every planet by default (will fail gracefully if not found)
 *Added ability to edit and add more PQSMods, and to disable any PQSMod.
