@@ -565,8 +565,6 @@ namespace RealSolarSystem
                                             continue;
                                     guiMinor = "PQS " + p.name;
                                     //OnGui();
-                                    p.radius = body.Radius;
-                                    print("Editing PQS " + pName + ", radius = " + p.radius);
                                     if (custom) // YES, THIS IS SILLY
                                     // I SHOULD JUST WRITE A REAL C# EXTENSIBLE LOADER
                                     // Oh well. Hacks are quicker.
@@ -574,6 +572,17 @@ namespace RealSolarSystem
                                         ConfigNode pqsNode = node.GetNode("PQS").GetNode(pName);
 
                                         // PQS members
+                                        if (pqsNode.HasValue("radius"))
+                                        {
+                                            if (double.TryParse(pqsNode.GetValue("radius"), out dtmp))
+                                            {
+                                                p.radius = dtmp;
+			                                    print("Editing PQS " + pName + ", config set radius = " + p.radius);
+                                            }
+                                        } else {
+		                                    p.radius = body.Radius;
+		                                    print("Editing PQS " + pName + ", default set radius = " + p.radius);
+										}
                                         if(pqsNode.HasValue("maxLevel"))
                                         {
                                             if (int.TryParse(pqsNode.GetValue("maxLevel"), out itmp))
