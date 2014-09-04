@@ -204,9 +204,6 @@ namespace RealSolarSystem
             body.gMagnitudeAtCenter = body.gravParameter;
         }
 
-        // thanks to asmi for this!
-        public static bool kerbinMapDecalsDone = false;
-
 
         public static bool done = false;
 
@@ -253,6 +250,9 @@ namespace RealSolarSystem
         {
             if (doneRSS)
                 return;
+
+            if ((object)(KSCLoader.instance) == null)
+                KSCLoader.instance = new KSCLoader(); // just in case the other hasn't run first
 
             // First, run GC.
             ProfileTimer.Push("RSS_FirstGC");

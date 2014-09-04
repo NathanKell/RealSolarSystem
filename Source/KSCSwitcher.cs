@@ -473,7 +473,7 @@ namespace RealSolarSystem {
 	}
 
 	public class KSCLoader {
-		public static KSCLoader instance;
+		public static KSCLoader instance = null;
 		public KSCSiteManager Sites = new KSCSiteManager();
 
 		void onGameStateCreated(Game game) {
@@ -499,10 +499,11 @@ namespace RealSolarSystem {
 		}
 	}
 
-	[KSPAddon(KSPAddon.Startup.Instantly, false)]
+	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
 	public class ScenarioSpawn : MonoBehaviour {
 		void Start() {
-			KSCLoader.instance = new KSCLoader();
+            if((object)(KSCLoader.instance) == null)
+			    KSCLoader.instance = new KSCLoader();
 			enabled = false;
 		}
 	}
