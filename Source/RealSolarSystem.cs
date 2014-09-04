@@ -256,6 +256,7 @@ namespace RealSolarSystem
 
             // First, run GC.
             ProfileTimer.Push("RSS_FirstGC");
+            Resources.UnloadUnusedAssets();
             print("*RSS*: Total memory in use: " + GC.GetTotalMemory(true));
             ProfileTimer.Pop("RSS_FirstGC");
             // Constants
@@ -1776,6 +1777,7 @@ namespace RealSolarSystem
                             //OnGui();
                         }
                         #endregion
+                        Resources.UnloadUnusedAssets();
                         print("*RSS* Memory now " + GC.GetTotalMemory(true)); // Free memory
                     }
                 }

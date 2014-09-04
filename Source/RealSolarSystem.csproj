@@ -42,6 +42,7 @@
     <Compile Include="GUI.cs" />
     <Compile Include="KSCSwitcher.cs" />
     <Compile Include="KSPAddonFixed.cs" />
+    <Compile Include="LightShifter.cs" />
     <Compile Include="ObjLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RealSolarSystem.cs" />
