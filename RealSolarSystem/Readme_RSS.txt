@@ -46,6 +46,16 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v7.3 \/
+*Added LightShifter (ported by regex, based on Alternis Kerbol source). You can now adjust light. See wiki for details.
+*Update to Custom Biomes 1.6.6
+*Now supports ModuleManager 2.3.x (Launch Sites work again)
+*asmi: fixed Baikonur elevation and default azimuth
+*regex: can now set PQS radius independent of CB radius
+*Updated message display on change KSC location to use display name, not internal name
+*Add more attempts at garbage collection during RSS load; they probably run as coroutines and therefore it doesn't help, but...
+*Darkened Earth a bit (was too bright for non-EVE users(
+
 v7.2 \/
 *Add camera clip distance changing to the inflight GUI (ALT+G)
 *Moved to using a ModuleManager patch for Custom Asteroids, since it has some issues in .24.2. Use CustomAsteroids only if you want...
