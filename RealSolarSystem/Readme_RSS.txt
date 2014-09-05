@@ -55,6 +55,7 @@ v7.3 \/
 *Updated message display on change KSC location to use display name, not internal name
 *Add more attempts at garbage collection during RSS load; they probably run as coroutines and therefore it doesn't help, but...
 *Darkened Earth a bit (was too bright for non-EVE users(
+*Upgrade to Module Manager 2.3.3
 
 v7.2 \/
 *Add camera clip distance changing to the inflight GUI (ALT+G)
