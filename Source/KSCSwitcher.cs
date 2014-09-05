@@ -85,7 +85,7 @@ namespace RealSolarSystem {
 						if(isActiveSite) {
 							ScreenMessages.PostScreenMessage("Cannot set launch site to active site.", 2.5f, ScreenMessageStyle.LOWER_CENTER);
 						} else {
-							setSite(kvp.Key);
+							setSite(kvp.Value);
 						}
 					}
 					GUI.contentColor = defColor;
