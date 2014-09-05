@@ -134,7 +134,7 @@ namespace RealSolarSystem {
 							if(isActiveSite) {
 								ScreenMessages.PostScreenMessage("Cannot set launch site to active site.", 2.5f, ScreenMessageStyle.LOWER_CENTER);
 							} else {
-								setSite(kvp.Key);
+								setSite(kvp.Value);
 							}
 						}
 					}
@@ -276,14 +276,13 @@ namespace RealSolarSystem {
 			return hasChanged;
 		}
 		
-		private void setSite(string name) {
-			ConfigNode site = KSCLoader.instance.Sites.getSiteByName(name);
+		private void setSite(LaunchSite newSite) {
+			ConfigNode site = KSCLoader.instance.Sites.getSiteByName(newSite.name);
             if(site == null) { return; }
 			
 			if(KSCSwitcher.setSite(site)) {
-				activeSite = name;
-				LastKSC.fetch.lastSite = activeSite;
-				ScreenMessages.PostScreenMessage("Launch site changed to " + name, 2.5f, ScreenMessageStyle.LOWER_CENTER);
+				LastKSC.fetch.lastSite = activeSite = newSite.name;
+				ScreenMessages.PostScreenMessage("Launch site changed to " + newSite.displayName, 2.5f, ScreenMessageStyle.LOWER_CENTER);
 				showWindow = false;
                 KSCReset.shouldCameraBeReset = true;
                 print("*RSS* Launch site updated.  Camera reset set to true");
