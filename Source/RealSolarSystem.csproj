@@ -25,7 +25,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
+    <DebugType>none</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>..\RealSolarSystem\Plugins\</OutputPath>
     <DefineConstants>
@@ -41,7 +41,6 @@
     <Compile Include="ConfigNodeExtensions.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="KSCSwitcher.cs" />
-    <Compile Include="KSPAddonFixed.cs" />
     <Compile Include="LightShifter.cs" />
     <Compile Include="ObjLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -59,6 +58,7 @@
     </Reference>
     <Reference Include="System, Version=2.0.5.0, Culture=neutral, PublicKeyToken=7cec85d7bea7798e, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\Games\KSP_win64\KSP_x64_Data\Managed\System.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -69,10 +69,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>del *.pdb
-del "System.Core.dll"
-rd /s /q RealSolarSystem\bin
-rd /s /q RealSolarSystem\obj</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

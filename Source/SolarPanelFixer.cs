@@ -10,10 +10,9 @@ namespace RealSolarSystem
 {
     // Fixes powerCurves of all solar panels by replacing the existing powerCurve with the
     // specified in the RealSolarSystemSettings.cfg file
-    [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(SolarPanelFixer))]
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class SolarPanelFixer : MonoBehaviour
     {
-
         public void FixSP(ModuleDeployableSolarPanel sp, ConfigNode curveNode)
         {
             sp.powerCurve = new FloatCurve();
@@ -22,6 +21,8 @@ namespace RealSolarSystem
         public static bool fixedSolar = false;
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+                return;
             if (!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
             {
                 fixedSolar = true;

@@ -9,7 +9,7 @@ using System.IO;
 
 namespace RealSolarSystem
 {
-    [KSPAddonFixed(KSPAddon.Startup.MainMenu, true, typeof(RealSolarSystem))]
+    [KSPAddon(KSPAddon.Startup.MainMenu, true)]
     public class RealSolarSystem : MonoBehaviour
     {
         public static bool doneRSS = false;
@@ -248,7 +248,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (doneRSS)
+            if (doneRSS || !CompatibilityChecker.IsCompatible())
                 return;
 
             if ((object)(KSCLoader.instance) == null)

@@ -16,8 +16,14 @@ namespace RealSolarSystem
         ConfigNode RSSSettings = null;
         int updateCount = 0;
         bool useKeypressClip = false;
+        protected bool isCompatible = true;
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+            {
+                isCompatible = false;
+                return;
+            }
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
 
@@ -32,11 +38,17 @@ namespace RealSolarSystem
         }
         public void OnDestroy()
         {
-            GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
+            if (isCompatible)
+            {
+                GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
+            }
         }
 
         public void Update()
         {
+            if (!isCompatible)
+                return;
+
             if(!useKeypressClip && updateCount > 22)
                 return;
             updateCount++;
@@ -82,6 +94,9 @@ namespace RealSolarSystem
         bool dumpOrbits = false;
         public void FixedUpdate()
         {
+            if (!isCompatible)
+                return;
+
             if (!dumpOrbits)
                 return;
             counter += TimeWarp.fixedDeltaTime;

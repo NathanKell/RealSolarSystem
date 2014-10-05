@@ -7,7 +7,7 @@ using KSP;
 using KSP.IO;
 
 namespace RealSolarSystem {
-	[KSPAddonFixed(KSPAddon.Startup.TrackingStation, false, typeof(KSCSwitcher))]
+	[KSPAddon(KSPAddon.Startup.TrackingStation, false)]
 	public class KSCSwitcher : MonoBehaviour {
 		public SortedList<string, LaunchSite> siteLocations;
 		public static string activeSite;
@@ -27,8 +27,15 @@ namespace RealSolarSystem {
 		private GUIStyle siteText = null;
 		private GUIStyle infoLabel = null;
 
+        protected bool isCompatible = true;
+
 		public void Start() {
-			showWindow = false;
+            showWindow = false;
+            if (!CompatibilityChecker.IsCompatible())
+            {
+                isCompatible = false;
+                return;
+            }
 			scrollPosition = Vector2.zero;
 			siteLocations = KSCLoader.instance.Sites.getSitesGeographicalList();
 			loadTextures();
@@ -38,11 +45,15 @@ namespace RealSolarSystem {
 		}
 		
 		public void OnDestroy() {
+            if (!isCompatible)
+                return;
 			RenderingManager.RemoveFromPostDrawQueue(2, this.onDraw);
 			RenderingManager.RemoveFromPostDrawQueue(3, this.onDrawGUI);
 		}
 		
 		public void onDrawGUI() {
+            if (!isCompatible)
+                return;
 			if(siteLocations.Count < 1) { return; }
 			
 			GUI.skin = HighLogic.Skin;
@@ -109,6 +120,8 @@ namespace RealSolarSystem {
 		}
 
 		public void onDraw() {
+            if (!isCompatible)
+                return;
 			if(siteLocations.Count < 1 || lsTexture == null || !showSites || !iconDisplayDistance()) { return; }
 
 			CelestialBody Kerbin = getKSCBody();
@@ -501,9 +514,12 @@ namespace RealSolarSystem {
 	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
 	public class ScenarioSpawn : MonoBehaviour {
 		void Start() {
-            if((object)(KSCLoader.instance) == null)
-			    KSCLoader.instance = new KSCLoader();
-			enabled = false;
+            if (CompatibilityChecker.IsCompatible())
+            {
+                if ((object)(KSCLoader.instance) == null)
+                    KSCLoader.instance = new KSCLoader();
+                enabled = false;
+            }
 		}
 	}
 	

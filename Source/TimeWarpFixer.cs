@@ -14,15 +14,18 @@ namespace RealSolarSystem
         public double lastTime = 0;
         public double currentTime = 0;
         public static bool fixedTimeWarp = false;
+        protected bool isCompatible = true;
 
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+                isCompatible = false;
             fixedTimeWarp = false;
         }
 
         public void Update()
         {
-            if (ScaledSpace.Instance == null)
+            if (!isCompatible || ScaledSpace.Instance == null)
                 return;
 
             // Fix Timewarp

@@ -13,9 +13,15 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class CameraFixer : MonoBehaviour
     {
+        protected bool isCompatible = true;
         public static bool ready = false;
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+            {
+                isCompatible = false;
+                return;
+            }
             foreach (AtmosphereFromSpace afs in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromSpace)))
             {
                 try
@@ -128,9 +134,15 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
     public class KSCReset : MonoBehaviour
     {
+        protected bool isCompatible = true;
         public static bool shouldCameraBeReset = true;
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+            {
+                isCompatible = false;
+                return;
+            }
             if (shouldCameraBeReset)
             {
                 //HighLogic.LoadScene(GameScenes.SPACECENTER);
