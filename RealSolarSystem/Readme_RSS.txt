@@ -46,6 +46,12 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v7.4 \/
+*Upgrade to ModuleManager 2.4.5.
+*metaphor: add pressure/temperature curves for Jupiter.
+*eggrobin: improve curves for solar panel power, Earth pressure and temperature.
+*Use compatibility info, now.
+
 v7.3 \/
 *Added LightShifter (ported by regex, based on Alternis Kerbol source). You can now adjust light. See wiki for details.
 *Update to Custom Biomes 1.6.6
