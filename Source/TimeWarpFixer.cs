@@ -18,7 +18,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
+            if (!CompatibilityChecker.IsAllCompatible())
                 isCompatible = false;
             fixedTimeWarp = false;
         }

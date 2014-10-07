@@ -17,22 +17,10 @@ namespace RealSolarSystem
         public static bool ready = false;
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
+            if (!CompatibilityChecker.IsAllCompatible())
             {
                 isCompatible = false;
                 return;
-            }
-            foreach (AtmosphereFromSpace afs in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromSpace)))
-            {
-                try
-                {
-                    print("Found afs " + afs.name + ", tag " + afs.tag);
-                    print("   Parent: " + afs.transform.parent.name);
-                }
-                catch (Exception e)
-                {
-                    print("Failed, " + e.Message);
-                }
             }
             if (HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
                 ready = true;
@@ -138,7 +126,7 @@ namespace RealSolarSystem
         public static bool shouldCameraBeReset = true;
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
+            if (!CompatibilityChecker.IsAllCompatible())
             {
                 isCompatible = false;
                 return;

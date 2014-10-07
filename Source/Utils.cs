@@ -143,7 +143,6 @@ namespace RealSolarSystem
             print("useLegacyAtmosphere = " + body.useLegacyAtmosphere);
             print("zUpAngularVelocity = " + body.zUpAngularVelocity);
             print("pqsController = " + body.pqsController);
-            print("terrainController = " + body.terrainController);
         }
         public static void DumpPQS(PQS pqs)
         {

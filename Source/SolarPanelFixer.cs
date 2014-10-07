@@ -21,7 +21,7 @@ namespace RealSolarSystem
         public static bool fixedSolar = false;
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
+            if (!CompatibilityChecker.IsAllCompatible())
                 return;
             if (!fixedSolar && HighLogic.LoadedScene.Equals(GameScenes.MAINMENU))
             {

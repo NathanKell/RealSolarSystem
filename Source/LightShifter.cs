@@ -13,7 +13,7 @@ namespace RealSolarSystem {
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class LightShifter : MonoBehaviour {
         void Start() {
-            if (!CompatibilityChecker.IsCompatible())
+            if (!CompatibilityChecker.IsAllCompatible())
                 return;
             //The lights are instantiated on each scene startup, unlike planets which instantiate at the beginning of the game
             //so a more specific check has to be performed

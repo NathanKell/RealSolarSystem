@@ -46,6 +46,10 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.0
+*Update to ModuleManager v2.5.0
+*Update to KSP 0.25
+
 v7.4 \/
 *Upgrade to ModuleManager 2.4.5.
 *metaphor: add pressure/temperature curves for Jupiter.

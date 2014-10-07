@@ -248,7 +248,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (doneRSS || !CompatibilityChecker.IsCompatible())
+            if (doneRSS || !CompatibilityChecker.IsAllCompatible())
                 return;
 
             if ((object)(KSCLoader.instance) == null)
