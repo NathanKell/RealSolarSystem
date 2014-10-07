@@ -47,8 +47,9 @@ Pluto is represented by Vall
 ===========================
 Changelog
 v8.0
-*Update to ModuleManager v2.5.0
-*Update to KSP 0.25
+*Update to ModuleManager v2.5.0.
+*Update to KSP 0.25.
+*Removed some useless checks.
 
 v7.4 \/
 *Upgrade to ModuleManager 2.4.5.
