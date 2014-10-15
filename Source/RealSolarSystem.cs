@@ -1867,11 +1867,14 @@ namespace RealSolarSystem
                     if (body.name.Equals(node.name))
                     {
                         double origRadius = body.Radius;
-                        LoadCB(node, body);
-                        LoadPQS(node, body, origRadius);
-                        LoadScaledSpace(node, body, origRadius);
-                        LoadExport(node, body);
-                        yield return null;
+                        var retval = LoadCB(node, body);
+                        while (retval.MoveNext()) yield return retval.Current;
+                        retval = LoadPQS(node, body, origRadius);
+                        while (retval.MoveNext()) yield return retval.Current;
+                        retval = LoadScaledSpace(node, body, origRadius);
+                        while (retval.MoveNext()) yield return retval.Current;
+                        retval = LoadExport(node, body);
+                        while (retval.MoveNext()) yield return retval.Current;
                     }
                 }
             }
@@ -1910,7 +1913,7 @@ namespace RealSolarSystem
             /*print("*RSS* Printing CBTs");
             foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                 Utils.DumpCBT(c);*/
-            LoadRSS();
+            StartCoroutine(LoadRSS());
         }
     }
 
