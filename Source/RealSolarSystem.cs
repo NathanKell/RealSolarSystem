@@ -93,7 +93,7 @@ namespace RealSolarSystem
             if (doneRSS)
             {
                 GUILayout.BeginHorizontal();
-                if (GUILayout.Button("OK"))
+                if (GUILayout.Button("OK", skins.button))
                     showGUI = false;
                 GUILayout.EndHorizontal();
             }
