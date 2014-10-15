@@ -23,10 +23,6 @@ namespace RealSolarSystem
 
         public ConfigNode node;
 
-        public int nodeIndex = 0;
-
-        public RealSolarSystem.LoadingState state;
-
         public RSSLoadInfo(ConfigNode RSSnode)
         {
             useEpoch = RSSnode.TryGetValue("Epoch", ref epoch);
@@ -38,7 +34,6 @@ namespace RealSolarSystem
 
             node = new ConfigNode();
             RSSnode.CopyTo(node);
-            state = RealSolarSystem.LoadingState.START;
             // get spherical scaledspace mesh
             if (ScaledSpace.Instance != null)
             {
@@ -65,11 +60,11 @@ namespace RealSolarSystem
         private string guiMajor = "";
         private string guiMinor = "";
         private string guiExtra = "";
-        /*private Rect screenRect;
-        private int GuiIdx = -1;*/
+        private Rect screenRect;
+        private int GuiIdx = -1;
         private GUISkin skins = HighLogic.Skin;
 
-        /*public void OnGui()
+        public void OnGui()
         {
             if(showGUI)
             {
@@ -101,7 +96,7 @@ namespace RealSolarSystem
                 GUILayout.EndHorizontal();
             }
             GUILayout.EndVertical();
-        }*/
+        }
 
         Texture GetRamp(string bodyName)
         {
@@ -298,97 +293,7 @@ namespace RealSolarSystem
         // Constants
         public const double DEG2RAD = Math.PI / 180.0;
 
-        public void LoadFinishOrbits()
-        {
-            // do final update for all SoIs and hillSpheres and periods
-            string guiMajorBase = "Fixing orbit: ";
-            //OnGui();
-            foreach (CelestialBody body in FlightGlobals.fetch.bodies)
-            {
-                try
-                {
-                    guiMajor = guiMajorBase + body.name;
-                    //OnGui();
-                    if (body.orbitDriver != null)
-                    {
-                        if (body.referenceBody != null)
-                        {
-                            body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
-                            body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
-                            if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
-                                body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
-
-                            body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
-                            if (body.orbit.eccentricity <= 1.0)
-                            {
-                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
-                                body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / (Math.PI * 2);
-                                body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
-                            }
-                            else
-                            {
-                                // ignores this body's own mass for this one...
-                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
-                                body.orbit.ObT = Math.Pow(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3.0) / body.orbit.referenceBody.gravParameter, 0.5) * body.orbit.meanAnomaly;
-                                body.orbit.ObTAtEpoch = body.orbit.ObT;
-                            }
-                        }
-                        else
-                        {
-                            body.sphereOfInfluence = double.PositiveInfinity;
-                            body.hillSphere = double.PositiveInfinity;
-                        }
-                        // doesn't seem needed - body.orbitDriver.QueuedUpdate = true;
-                    }
-                    try
-                    {
-                        body.CBUpdate();
-                    }
-                    catch (Exception e)
-                    {
-                        print("CBUpdate for " + body.name + " failed: " + e.Message);
-                    }
-                }
-                catch (Exception e)
-                {
-                    print("Final update bodies failed: " + e.Message);
-                }
-            }
-        }
-
-        public enum LoadingState
-        {
-            START,
-            BODY,
-            PQS,
-            WRAP,
-            SCALEDCOLOR,
-            SCALEDNRM,
-            EXPORT,
-            DONE
-        }
-        public void Update()
-        {
-            if (!workingRSS)
-                return;
-            switch (loadInfo.state)
-            {
-                case LoadingState.START:
-                    if (loadInfo.nodeIndex < loadInfo.node.nodes.Count)
-                    {
-
-                    }
-                    else
-                    {
-                        workingRSS = false;
-                        doneRSS = true;
-                    }
-                    break;
-                case LoadingState.BODY:
-
-            }
-        }
-        public void LoadCB(ConfigNode node, CelestialBody body)
+        private IEnumerator<YieldInstruction> LoadCB(ConfigNode node, CelestialBody body)
         {
             bool updateMass = true;
 
@@ -490,6 +395,7 @@ namespace RealSolarSystem
                     body.rotationPeriod = 0;
                 }
             }*/
+            yield return null;
 
             #region CBOrbit
             ConfigNode onode = node.GetNode("Orbit");
@@ -541,6 +447,7 @@ namespace RealSolarSystem
                     }
                 }
             }
+            yield return null;
             // SOI and HillSphere done at end
             body.CBUpdate();
             #endregion
@@ -606,6 +513,7 @@ namespace RealSolarSystem
                 }
             }
             print("Did CBT for " + node.name);
+            yield return null;
             #endregion
 
             #region Science
@@ -637,10 +545,68 @@ namespace RealSolarSystem
                 guiMinor = "";
                 //OnGui();
             }
+            yield return null;
             #endregion
         }
+        private IEnumerator<YieldInstruction> LoadFinishOrbits()
+        {
+            // do final update for all SoIs and hillSpheres and periods
+            string guiMajorBase = "Fixing orbit: ";
+            //OnGui();
+            foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+            {
+                try
+                {
+                    guiMajor = guiMajorBase + body.name;
+                    //OnGui();
+                    if (body.orbitDriver != null)
+                    {
+                        if (body.referenceBody != null)
+                        {
+                            body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
+                            body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                            if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
+                                body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
 
-        public void LoadPQS(ConfigNode node, CelestialBody body, double origRadius)
+                            body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
+                            if (body.orbit.eccentricity <= 1.0)
+                            {
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
+                                body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / (Math.PI * 2);
+                                body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
+                            }
+                            else
+                            {
+                                // ignores this body's own mass for this one...
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
+                                body.orbit.ObT = Math.Pow(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3.0) / body.orbit.referenceBody.gravParameter, 0.5) * body.orbit.meanAnomaly;
+                                body.orbit.ObTAtEpoch = body.orbit.ObT;
+                            }
+                        }
+                        else
+                        {
+                            body.sphereOfInfluence = double.PositiveInfinity;
+                            body.hillSphere = double.PositiveInfinity;
+                        }
+                        // doesn't seem needed - body.orbitDriver.QueuedUpdate = true;
+                    }
+                    try
+                    {
+                        body.CBUpdate();
+                    }
+                    catch (Exception e)
+                    {
+                        print("CBUpdate for " + body.name + " failed: " + e.Message);
+                    }
+                }
+                catch (Exception e)
+                {
+                    print("Final update bodies failed: " + e.Message);
+                }
+                yield return null;
+            }
+        }
+        private IEnumerator<YieldInstruction> LoadPQS(ConfigNode node, CelestialBody body, double origRadius)
         {
             #region PQS
             double dtmp;
@@ -740,7 +706,7 @@ namespace RealSolarSystem
                                 }
                             }
 
-
+                            yield return null;
                             // PQSMods
                             var mods = p.transform.GetComponentsInChildren(typeof(PQSMod), true);
                             foreach (var m in mods)
@@ -856,12 +822,15 @@ namespace RealSolarSystem
                                             {
                                                 Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
                                                 map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
+                                                yield return null;
                                                 //print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
                                                 //System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
                                                 //DestroyImmediate(mod.heightMap);
                                                 //mod.heightMap = ScriptableObject.CreateInstance<MapSO>();
                                                 mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
                                                 DestroyImmediate(map);
+                                                map = null;
+                                                yield return null;
                                             }
                                             else
                                                 print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("heightMap"));
@@ -1275,9 +1244,12 @@ namespace RealSolarSystem
                                             // for now don't destroy old map, use GC.
                                             Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
                                             map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
+                                            yield return null;
                                             mod.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
                                             mod.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
                                             DestroyImmediate(map);
+                                            map = null;
+                                            yield return null;
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
@@ -1331,9 +1303,10 @@ namespace RealSolarSystem
 
                                             Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
                                             map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
+                                            yield return null;
                                             colorMap.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
                                             colorMap.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
-
+                                            yield return null;
                                             colorMap.blend = 1.0f;
                                             if (modNode.HasValue("blend"))
                                                 if (float.TryParse(modNode.GetValue("blend"), out ftmp))
@@ -1346,6 +1319,7 @@ namespace RealSolarSystem
 
                                             colorMap.modEnabled = true;
                                             DestroyImmediate(map);
+                                            map = null;
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
@@ -1424,9 +1398,12 @@ namespace RealSolarSystem
 
                                             Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
                                             map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")));
+                                            yield return null;
                                             heightMap.heightMap = ScriptableObject.CreateInstance<MapSO>();
                                             heightMap.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
-
+                                            DestroyImmediate(map);
+                                            map = null;
+                                            yield return null;
                                             heightMap.heightMapOffset = 0.0f;
                                             modNode.TryGetValue("heightMapOffset", ref heightMap.heightMapOffset);
 
@@ -1441,12 +1418,12 @@ namespace RealSolarSystem
                                             heightMap.scaleDeformityByRadius = false;
 
                                             heightMap.modEnabled = true;
-                                            DestroyImmediate(map);
                                         }
                                         else
                                             print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("vertexColorMap"));
 
                                     }
+                                    yield return null;
                                 }
                             }
                             if (pqsNode.HasNode("Disable"))
@@ -1496,6 +1473,7 @@ namespace RealSolarSystem
                                     }
                                 }
                             }
+                            yield return null;
                         }
                         try
                         {
@@ -1516,6 +1494,395 @@ namespace RealSolarSystem
             //OnGui();
             #endregion
         }
+        private IEnumerator<YieldInstruction> LoadScaledSpace(ConfigNode node, CelestialBody body, double origRadius)
+        {
+            #region ScaledSpace
+            // Scaled space
+            Transform scaledSpaceTransform = null;
+            Transform atmo = null;
+            guiMinor = "Scaled Space";
+            //OnGui();
+            if (ScaledSpace.Instance != null)
+            {
+                float SSTScale = 1.0f;
+                node.TryGetValue("SSTScale", ref SSTScale);
+                foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
+                {
+                    if (t.name.Equals(node.name))
+                    {
+                        print("*RSS* Found scaledspace transform for " + t.name + ", scale " + t.localScale.x);
+                        scaledSpaceTransform = t;
+                        // replace
+                        int replaceColor = 0;
+                        string path = "";
+                        if (node.HasValue("SSColor"))
+                        {
+                            replaceColor = 1;
+                            path = node.GetValue("SSColor");
+                        }
+                        if (node.HasValue("SSColor32"))
+                        {
+                            replaceColor = 2;
+                            path = node.GetValue("SSColor32");
+                        }
+                        if (replaceColor > 0)
+                        {
+                            guiExtra = "Color map";
+                            //OnGui();
+                            if (File.Exists(KSPUtil.ApplicationRootPath + path))
+                            {
+                                Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
+                                map.LoadImage(System.IO.File.ReadAllBytes(path));
+                                yield return null;
+                                map.Compress(true);
+                                map.Apply(true, true);
+                                yield return null;
+                                Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
+                                foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                {
+                                    if (m.GetTexture("_MainTex") == oldColor)
+                                        m.SetTexture("_MainTex", map);
+                                }
+                                DestroyImmediate(oldColor);
+                                // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
+                            }
+                            else
+                                print("*RSS* *ERROR* texture does not exist! " + path);
+
+                            guiExtra = "";
+                            //OnGui();
+                        }
+                        yield return null;
+                        if (node.HasValue("SSBump"))
+                        {
+                            if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
+                            {
+                                guiExtra = "Normal Map";
+                                //OnGui();
+                                Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                                map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
+                                yield return null;
+                                if (loadInfo.compressNormals)
+                                    map.Compress(true);
+                                map.Apply(true, true);
+                                yield return null;
+                                Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
+                                if (oldBump != null)
+                                {
+                                    foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                    {
+                                        if (m.GetTexture("_BumpMap") == oldBump)
+                                            m.SetTexture("_BumpMap", map);
+                                    }
+                                    DestroyImmediate(oldBump);
+                                }
+                                yield return null;
+                            }
+                            else
+                                print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
+
+                            guiExtra = "";
+                            //OnGui();
+                        }
+                        /*if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                        {
+                            try
+                            {
+                                System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "Ramp.png", ((Texture2D)t.gameObject.renderer.material.GetTexture("_rimColorRamp")).EncodeToPNG());
+                            }
+                            catch (Exception e)
+                            {
+                                print("*RSS* Failed to get/write ramp for " + body.name + ", exception: " + e.Message);
+                            }
+                        }*/
+                        if (node.HasValue("SSRampRef"))
+                        {
+                            //if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                            // for now try setting anyway.
+                            Texture map = null;
+                            map = GetRamp(node.GetValue("SSRampRef"));
+                            if (map != null)
+                                t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
+                            else
+                                print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
+                        }
+                        if (node.HasValue("SSRamp"))
+                        {
+                            Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSRamp"), false);
+                            bool localLoad = false;
+                            if (map == null)
+                            {
+                                if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSRamp")))
+                                {
+                                    map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSRamp")));
+                                    map.Compress(true);
+                                    map.Apply(true, true);
+                                    localLoad = true;
+                                }
+                            }
+                            if (map != null)
+                            {
+                                if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
+                                    t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
+                                else
+                                    if (localLoad)
+                                        DestroyImmediate(map);
+                            }
+                            else
+                                print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
+                        }
+                        yield return null;
+                        if (node.HasValue("SSSpec"))
+                        {
+                            try
+                            {
+                                Vector4 col = KSPUtil.ParseVector4(node.GetValue("SSSpec"));
+                                Color c = new Color(col.x, col.y, col.z, col.w);
+                                t.gameObject.renderer.material.SetColor("_SpecColor", c);
+                            }
+                            catch (Exception e)
+                            {
+                                print("*RSS* Error reading SSSpec as color4: original text: " + node.GetValue("SSSpec") + " --- exception " + e.Message);
+                            }
+                        }
+
+                        // Fix mesh
+                        bool rescale = true;
+                        bool doWrapHere = loadInfo.doWrap;
+                        node.TryGetValue("wrap", ref doWrapHere);
+                        bool sphereVal = loadInfo.spheresOnly;
+                        bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
+                        float origLocalScale = t.localScale.x; // assume uniform scale
+                        if (body.pqsController != null && doWrapHere)
+                        {
+                            MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
+                            if (m == null || m.mesh == null)
+                            {
+                                print("*RSS* Failure getting SSM for " + body.pqsController.name + ": mesh is null");
+                            }
+                            else
+                            {
+                                guiExtra = "Mesh";
+                                //OnGui();
+                                if (sphereVal)
+                                {
+                                    Mesh tMesh = new Mesh();
+                                    Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
+                                    float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
+                                    // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
+                                    print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name + ". Vertex Scale " + scaleFactor);
+                                    Utils.ScaleVerts(tMesh, scaleFactor);
+                                    tMesh.RecalculateBounds();
+                                    m.mesh = tMesh;
+                                    yield return null;
+                                    // do normal rescaling below.
+                                }
+                                else
+                                {
+                                    // **** No longer exporting and importing
+                                    // Now I just do everything except tangents each time. Tangents don't seem necessary to fix, and
+                                    // the rest is fast enough...and something in .24/64 broke importing for *some* planets. WEIRD.
+                                    char sep = System.IO.Path.DirectorySeparatorChar;
+                                    string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
+                                                + sep + "PluginData" + sep + t.name;
+
+                                    filePath += ".obj";
+
+                                    try
+                                    {
+                                        print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
+                                        ProfileTimer.Push("Wrap time for " + body.name);
+                                        Mesh tMesh = new Mesh();
+                                        Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
+                                        float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
+                                        // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
+                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0, scaleFactor);
+                                        //ProfileTimer.Push("Recalc Normals");
+                                        tMesh.RecalculateNormals();
+                                        //ProfileTimer.Pop("Recalc Normals");
+                                        //ObjLib.UpdateTangents(tMesh);
+                                        //print("*RSS* wrapped.");
+                                        /*try
+                                        {
+                                            ObjLib.MeshToFile(m, filePath);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
+                                        }*/
+                                        //print("*RSS*: Done wrapping and exporting. Setting scale");
+
+                                        tMesh.RecalculateBounds();
+                                        m.mesh = tMesh;
+                                        // do normal rescaling below.
+                                        ProfileTimer.Pop("Wrap time for " + body.name);
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        print("*RSS* Exception wrapping: " + e.Message);
+                                    }
+                                    yield return null;
+                                }
+                                guiExtra = "";
+                                //OnGui();
+                            }
+                            atmo = t.FindChild("Atmosphere");
+                        }
+                        guiExtra = "";
+                        //OnGui();
+                        if (rescale)
+                        {
+                            float scaleFactor = (float)((double)origLocalScale * body.Radius / origRadius * SSTScale);
+                            t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                        }
+                        else
+                        {
+                            // rescale only atmo
+                            if (atmo != null)
+                            {
+                                print("*RSS* found atmo transform for " + node.name);
+                                float scaleFactor = loadInfo.SSAtmoScale; // default to global default
+                                if (!node.TryGetValue("SSAtmoScale", ref scaleFactor)) // if no override multiplier
+                                {
+                                    if (loadInfo.defaultAtmoScale) // use stock KSP multiplier
+                                        scaleFactor *= 1.025f;
+                                    else // or use atmosphere height-dependent multiplier
+                                        scaleFactor *= (float)((body.Radius + body.maxAtmosphereAltitude) / body.Radius);
+                                }
+                                scaleFactor *= origLocalScale / t.localScale.x * (float)(body.Radius / origRadius); // since our parent transform changed, we no longer are the same scale as the planet.
+                                atmo.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                                print("*RSS* final scale of atmo for " + body.name + " in scaledspace: " + atmo.localScale.x);
+                            }
+                        }
+                        print("*RSS* final scale of " + body.name + " in scaledspace: " + t.localScale.x);
+                        yield return null;
+                    }
+                }
+            }
+            #region AtmosphereFromGround
+            foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
+            {
+                //print("*RSS* Found AG " + ag.name + " " + (ag.tag == null ? "" : ag.tag) + ". Planet " + (ag.planet == null ? "NULL" : ag.planet.name));
+                if (ag != null && ag.planet != null)
+                {
+                    // generalized version of Starwaster's code. Thanks Starwaster!
+                    if (ag.planet.name.Equals(node.name))
+                    {
+                        print("Found atmo for " + node.name + ": " + ag.name + ", has localScale " + ag.transform.localScale.x);
+                        UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
+                        print("Atmo updated");
+                    }
+                }
+            }
+            yield return null;
+            #endregion
+            #endregion
+        }
+        private IEnumerator<YieldInstruction> LoadExport(ConfigNode node, CelestialBody body)
+        {
+            #region Export
+            double dtmp;
+            int itmp;
+            bool btmp;
+            // texture rebuild
+            if (node.HasNode("Export"))
+            {
+                guiMinor = "Exporting maps";
+                //OnGui();
+                int res = 2048;
+                bool ocean = false;
+                Color oceanColor;
+                double maxHeight, oceanHeight;
+                PQS bodyPQS = null;
+                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
+                    if (p.name.Equals(body.name))
+                    {
+                        bodyPQS = p;
+                        break;
+                    }
+                if (bodyPQS != null)
+                {
+                    maxHeight = bodyPQS.radiusDelta * 0.5;
+                    oceanHeight = 0;
+                    ocean = body.ocean;
+                    oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
+                    ConfigNode exportNode = node.GetNode("Export");
+                    if (exportNode.HasValue("resolution"))
+                    {
+                        if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
+                            res = itmp;
+                    }
+                    if (exportNode.HasValue("maxHeight"))
+                    {
+                        if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
+                            maxHeight = dtmp;
+                    }
+                    if (exportNode.HasValue("ocean"))
+                    {
+                        if (bool.TryParse(exportNode.GetValue("ocean"), out btmp))
+                            ocean = btmp;
+                    }
+                    if (exportNode.HasValue("oceanHeight"))
+                    {
+                        if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
+                            oceanHeight = dtmp;
+                    }
+                    if (exportNode.HasValue("oceanColor"))
+                    {
+                        try
+                        {
+                            ocean = true;
+                            Vector4 col = KSPUtil.ParseVector4(exportNode.GetValue("oceanColor"));
+                            oceanColor = new Color(col.x, col.y, col.z, col.w);
+                        }
+                        catch (Exception e)
+                        {
+                            print("*RSS* Error parsing as col3: original text: " + exportNode.GetValue("oceanColor") + " --- exception " + e.Message);
+                        }
+                    }
+                    Texture2D[] outputMaps = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
+                    yield return null;
+                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "1.png", outputMaps[0].EncodeToPNG());
+                    yield return null;
+                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "2.png", outputMaps[1].EncodeToPNG());
+                    yield return null;
+                }
+                guiMinor = "";
+                //OnGui();
+            }
+            #endregion
+        }
+        private IEnumerator<YieldInstruction> LoadRSS()
+        {
+            workingRSS = true;
+
+            print("*RSS* fixing bodies");
+
+            showGUI = true;
+            //OnGui();
+            foreach (ConfigNode node in loadInfo.node.nodes)
+            {
+                foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
+                {
+                    if (body.name.Equals(node.name))
+                    {
+                        double origRadius = body.Radius;
+                        LoadCB(node, body);
+                        LoadPQS(node, body, origRadius);
+                        LoadScaledSpace(node, body, origRadius);
+                        LoadExport(node, body);
+                        yield return null;
+                    }
+                }
+            }
+            LoadFinishOrbits();
+
+            print("*RSS* Done loading!");
+            guiExtra = "";
+            guiMinor = "";
+            guiMajor = "Done!";
+            doneRSS = true;
+        }
         public void Start()
         {
             if (doneRSS || !CompatibilityChecker.IsAllCompatible())
@@ -1524,18 +1891,12 @@ namespace RealSolarSystem
             if ((object)(KSCLoader.instance) == null)
                 KSCLoader.instance = new KSCLoader(); // just in case the other hasn't run first
 
-            double dtmp;
-            float ftmp;
-            int itmp;
-            bool btmp;
-
             // First, run GC.
-            ProfileTimer.Push("RSS_FirstGC");
-            Resources.UnloadUnusedAssets();
-            print("*RSS*: Total memory in use: " + GC.GetTotalMemory(true));
-            ProfileTimer.Pop("RSS_FirstGC");
-
-            string guiMajorBase = "";
+            // GCDISABLE
+            //ProfileTimer.Push("RSS_FirstGC");
+            //Resources.UnloadUnusedAssets();
+            //print("*RSS*: Total memory in use: " + GC.GetTotalMemory(true));
+            //ProfileTimer.Pop("RSS_FirstGC");
 
             ConfigNode RSSSettings = null;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
@@ -1549,372 +1910,7 @@ namespace RealSolarSystem
             /*print("*RSS* Printing CBTs");
             foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                 Utils.DumpCBT(c);*/
-            workingRSS = true;
-
-            print("*RSS* fixing bodies");
-
-            showGUI = true;
-            //OnGui();
-            foreach (ConfigNode node in RSSSettings.nodes)
-            {
-                foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
-                {
-                    if (body.name.Equals(node.name))
-                    {
-                        #region ScaledSpace
-                        // Scaled space
-                        Transform scaledSpaceTransform = null;
-                        Transform atmo = null;
-                        guiMinor = "Scaled Space";
-                        //OnGui();
-                        if (ScaledSpace.Instance != null)
-                        {
-                            float SSTScale = 1.0f;
-                            node.TryGetValue("SSTScale", ref SSTScale);
-                            foreach (Transform t in ScaledSpace.Instance.scaledSpaceTransforms)
-                            {
-                                if (t.name.Equals(node.name))
-                                {
-                                    print("*RSS* Found scaledspace transform for " + t.name + ", scale " + t.localScale.x);
-                                    scaledSpaceTransform = t;
-                                    // replace
-                                    int replaceColor = 0;
-                                    string path = "";
-                                    if (node.HasValue("SSColor"))
-                                    {
-                                        replaceColor = 1;
-                                        path = node.GetValue("SSColor");
-                                    }
-                                    if (node.HasValue("SSColor32"))
-                                    {
-                                        replaceColor = 2;
-                                        path = node.GetValue("SSColor32");
-                                    }
-                                    if (replaceColor > 0)
-                                    {
-                                        guiExtra = "Color map";
-                                        //OnGui();
-                                        if (File.Exists(KSPUtil.ApplicationRootPath + path))
-                                        {
-                                            Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24: TextureFormat.RGBA32, true);
-                                            map.LoadImage(System.IO.File.ReadAllBytes(path));
-                                            map.Compress(true);
-                                            map.Apply(true, true);
-                                            Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
-                                            foreach(Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
-                                            {
-                                                if(m.GetTexture("_MainTex") == oldColor)
-                                                    m.SetTexture("_MainTex", map);
-                                            }
-                                            DestroyImmediate(oldColor);
-                                            // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
-                                        }
-                                        else
-                                            print("*RSS* *ERROR* texture does not exist! " + path);
-
-                                        guiExtra = "";
-                                        //OnGui();
-                                    }
-                                    if (node.HasValue("SSBump"))
-                                    {
-                                        if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
-                                        {
-                                            guiExtra = "Normal Map";
-                                            //OnGui();
-                                            Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                                            map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
-                                            if(compressNormals)
-                                                map.Compress(true);
-                                            map.Apply(true, true);
-                                            Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
-                                            if (oldBump != null)
-                                            {
-                                                foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
-                                                {
-                                                    if (m.GetTexture("_BumpMap") == oldBump)
-                                                        m.SetTexture("_BumpMap", map);
-                                                }
-                                                DestroyImmediate(oldBump);
-                                            }
-                                        }
-                                        else
-                                            print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
-                                        
-                                        guiExtra = "";
-                                        //OnGui();
-                                    }
-                                    /*if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
-                                    {
-                                        try
-                                        {
-                                            System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "Ramp.png", ((Texture2D)t.gameObject.renderer.material.GetTexture("_rimColorRamp")).EncodeToPNG());
-                                        }
-                                        catch (Exception e)
-                                        {
-                                            print("*RSS* Failed to get/write ramp for " + body.name + ", exception: " + e.Message);
-                                        }
-                                    }*/
-                                    if (node.HasValue("SSRampRef"))
-                                    {
-                                        //if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
-                                        // for now try setting anyway.
-                                        Texture map = null;
-                                        map = GetRamp(node.GetValue("SSRampRef"));
-                                        if(map != null)
-                                            t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
-                                        else
-                                            print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
-                                    }
-                                    if (node.HasValue("SSRamp"))
-                                    {
-                                        Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSRamp"), false);
-                                        bool localLoad = false;
-                                        if (map == null)
-                                        {
-                                            if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSRamp")))
-                                            {
-                                                map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSRamp")));
-                                                map.Compress(true);
-                                                map.Apply(true, true);
-                                                localLoad = true;
-                                            }
-                                        }
-                                        if (map != null)
-                                        {
-                                            if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
-                                                t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
-                                            else
-                                                if (localLoad)
-                                                    DestroyImmediate(map);
-                                        }
-                                        else
-                                            print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
-                                    }
-                                    if (node.HasValue("SSSpec"))
-                                    {
-                                        try
-                                        {
-                                            Vector4 col = KSPUtil.ParseVector4(node.GetValue("SSSpec"));
-                                            Color c = new Color(col.x, col.y, col.z, col.w);
-                                            t.gameObject.renderer.material.SetColor("_SpecColor", c);
-                                        }
-                                        catch(Exception e)
-                                        {
-                                            print("*RSS* Error reading SSSpec as color4: original text: " + node.GetValue("SSSpec") + " --- exception " + e.Message);
-                                        }
-                                    }
-
-                                    // Fix mesh
-                                    bool rescale = true;
-                                    bool doWrapHere = doWrap;
-                                    node.TryGetValue("wrap", ref doWrapHere);
-                                    bool sphereVal = spheresOnly;
-                                    bool sphereHere = node.TryGetValue("useSphericalSSM", ref sphereVal);
-                                    float origLocalScale = t.localScale.x; // assume uniform scale
-                                    if (body.pqsController != null && doWrapHere)
-                                    {
-                                        MeshFilter m = (MeshFilter)t.GetComponent(typeof(MeshFilter));
-                                        if (m == null || m.mesh == null)
-                                        {
-                                            print("*RSS* Failure getting SSM for " + body.pqsController.name + ": mesh is null");
-                                        }
-                                        else
-                                        {
-                                            guiExtra = "Mesh";
-                                            //OnGui();
-                                            if (sphereVal)
-                                            {
-                                                Mesh tMesh = new Mesh();
-                                                Utils.CopyMesh(joolMesh.mesh, tMesh);
-                                                float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
-                                                // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
-                                                print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name + ". Vertex Scale " + scaleFactor);
-                                                Utils.ScaleVerts(tMesh, scaleFactor);
-                                                tMesh.RecalculateBounds();
-                                                m.mesh = tMesh;
-                                                // do normal rescaling below.
-	                                        }
-	                                        else
-	                                        {
-                                                // **** No longer exporting and importing
-                                                // Now I just do everything except tangents each time. Tangents don't seem necessary to fix, and
-                                                // the rest is fast enough...and something in .24/64 broke importing for *some* planets. WEIRD.
-	                                            char sep = System.IO.Path.DirectorySeparatorChar;
-	                                            string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
-	                                                        + sep + "PluginData" + sep + t.name;
-
-                                                filePath += ".obj";
-                                                
-	                                            try
-	                                            {
-	                                                print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
-                                                    ProfileTimer.Push("Wrap time for " + body.name);
-                                                    Mesh tMesh = new Mesh();
-                                                    Utils.CopyMesh(joolMesh.mesh, tMesh);
-                                                    float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
-                                                    // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
-                                                    Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0, scaleFactor);
-                                                    //ProfileTimer.Push("Recalc Normals");
-                                                    tMesh.RecalculateNormals();
-                                                    //ProfileTimer.Pop("Recalc Normals");
-                                                    //ObjLib.UpdateTangents(tMesh);
-	                                                //print("*RSS* wrapped.");
-	                                                /*try
-	                                                {
-	                                                    ObjLib.MeshToFile(m, filePath);
-	                                                }
-	                                                catch (Exception e)
-	                                                {
-	                                                    print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
-	                                                }*/
-	                                                //print("*RSS*: Done wrapping and exporting. Setting scale");
-                                                    
-                                                    tMesh.RecalculateBounds();
-                                                    m.mesh = tMesh;
-                                                    // do normal rescaling below.
-                                                    ProfileTimer.Pop("Wrap time for " + body.name);
-	                                            }
-	                                            catch (Exception e)
-	                                            {
-	                                                print("*RSS* Exception wrapping: " + e.Message);
-                                                }
-                                            }
-                                            guiExtra = "";
-                                            //OnGui();
-                                        }
-                                        atmo = t.FindChild("Atmosphere");
-                                    }
-                                    guiExtra = "";
-                                    //OnGui();
-                                    if (rescale)
-                                    {
-                                        float scaleFactor = (float)((double)origLocalScale * body.Radius / origRadius * SSTScale);
-                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                    }
-                                    else
-                                    {
-                                        // rescale only atmo
-                                        if (atmo != null)
-                                        {
-                                            print("*RSS* found atmo transform for " + node.name);
-                                            float scaleFactor = SSAtmoScale; // default to global default
-                                            if (!node.TryGetValue("SSAtmoScale", ref scaleFactor)) // if no override multiplier
-                                            {
-                                                if (defaultAtmoScale) // use stock KSP multiplier
-                                                    scaleFactor *= 1.025f;
-                                                else // or use atmosphere height-dependent multiplier
-                                                    scaleFactor *= (float)((body.Radius + body.maxAtmosphereAltitude) / body.Radius);
-                                            }
-                                            scaleFactor *= origLocalScale / t.localScale.x * (float)(body.Radius / origRadius); // since our parent transform changed, we no longer are the same scale as the planet.
-                                            atmo.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                            print("*RSS* final scale of atmo for " + body.name + " in scaledspace: " + atmo.localScale.x);
-                                        }
-                                    }
-                                    print("*RSS* final scale of " + body.name + " in scaledspace: " + t.localScale.x);
-                                }
-                            }
-                        }
-                        #region AtmosphereFromGround
-                        foreach (AtmosphereFromGround ag in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
-                        {
-                            //print("*RSS* Found AG " + ag.name + " " + (ag.tag == null ? "" : ag.tag) + ". Planet " + (ag.planet == null ? "NULL" : ag.planet.name));
-                            if (ag != null && ag.planet != null)
-                            {
-                                // generalized version of Starwaster's code. Thanks Starwaster!
-                                if (ag.planet.name.Equals(node.name))
-                                {
-                                    print("Found atmo for " + node.name + ": " + ag.name + ", has localScale " + ag.transform.localScale.x);
-                                    UpdateAFG(body, ag, node.GetNode("AtmosphereFromGround"));
-                                    print("Atmo updated");
-                                }
-                            }
-                        }
-                        #endregion
-                        #endregion
-
-                        #region Export
-                        // texture rebuild
-                        if (node.HasNode("Export"))
-                        {
-                            try
-                            {
-                                guiMinor = "Exporting maps";
-                                //OnGui();
-                                int res = 2048;
-                                bool ocean = false;
-                                Color oceanColor;
-                                double maxHeight, oceanHeight;
-                                PQS bodyPQS = null;
-                                foreach (PQS p in Resources.FindObjectsOfTypeAll(typeof(PQS)))
-                                    if (p.name.Equals(body.name))
-                                    {
-                                        bodyPQS = p;
-                                        break;
-                                    }
-                                if (bodyPQS != null)
-                                {
-                                    maxHeight = bodyPQS.radiusDelta * 0.5;
-                                    oceanHeight = 0;
-                                    ocean = body.ocean;
-                                    oceanColor = new Color(0.1255f, 0.22353f, 0.35683f);
-                                    ConfigNode exportNode = node.GetNode("Export");
-                                    if (exportNode.HasValue("resolution"))
-                                    {
-                                        if (int.TryParse(exportNode.GetValue("resolution"), out itmp))
-                                            res = itmp;
-                                    }
-                                    if (exportNode.HasValue("maxHeight"))
-                                    {
-                                        if (double.TryParse(exportNode.GetValue("maxHeight"), out dtmp))
-                                            maxHeight = dtmp;
-                                    }
-                                    if (exportNode.HasValue("ocean"))
-                                    {
-                                        if (bool.TryParse(exportNode.GetValue("ocean"), out btmp))
-                                            ocean = btmp;
-                                    }
-                                    if (exportNode.HasValue("oceanHeight"))
-                                    {
-                                        if (double.TryParse(exportNode.GetValue("oceanHeight"), out dtmp))
-                                            oceanHeight = dtmp;
-                                    }
-                                    if (exportNode.HasValue("oceanColor"))
-                                    {
-                                        try
-                                        {
-                                            ocean = true;
-                                            Vector4 col = KSPUtil.ParseVector4(exportNode.GetValue("oceanColor"));
-                                            oceanColor = new Color(col.x, col.y, col.z, col.w);
-                                        }
-                                        catch(Exception e)
-                                        {
-                                            print("*RSS* Error parsing as col3: original text: " + exportNode.GetValue("oceanColor") + " --- exception " + e.Message);
-                                        }
-                                    }
-                                    Texture2D[] outputMaps = bodyPQS.CreateMaps(res, maxHeight, ocean, oceanHeight, oceanColor);
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "1.png", outputMaps[0].EncodeToPNG());
-                                    System.IO.File.WriteAllBytes(KSPUtil.ApplicationRootPath + body.name + "2.png", outputMaps[1].EncodeToPNG());
-                                }
-                            }
-                            catch (Exception e)
-                            {
-                                print("Export for " + node.name + " failed: " + e.Message);
-                            }
-                            guiMinor = "";
-                            //OnGui();
-                        }
-                        #endregion
-                        Resources.UnloadUnusedAssets();
-                        print("*RSS* Memory now " + GC.GetTotalMemory(true)); // Free memory
-                    }
-                }
-            }
-            
-            print("*RSS* Done loading!");
-            guiExtra = "";
-            guiMinor = "";
-            guiMajor = "Done!";
-            doneRSS = true;
+            LoadRSS();
         }
     }
 
