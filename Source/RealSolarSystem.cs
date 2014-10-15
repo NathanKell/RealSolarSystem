@@ -68,10 +68,12 @@ namespace RealSolarSystem
         {
             if(showGUI)
             {
-                if(GuiIdx < 0)
+                if (GuiIdx < 0)
+                {
                     GuiIdx = "RealSolarSystem".GetHashCode();
-               screenRect = new Rect(100, 200, 300, 220);
-               GUILayout.Window(GuiIdx, screenRect, RSSGUI, "RealSolarSystem Status", skins.window);
+                    screenRect = new Rect(100, 200, 300, 220);
+                }
+                screenRect = GUILayout.Window(GuiIdx, screenRect, RSSGUI, "RealSolarSystem Status", skins.window);
             }
 
         }
@@ -95,6 +97,7 @@ namespace RealSolarSystem
                     showGUI = false;
                 GUILayout.EndHorizontal();
             }
+            GUI.DragWindow();
             GUILayout.EndVertical();
         }
 
@@ -1857,8 +1860,6 @@ namespace RealSolarSystem
             workingRSS = true;
 
             print("*RSS* fixing bodies");
-
-            showGUI = true;
             //OnGui();
             foreach (ConfigNode node in loadInfo.node.nodes)
             {
@@ -1885,9 +1886,11 @@ namespace RealSolarSystem
             guiMinor = "";
             guiMajor = "Done!";
             doneRSS = true;
+            workingRSS = false;
         }
         public void Start()
         {
+            enabled = true;
             if (doneRSS || !CompatibilityChecker.IsAllCompatible())
                 return;
 
@@ -1913,8 +1916,10 @@ namespace RealSolarSystem
             /*print("*RSS* Printing CBTs");
             foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                 Utils.DumpCBT(c);*/
+            showGUI = true;
             StartCoroutine(LoadRSS());
         }
+
     }
 
 }
