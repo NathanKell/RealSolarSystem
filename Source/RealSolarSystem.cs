@@ -1562,7 +1562,7 @@ namespace RealSolarSystem
                                 yield return null;
                                 map.Compress(true);
                                 map.Apply(true, true);
-                                yield return null;
+                                yield return new WaitForSeconds(1);
                                 Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
                                 foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
                                 {
@@ -1902,7 +1902,7 @@ namespace RealSolarSystem
             /*initialMemory = GC.GetTotalMemory(true);
             print("*RSS*: Total memory in use before load: " + initialMemory);*/
             //ProfileTimer.Pop("RSS_FirstGC");
-
+            InputLockManager.SetControlLock(ControlTypes.MAIN_MENU, "RSSLoad");
             print("*RSS* Modifying bodies");
             //OnGui();
             int nodeCount = loadInfo.node.nodes.Count - (loadInfo.node.HasNode("LaunchSites") ? 1 : 0);
@@ -1919,6 +1919,7 @@ namespace RealSolarSystem
                         while (retval.MoveNext()) yield return retval.Current;
                         retval = LoadPQS(node, body, origRadius);
                         while (retval.MoveNext()) yield return retval.Current;
+                        yield return new WaitForSeconds(1);
                         retval = LoadScaledSpace(node, body, origRadius);
                         while (retval.MoveNext()) yield return retval.Current;
                         retval = LoadExport(node, body);
@@ -1941,6 +1942,7 @@ namespace RealSolarSystem
             guiMinor = guiExtra = "";
             doneRSS = true;
             workingRSS = false;
+            InputLockManager.RemoveControlLock("RSSLoad");
         }
         long initialMemory;
         long finalMemory;
