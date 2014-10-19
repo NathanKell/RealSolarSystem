@@ -1572,7 +1572,8 @@ namespace RealSolarSystem
                                 print("RSS Loading local texture " + path);
                                 localLoad = true;
                                 success = false;
-                                if (File.Exists(KSPUtil.ApplicationRootPath + path))
+                                path = KSPUtil.ApplicationRootPath + path;
+                                if (File.Exists(path))
                                 {
                                     map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
                                     map.LoadImage(System.IO.File.ReadAllBytes(path));
@@ -1607,12 +1608,12 @@ namespace RealSolarSystem
                         if (node.HasValue("SSBump"))
                         {
                             guiExtra = "Normal Map";
+                            path = node.GetValue("SSBump");
                             //Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSBump"), false);
                             Texture2D map = null;
-                            string tName = node.GetValue("SSBump");
                             Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
                             foreach (Texture2D tex in textures)
-                                if (tex.name.Equals(tName))
+                                if (tex.name.Equals(path))
                                 {
                                     map = tex;
                                     break;
@@ -1623,35 +1624,38 @@ namespace RealSolarSystem
                             if ((object)map == null)
                             {
                                 localLoad = true;
+                                print("RSS Loading local texture " + path);
                                 success = false;
-                                if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
+                                path = KSPUtil.ApplicationRootPath + path;
+                                if (File.Exists(path))
                                 {
                                     
                                     yield return null;
                                     //OnGui();
                                     map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                                    map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
+                                    map.LoadImage(System.IO.File.ReadAllBytes(path));
                                     yield return null;
                                     if (loadInfo.compressNormals)
                                         map.Compress(true);
                                     yield return null;
                                     map.Apply(true, true);
+                                    success = true;
                                     yield return null;
                                 }
                                 else
-                                    print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
+                                    print("*RSS* *ERROR* texture does not exist! " + path);
                             }
                             if (success)
                             {
                                 Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
-                                bool replacedOrig = false;
                                 if (oldBump != null)
                                 {
                                     foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
                                     {
-                                        if (m.GetTexture("_BumpMap") == oldBump || m == t.gameObject.renderer.material)
+                                        if (m.GetTexture("_BumpMap") == oldBump)
                                             m.SetTexture("_BumpMap", map);
                                     }
+                                    t.gameObject.renderer.material.SetTexture("_BumpMap", map); // in case one wasn't set.
                                     DestroyImmediate(oldBump);
                                     oldBump = null;
                                     yield return null;

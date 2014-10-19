@@ -67,20 +67,38 @@ namespace RealSolarSystem
                     else
                     {
                         float farClip = -1;
+                        float nearClip = 01;
                         if (cam.name.Equals("Camera 00"))
                         {
                             RSSSettings.TryGetValue("cam00FarClip", ref farClip);
                             if (RSSSettings.HasNode(bodyName))
                                 RSSSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
+                            RSSSettings.TryGetValue("cam00NearClip", ref nearClip);
+                            if (RSSSettings.HasNode(bodyName))
+                                RSSSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
                         }
-                        else
+                        else if (cam.name.Equals("Camera 01"))
                         {
                             RSSSettings.TryGetValue("cam01FarClip", ref farClip);
                             if (RSSSettings.HasNode(bodyName))
                                 RSSSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
+                            RSSSettings.TryGetValue("cam01NearClip", ref nearClip);
+                            if (RSSSettings.HasNode(bodyName))
+                                RSSSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
+                        }
+                        else if (cam.name.Equals("Camera ScaledSpace"))
+                        {
+                            RSSSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
+                            if (RSSSettings.HasNode(bodyName))
+                                RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
+                            RSSSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                            if (RSSSettings.HasNode(bodyName))
+                                RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
                         }
                         if (farClip > 0)
                             cam.farClipPlane = farClip;
+                        if (nearClip > 0)
+                            cam.nearClipPlane = nearClip;
                     }
 
                     msg += "  (" + cam.name + "): " + cam.farClipPlane + ".";

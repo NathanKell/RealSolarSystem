@@ -46,6 +46,11 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.1.2
+*Fixed normal map loading
+*Added ability to set both far and near clip planes in cfg, added cfg support for camScaledSpace (camScaledSpaceNearClip like cam01FarClip in cfg)
+*Water now no longer disappears when close (by setting cam01NearClip to 1)
+
 v8.1.1
 *Fixed stupidity where I deleted textures after loading them.
 
