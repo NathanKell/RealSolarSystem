@@ -1553,47 +1553,103 @@ namespace RealSolarSystem
                         if (replaceColor > 0)
                         {
                             guiExtra = "Color map";
-                            yield return null;
-                            //OnGui();
-                            if (File.Exists(KSPUtil.ApplicationRootPath + path))
+                            //Texture2D map = GameDatabase.Instance.GetTexture(path, false);
+                            Texture2D omap = null;
+                            Texture map = null;
+                            Texture[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture)) as Texture[];
+                            foreach (Texture tex in textures)
                             {
-                                Texture2D map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
-                                map.LoadImage(System.IO.File.ReadAllBytes(path));
-                                yield return null;
-                                map.Compress(true);
-                                map.Apply(true, true);
-                                yield return new WaitForSeconds(1);
-                                Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
-                                foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                if (tex.name.Equals(path))
                                 {
-                                    if (m.GetTexture("_MainTex") == oldColor)
-                                        m.SetTexture("_MainTex", map);
+                                    map = tex;
+                                    break;
                                 }
-                                DestroyImmediate(oldColor);
-                                oldColor = null;
-                                yield return null;
-                                // shouldn't be needed - t.gameObject.renderer.material.SetTexture("_MainTex", map);
                             }
-                            else
-                                print("*RSS* *ERROR* texture does not exist! " + path);
-                            //OnGui();
+                            bool localLoad = false;
+                            bool success = true;
+                            yield return null;
+                            if ((object)map == null)
+                            {
+                                localLoad = true;
+                                success = false;
+                                if (File.Exists(KSPUtil.ApplicationRootPath + path))
+                                {
+                                    omap = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
+                                    omap.LoadImage(System.IO.File.ReadAllBytes(path));
+                                    yield return null;
+                                    omap.Compress(true);
+                                    omap.Apply(true, true);
+                                    map = (Texture)omap;
+                                    yield return null;
+                                    success = true;
+                                }
+                                else
+                                    print("*RSS* *ERROR* texture does not exist! " + path);
+                            }
+                            if (success)
+                            {
+                                Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
+                                if ((object)oldColor != null)
+                                {
+                                    foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
+                                    {
+                                        if (m.GetTexture("_MainTex") == oldColor)
+                                            m.SetTexture("_MainTex", map);
+                                    }
+                                    DestroyImmediate(oldColor);
+                                    oldColor = null;
+                                    yield return null;
+                                }
+                                if(t.gameObject.renderer.material.GetTexture("_MainTex") != map)
+                                    t.gameObject.renderer.material.SetTexture("_MainTex", map);
+                            }
+                            if (localLoad)
+                            {
+                                DestroyImmediate(map);
+                                map = null;
+                                yield return null;
+                            }
                         }
                         yield return null;
                         guiExtra = "";
                         if (node.HasValue("SSBump"))
                         {
-                            if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
+                            guiExtra = "Normal Map";
+                            //Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSBump"), false);
+                            Texture2D map = null;
+                            string tName = node.GetValue("SSBump");
+                            Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
+                            foreach (Texture2D tex in textures)
+                                if (tex.name.Equals(tName))
+                                {
+                                    map = tex;
+                                    break;
+                                }
+                            bool localLoad = false;
+                            bool success = true;
+                            yield return null;
+                            if ((object)map == null)
                             {
-                                guiExtra = "Normal Map";
-                                yield return null;
-                                //OnGui();
-                                Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                                map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
-                                yield return null;
-                                if (loadInfo.compressNormals)
-                                    map.Compress(true);
-                                map.Apply(true, true);
-                                yield return null;
+                                localLoad = true;
+                                success = false;
+                                if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSBump")))
+                                {
+                                    
+                                    yield return null;
+                                    //OnGui();
+                                    map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                                    map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSBump")));
+                                    yield return null;
+                                    if (loadInfo.compressNormals)
+                                        map.Compress(true);
+                                    map.Apply(true, true);
+                                    yield return null;
+                                }
+                                else
+                                    print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
+                            }
+                            if (success)
+                            {
                                 Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
                                 if (oldBump != null)
                                 {
@@ -1604,11 +1660,17 @@ namespace RealSolarSystem
                                     }
                                     DestroyImmediate(oldBump);
                                     oldBump = null;
+                                    yield return null;
                                 }
+                                if(t.gameObject.renderer.material.GetTexture("_BumpMap") != map)
+                                    t.gameObject.renderer.material.SetTexture("_BumpMap", map);
+                            }
+                            if (localLoad)
+                            {
+                                DestroyImmediate(map);
+                                map = null;
                                 yield return null;
                             }
-                            else
-                                print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSBump"));
                             yield return null;
                             guiExtra = "";
                             //OnGui();
@@ -1919,7 +1981,7 @@ namespace RealSolarSystem
                         while (retval.MoveNext()) yield return retval.Current;
                         retval = LoadPQS(node, body, origRadius);
                         while (retval.MoveNext()) yield return retval.Current;
-                        yield return new WaitForSeconds(1);
+                        yield return null;
                         retval = LoadScaledSpace(node, body, origRadius);
                         while (retval.MoveNext()) yield return retval.Current;
                         retval = LoadExport(node, body);
@@ -1944,8 +2006,6 @@ namespace RealSolarSystem
             workingRSS = false;
             InputLockManager.RemoveControlLock("RSSLoad");
         }
-        long initialMemory;
-        long finalMemory;
         public void Start()
         {
             enabled = true;
