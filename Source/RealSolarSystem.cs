@@ -1554,10 +1554,9 @@ namespace RealSolarSystem
                         {
                             guiExtra = "Color map";
                             //Texture2D map = GameDatabase.Instance.GetTexture(path, false);
-                            Texture2D omap = null;
-                            Texture map = null;
-                            Texture[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture)) as Texture[];
-                            foreach (Texture tex in textures)
+                            Texture2D map = null;
+                            Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
+                            foreach (Texture2D tex in textures)
                             {
                                 if (tex.name.Equals(path))
                                 {
@@ -1570,16 +1569,17 @@ namespace RealSolarSystem
                             yield return null;
                             if ((object)map == null)
                             {
+                                print("RSS Loading local texture " + path);
                                 localLoad = true;
                                 success = false;
                                 if (File.Exists(KSPUtil.ApplicationRootPath + path))
                                 {
-                                    omap = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
-                                    omap.LoadImage(System.IO.File.ReadAllBytes(path));
+                                    map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
+                                    map.LoadImage(System.IO.File.ReadAllBytes(path));
                                     yield return null;
-                                    omap.Compress(true);
-                                    omap.Apply(true, true);
-                                    map = (Texture)omap;
+                                    map.Compress(true);
+                                    yield return null;
+                                    map.Apply(true, true);
                                     yield return null;
                                     success = true;
                                 }
@@ -1600,14 +1600,6 @@ namespace RealSolarSystem
                                     oldColor = null;
                                     yield return null;
                                 }
-                                if(t.gameObject.renderer.material.GetTexture("_MainTex") != map)
-                                    t.gameObject.renderer.material.SetTexture("_MainTex", map);
-                            }
-                            if (localLoad)
-                            {
-                                DestroyImmediate(map);
-                                map = null;
-                                yield return null;
                             }
                         }
                         yield return null;
@@ -1642,6 +1634,7 @@ namespace RealSolarSystem
                                     yield return null;
                                     if (loadInfo.compressNormals)
                                         map.Compress(true);
+                                    yield return null;
                                     map.Apply(true, true);
                                     yield return null;
                                 }
@@ -1651,25 +1644,18 @@ namespace RealSolarSystem
                             if (success)
                             {
                                 Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
+                                bool replacedOrig = false;
                                 if (oldBump != null)
                                 {
                                     foreach (Material m in Resources.FindObjectsOfTypeAll(typeof(Material)))
                                     {
-                                        if (m.GetTexture("_BumpMap") == oldBump)
+                                        if (m.GetTexture("_BumpMap") == oldBump || m == t.gameObject.renderer.material)
                                             m.SetTexture("_BumpMap", map);
                                     }
                                     DestroyImmediate(oldBump);
                                     oldBump = null;
                                     yield return null;
                                 }
-                                if(t.gameObject.renderer.material.GetTexture("_BumpMap") != map)
-                                    t.gameObject.renderer.material.SetTexture("_BumpMap", map);
-                            }
-                            if (localLoad)
-                            {
-                                DestroyImmediate(map);
-                                map = null;
-                                yield return null;
                             }
                             yield return null;
                             guiExtra = "";

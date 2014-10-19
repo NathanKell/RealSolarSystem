@@ -46,6 +46,9 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.1.1
+*Fixed stupidity where I deleted textures after loading them.
+
 v8.1
 *Completely revised loading system to use coroutines, added GUI. RSS will now load at the main menu, over a period of time to allow garbage collection to run. RAM usage should no longer spike as badly. Many thanks to stupid_chris for getting me set up with coroutines, and to Sarbian for help fixing some remaining issues. While loading may take slightly longer, you should be able to use more textures/parts, and you now get a handy GUI to track status.
 *Support calling textures from GameDatabase for the scaled space textures (SSColor, SSBump). This allows use combined with Sarbian's DDSLoader.
