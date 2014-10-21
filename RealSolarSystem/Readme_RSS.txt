@@ -46,6 +46,10 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.2
+*Finally fixed (I trust) all remaining issues from the loader rewrite
+*Borrowed some PQSMod values from 6.4x Kerbin (kudos to Raptor831 et al)
+
 v8.1.2
 *Fixed normal map loading
 *Added ability to set both far and near clip planes in cfg, added cfg support for camScaledSpace (camScaledSpaceNearClip like cam01FarClip in cfg)

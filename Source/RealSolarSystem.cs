@@ -554,6 +554,7 @@ namespace RealSolarSystem
             // do final update for all SoIs and hillSpheres and periods
             guiMajor = "Final orbit pass";
             //OnGui();
+            print("*RSS* Doing final orbit pass");
             foreach (CelestialBody body in FlightGlobals.fetch.bodies)
             {
                 guiMinor = body.name;
@@ -564,6 +565,7 @@ namespace RealSolarSystem
                 {
                     if (body.referenceBody != null)
                     {
+                        print("Computing params for " + body.name);
                         body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
                         body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
                         if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
@@ -1564,13 +1566,11 @@ namespace RealSolarSystem
                                     break;
                                 }
                             }
-                            bool localLoad = false;
                             bool success = true;
                             yield return null;
                             if ((object)map == null)
                             {
                                 print("RSS Loading local texture " + path);
-                                localLoad = true;
                                 success = false;
                                 path = KSPUtil.ApplicationRootPath + path;
                                 if (File.Exists(path))
@@ -1618,12 +1618,10 @@ namespace RealSolarSystem
                                     map = tex;
                                     break;
                                 }
-                            bool localLoad = false;
                             bool success = true;
                             yield return null;
                             if ((object)map == null)
                             {
-                                localLoad = true;
                                 print("RSS Loading local texture " + path);
                                 success = false;
                                 path = KSPUtil.ApplicationRootPath + path;
@@ -1980,7 +1978,8 @@ namespace RealSolarSystem
                 }
             }
             yield return null;
-            LoadFinishOrbits();
+            var retval2 = LoadFinishOrbits();
+			while(retval2.MoveNext()) yield return retval2.Current;
             yield return null;
             Resources.UnloadUnusedAssets();
             yield return null;
