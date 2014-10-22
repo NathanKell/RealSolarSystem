@@ -67,7 +67,7 @@ namespace RealSolarSystem
                     else
                     {
                         float farClip = -1;
-                        float nearClip = 01;
+                        float nearClip = -1;
                         if (cam.name.Equals("Camera 00"))
                         {
                             RSSSettings.TryGetValue("cam00FarClip", ref farClip);

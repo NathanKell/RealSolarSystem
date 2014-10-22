@@ -46,6 +46,10 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.2.1
+*Fix typo in camera clipping that made the ground flicker (at least it wasn't another loader bug).
+*Correct version this time in assembly info.
+
 v8.2
 *Finally fixed (I trust) all remaining issues from the loader rewrite
 *Borrowed some PQSMod values from 6.4x Kerbin (kudos to Raptor831 et al)
