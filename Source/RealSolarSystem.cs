@@ -826,7 +826,7 @@ namespace RealSolarSystem
                                             if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
                                             {
                                                 Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
-                                                map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
+                                                map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")));
                                                 yield return null;
                                                 //print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
                                                 //System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
