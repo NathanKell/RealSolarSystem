@@ -806,6 +806,88 @@ namespace RealSolarSystem
                                         yield return null;
                                         mod.OnSetup();
                                     }
+									if(modNode.name.Equals("PQSMod_VertexPlanet") && m.GetType().ToString().Equals(modNode.name))
+									{
+										PQSMod_VertexPlanet mod = m as PQSMod_VertexPlanet;
+										if (modNode.HasValue("seed"))
+										{
+											if(int.TryParse(modNode.GetValue("seed"), out itmp))
+                                                mod.seed = itmp;
+										}
+										if (modNode.HasValue("deformity"))
+                                        {
+                                            if (double.TryParse (modNode.GetValue("deformity"), out dtmp))
+                                                mod.deformity = dtmp;
+                                        }
+                                        if (modNode.HasValue("colorDeformity"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("colorDeformity"), out dtmp))
+                                                mod.colorDeformity = dtmp;
+                                        }
+										if (modNode.HasValue("oceanLevel"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("oceanLevel"), out dtmp))
+                                                mod.oceanLevel = dtmp;
+                                        }
+										if (modNode.HasValue("oceanStep"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("oceanStep"), out dtmp))
+                                                mod.oceanStep = dtmp;
+                                        }
+										if (modNode.HasValue("oceanDepth"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("oceanDepth"), out dtmp))
+                                                mod.oceanDepth = dtmp;
+                                        }
+										if (modNode.HasValue("oceanSnap"))
+                                        {
+                                            if (bool.TryParse(modNode.GetValue("oceanSnap"), out btmp))
+                                                mod.oceanSnap = btmp;
+                                        }
+										if (modNode.HasValue("terrainSmoothing"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainSmoothing"), out dtmp))
+                                                mod.terrainSmoothing = dtmp;
+                                        }
+                                        if (modNode.HasValue("terrainShapeStart"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainShapeStart"), out dtmp))
+                                                mod.terrainShapeStart = dtmp;
+                                        }
+										if (modNode.HasValue("terrainShapeEnd"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainShapeEnd"), out dtmp))
+                                                mod.terrainShapeEnd = dtmp;
+                                        }
+										if (modNode.HasValue("terrainRidgesMin"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainRidgesMin"), out dtmp))
+                                                mod.terrainRidgesMin = dtmp;
+                                        }
+										if (modNode.HasValue("terrainRidgesMax"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainRidgesMax"), out dtmp))
+                                                mod.terrainRidgesMax = dtmp;
+                                        }
+										if (modNode.HasValue("buildHeightColors"))
+                                        {
+                                            if (bool.TryParse(modNode.GetValue("buildHeightColors"), out btmp))
+                                                mod.buildHeightColors = btmp;
+                                        }
+										if (modNode.HasValue("terrainRidgeBalance"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainRidgeBalance"), out dtmp))
+                                                mod.terrainRidgeBalance = dtmp;
+                                        }
+                                        if (modNode.HasValue ("order"))
+                                        {
+                                            if (int.TryParse (modNode.GetValue ("order"), out itmp))
+                                                mod.order = itmp;
+                                        }
+                                        // Also supports Landclasses. Maybe come back and do these later...
+                                        yield return null;
+                                        mod.OnSetup();
+									}
                                     ///
                                     if (modNode.name.Equals("PQSMod_VertexHeightMap") && m.GetType().ToString().Equals(modNode.name))
                                     {
@@ -839,6 +921,11 @@ namespace RealSolarSystem
                                             }
                                             else
                                                 print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("heightMap"));
+                                        }
+                                        if (modNode.HasValue ("order"))
+                                        {
+                                            if (int.TryParse (modNode.GetValue ("order"), out itmp))
+                                                mod.order = itmp;
                                         }
                                         yield return null;
                                         mod.OnSetup();
@@ -951,6 +1038,37 @@ namespace RealSolarSystem
                                     if (modNode.name.Equals("PQSLandControl") && m.GetType().ToString().Equals(modNode.name))
                                     {
                                         PQSLandControl mod = m as PQSLandControl;
+										if (modNode.HasValue("useHeightMap"))
+										{
+											if (bool.TryParse (modNode.GetValue ("useHeightMap"), out btmp))
+												mod.useHeightMap = btmp;
+
+											if (mod.useHeightMap && modNode.HasValue("heightMap"))
+											{
+												if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
+												{
+													Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
+													map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
+													yield return null;
+													//print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
+													//System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
+													//DestroyImmediate(mod.heightMap);
+													//mod.heightMap = ScriptableObject.CreateInstance<MapSO>();
+													mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
+													DestroyImmediate(map);
+													map = null;
+													yield return null;
+												}
+												else
+												{
+													print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("heightMap"));
+													mod.useHeightMap = false;
+												}
+											}
+											else
+												mod.useHeightMap = false; // If there was no heightMap given
+										}
+
 
                                         if (modNode.HasValue("vHeightMax"))
                                         {
@@ -1408,8 +1526,8 @@ namespace RealSolarSystem
                                         yield return null;
                                         vertColor.OnSetup();
                                     }
-                                    if (modNode.name.Equals("PQSMod_VertexHeightMap"))
-                                    {
+									if (modNode.name.Equals("PQSMod_VertexHeightMap"))
+									{
                                         if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
                                         {
                                             GameObject tempObj = new GameObject();
