@@ -384,22 +384,28 @@ namespace RealSolarSystem {
             if(RSSSettings == null) {
                 throw new UnityException("*RSS* REALSOLARSYSTEM node not found!");
 			}
-			
-			if(RSSSettings.HasNode("LaunchSites")) {
-				ConfigNode node = RSSSettings.GetNode("LaunchSites");
-				ConfigNode[] sites = node.GetNodes("Site");
 
-				foreach(ConfigNode site in sites) {
-	                if(site.HasValue("name")) {
-						ConfigNode pqsCity = site.GetNode("PQSCity");
-						if(pqsCity == null) { continue; }
-						
-                    	if(pqsCity.HasValue("latitude") && pqsCity.HasValue("longitude")) {
-							Sites.Add(site);
-						}
-					}
-				}
-			}
+            if (RSSSettings.HasNode("LaunchSites"))
+            {
+                ConfigNode node = RSSSettings.GetNode("LaunchSites");
+                ConfigNode[] sites = node.GetNodes("Site");
+
+                foreach (ConfigNode site in sites)
+                {
+                    if (site.HasValue("name"))
+                    {
+                        ConfigNode pqsCity = site.GetNode("PQSCity");
+                        if (pqsCity == null) { continue; }
+
+                        if (pqsCity.HasValue("latitude") && pqsCity.HasValue("longitude"))
+                        {
+                            Sites.Add(site);
+                        }
+                    }
+                }
+            }
+            else
+                Debug.Log("*RSS* No LaunchSites node found!");
 			
 			Debug.Log("*RSS* loaded " + Sites.Count + " launch sites.");
 		}
