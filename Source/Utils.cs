@@ -47,6 +47,40 @@ namespace RealSolarSystem
             mesh.vertices = vertices;
             ProfileTimer.Pop("MatchVerts");
         }
+        // returns true iff it's a local load
+        public static bool LoadTexture(string path, ref Texture2D map, bool compress, bool upload, bool unreadable)
+        {
+            map = null;
+
+            // first try in GDB
+            Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
+            foreach (Texture2D tex in textures)
+            {
+                if (tex.name.Equals(path))
+                {
+                    map = tex;
+                    break;
+                }
+            }
+            if ((object)map == null)
+            {
+                print("RSS Loading local texture " + path);
+                path = KSPUtil.ApplicationRootPath + path;
+                if (File.Exists(path))
+                {
+                    map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                    map.LoadImage(System.IO.File.ReadAllBytes(path));
+                    if(compress)
+                        map.Compress(true);
+                    if(upload)
+                        map.Apply(true, unreadable);
+                    return true;
+                }
+                else
+                    print("*RSS* *ERROR* texture does not exist! " + path);
+            }
+            return false;
+        }
         public static void CopyMesh(Mesh source, Mesh dest)
         {
             //ProfileTimer.Push("CopyMesh");

@@ -66,7 +66,7 @@ namespace RealSolarSystem
 
         public void OnGUI()
         {
-            if(showGUI)
+            if (showGUI)
             {
                 if (GuiIdx < 0)
                 {
@@ -111,7 +111,7 @@ namespace RealSolarSystem
 
         public static void UpdateAFG(CelestialBody body, AtmosphereFromGround afg, ConfigNode modNode = null)
         {
-            if(modNode != null)
+            if (modNode != null)
             {
                 float ftmp;
                 // the default
@@ -151,7 +151,7 @@ namespace RealSolarSystem
                     afg.transform.localScale = Vector3.one * ((float)(body.Radius + body.maxAtmosphereAltitude) / (float)body.Radius);
                 }
 
-                
+
                 if (modNode.HasValue("invWaveLength"))
                 {
                     //will be recomputed by SQUAD anyway so no point.
@@ -160,9 +160,9 @@ namespace RealSolarSystem
                     {
                         Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("invWaveLength"));
                         afg.invWaveLength = new Color(col.x, col.y, col.z, col.w);
-                        afg.waveLength = new Color((float)Math.Pow(1/col.x, 0.25), (float)Math.Pow(1/col.y, 0.25), (float)Math.Pow(1/col.z, 0.25), 1f);
+                        afg.waveLength = new Color((float)Math.Pow(1 / col.x, 0.25), (float)Math.Pow(1 / col.y, 0.25), (float)Math.Pow(1 / col.z, 0.25), 1f);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         print("*RSS* Error parsing as color4: original text: " + modNode.GetValue("invWaveLength") + " --- exception " + e.Message);
                     }
@@ -174,7 +174,7 @@ namespace RealSolarSystem
                         Vector4 col = KSPUtil.ParseVector4(modNode.GetValue("waveLength"));
                         afg.waveLength = new Color(col.x, col.y, col.z, col.w);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         print("*RSS* Error parsing as color4: original text: " + modNode.GetValue("waveLength") + " --- exception " + e.Message);
                     }
@@ -214,8 +214,8 @@ namespace RealSolarSystem
 
         public static Vector3 LLAtoECEF(double lat, double lon, double alt, double radius)
         {
-            const double degreesToRadians =  Math.PI / 180.0;
-            lat = (lat-90) * degreesToRadians;
+            const double degreesToRadians = Math.PI / 180.0;
+            lat = (lat - 90) * degreesToRadians;
             lon *= degreesToRadians;
             double x, y, z;
             double n = radius; // for now, it's still a sphere, so just the radius
@@ -806,6 +806,88 @@ namespace RealSolarSystem
                                         yield return null;
                                         mod.OnSetup();
                                     }
+                                    if (modNode.name.Equals("PQSMod_VertexPlanet") && m.GetType().ToString().Equals(modNode.name))
+                                    {
+                                        PQSMod_VertexPlanet mod = m as PQSMod_VertexPlanet;
+                                        if (modNode.HasValue("seed"))
+                                        {
+                                            if (int.TryParse(modNode.GetValue("seed"), out itmp))
+                                                mod.seed = itmp;
+                                        }
+                                        if (modNode.HasValue("deformity"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("deformity"), out dtmp))
+                                                mod.deformity = dtmp;
+                                        }
+                                        if (modNode.HasValue("colorDeformity"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("colorDeformity"), out dtmp))
+                                                mod.colorDeformity = dtmp;
+                                        }
+                                        if (modNode.HasValue("oceanLevel"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("oceanLevel"), out dtmp))
+                                                mod.oceanLevel = dtmp;
+                                        }
+                                        if (modNode.HasValue("oceanStep"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("oceanStep"), out dtmp))
+                                                mod.oceanStep = dtmp;
+                                        }
+                                        if (modNode.HasValue("oceanDepth"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("oceanDepth"), out dtmp))
+                                                mod.oceanDepth = dtmp;
+                                        }
+                                        if (modNode.HasValue("oceanSnap"))
+                                        {
+                                            if (bool.TryParse(modNode.GetValue("oceanSnap"), out btmp))
+                                                mod.oceanSnap = btmp;
+                                        }
+                                        if (modNode.HasValue("terrainSmoothing"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainSmoothing"), out dtmp))
+                                                mod.terrainSmoothing = dtmp;
+                                        }
+                                        if (modNode.HasValue("terrainShapeStart"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainShapeStart"), out dtmp))
+                                                mod.terrainShapeStart = dtmp;
+                                        }
+                                        if (modNode.HasValue("terrainShapeEnd"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainShapeEnd"), out dtmp))
+                                                mod.terrainShapeEnd = dtmp;
+                                        }
+                                        if (modNode.HasValue("terrainRidgesMin"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainRidgesMin"), out dtmp))
+                                                mod.terrainRidgesMin = dtmp;
+                                        }
+                                        if (modNode.HasValue("terrainRidgesMax"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainRidgesMax"), out dtmp))
+                                                mod.terrainRidgesMax = dtmp;
+                                        }
+                                        if (modNode.HasValue("buildHeightColors"))
+                                        {
+                                            if (bool.TryParse(modNode.GetValue("buildHeightColors"), out btmp))
+                                                mod.buildHeightColors = btmp;
+                                        }
+                                        if (modNode.HasValue("terrainRidgeBalance"))
+                                        {
+                                            if (double.TryParse(modNode.GetValue("terrainRidgeBalance"), out dtmp))
+                                                mod.terrainRidgeBalance = dtmp;
+                                        }
+                                        if (modNode.HasValue("order"))
+                                        {
+                                            if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                mod.order = itmp;
+                                        }
+                                        // Also supports Landclasses. Maybe come back and do these later...
+                                        yield return null;
+                                        mod.OnSetup();
+                                    }
                                     ///
                                     if (modNode.name.Equals("PQSMod_VertexHeightMap") && m.GetType().ToString().Equals(modNode.name))
                                     {
@@ -823,22 +905,26 @@ namespace RealSolarSystem
                                         }
                                         if (modNode.HasValue("heightMap"))
                                         {
-                                            if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
+                                            Texture2D map = null;
+                                            bool localLoad = Utils.LoadTexture(modNode.GetValue("heightMap"), ref map, false, false, false);
+                                            if((object)map != null)
                                             {
-                                                Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
-                                                map.LoadImage(System.IO.File.ReadAllBytes(modNode.GetValue("heightMap")));
                                                 yield return null;
-                                                //print("*RSS* MapSO: depth " + mod.heightMap.Depth + "(" + mod.heightMap.Width + "x" + mod.heightMap.Height + ")");
-                                                //System.IO.File.WriteAllBytes("oldHeightmap.png", mod.heightMap.CompileToTexture().EncodeToPNG());
-                                                //DestroyImmediate(mod.heightMap);
-                                                //mod.heightMap = ScriptableObject.CreateInstance<MapSO>();
                                                 mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
-                                                DestroyImmediate(map);
-                                                map = null;
+                                                if (localLoad)
+                                                {
+                                                    DestroyImmediate(map);
+                                                    map = null;
+                                                }
                                                 yield return null;
                                             }
                                             else
                                                 print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("heightMap"));
+                                        }
+                                        if (modNode.HasValue("order"))
+                                        {
+                                            if (int.TryParse(modNode.GetValue("order"), out itmp))
+                                                mod.order = itmp;
                                         }
                                         yield return null;
                                         mod.OnSetup();
@@ -951,6 +1037,36 @@ namespace RealSolarSystem
                                     if (modNode.name.Equals("PQSLandControl") && m.GetType().ToString().Equals(modNode.name))
                                     {
                                         PQSLandControl mod = m as PQSLandControl;
+                                        if (modNode.HasValue("useHeightMap"))
+                                        {
+                                            if (bool.TryParse(modNode.GetValue("useHeightMap"), out btmp))
+                                                mod.useHeightMap = btmp;
+
+                                            if (mod.useHeightMap && modNode.HasValue("heightMap"))
+                                            {
+                                                Texture2D map = null;
+                                                bool localLoad = Utils.LoadTexture(modNode.GetValue("heightMap"), ref map, false, false, false);
+                                                if ((object)map != null)
+                                                {
+                                                    yield return null;
+                                                    mod.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
+                                                    if (localLoad)
+                                                    {
+                                                        DestroyImmediate(map);
+                                                        map = null;
+                                                    }
+                                                    yield return null;
+                                                }
+                                                else
+                                                {
+                                                    print("*RSS* *ERROR* texture does not exist! " + modNode.GetValue("heightMap"));
+                                                    mod.useHeightMap = false;
+                                                }
+                                            }
+                                            else
+                                                mod.useHeightMap = false; // If there was no heightMap given
+                                        }
+
 
                                         if (modNode.HasValue("vHeightMax"))
                                         {
@@ -1253,16 +1369,23 @@ namespace RealSolarSystem
                                             if (int.TryParse(modNode.GetValue("order"), out itmp))
                                                 mod.order = itmp;
 
-                                        if (modNode.HasValue("vertexColorMap") && File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
+                                        if (modNode.HasValue("vertexColorMap"))
                                         {
                                             // for now don't destroy old map, use GC.
-                                            Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
-                                            map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
-                                            yield return null;
-                                            mod.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
-                                            mod.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
-                                            DestroyImmediate(map);
-                                            map = null;
+                                            Texture2D map = null;
+                                            bool localLoad = Utils.LoadTexture(modNode.GetValue("vertexColorMap"), ref map, false, false, false);
+                                            if ((object)map != null)
+                                            {
+                                                map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
+                                                yield return null;
+                                                mod.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
+                                                mod.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
+                                                if (localLoad)
+                                                {
+                                                    DestroyImmediate(map);
+                                                    map = null;
+                                                }
+                                            }
                                             yield return null;
                                         }
                                         else
@@ -1309,18 +1432,17 @@ namespace RealSolarSystem
                                     //OnGui();
                                     if (modNode.name.Equals("PQSMod_VertexColorMapBlend"))
                                     {
-                                        if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")))
+                                        Texture2D map = null;
+                                        bool localLoad = Utils.LoadTexture(modNode.GetValue("vertexColorMap"), ref map, false, false, false);
+                                        if((object)map != null)
                                         {
                                             GameObject tempObj = new GameObject();
-
 
                                             PQSMod_VertexColorMapBlend colorMap = (PQSMod_VertexColorMapBlend)tempObj.AddComponent(typeof(PQSMod_VertexColorMapBlend));
 
                                             tempObj.transform.parent = p.gameObject.transform;
                                             colorMap.sphere = p;
 
-                                            Texture2D map = new Texture2D(4, 4, TextureFormat.RGB24, false);
-                                            map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
                                             yield return null;
                                             colorMap.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
                                             colorMap.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
@@ -1336,8 +1458,12 @@ namespace RealSolarSystem
                                                     colorMap.order = itmp;
 
                                             colorMap.modEnabled = true;
-                                            DestroyImmediate(map);
-                                            map = null;
+
+                                            if (localLoad)
+                                            {
+                                                DestroyImmediate(map);
+                                                map = null;
+                                            }
                                             yield return null;
                                             colorMap.OnSetup();
                                         }
@@ -1410,7 +1536,9 @@ namespace RealSolarSystem
                                     }
                                     if (modNode.name.Equals("PQSMod_VertexHeightMap"))
                                     {
-                                        if (File.Exists(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")))
+                                        Texture2D map = null;
+                                        bool localLoad = Utils.LoadTexture(modNode.GetValue("heightMap"), ref map, false, false, false);
+                                        if ((object)map != null)
                                         {
                                             GameObject tempObj = new GameObject();
 
@@ -1419,8 +1547,6 @@ namespace RealSolarSystem
                                             tempObj.transform.parent = p.gameObject.transform;
                                             heightMap.sphere = p;
 
-                                            Texture2D map = new Texture2D(4, 4, TextureFormat.Alpha8, false);
-                                            map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("heightMap")));
                                             yield return null;
                                             heightMap.heightMap = ScriptableObject.CreateInstance<MapSO>();
                                             heightMap.heightMap.CreateMap(MapSO.MapDepth.Greyscale, map);
@@ -1555,39 +1681,9 @@ namespace RealSolarSystem
                         if (replaceColor > 0)
                         {
                             guiExtra = "Color map";
-                            //Texture2D map = GameDatabase.Instance.GetTexture(path, false);
                             Texture2D map = null;
-                            Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
-                            foreach (Texture2D tex in textures)
-                            {
-                                if (tex.name.Equals(path))
-                                {
-                                    map = tex;
-                                    break;
-                                }
-                            }
-                            bool success = true;
-                            yield return null;
+                            bool local = Utils.LoadTexture(path, ref map, true, true, true);
                             if ((object)map == null)
-                            {
-                                print("RSS Loading local texture " + path);
-                                success = false;
-                                path = KSPUtil.ApplicationRootPath + path;
-                                if (File.Exists(path))
-                                {
-                                    map = new Texture2D(4, 4, replaceColor == 1 ? TextureFormat.RGB24 : TextureFormat.RGBA32, true);
-                                    map.LoadImage(System.IO.File.ReadAllBytes(path));
-                                    yield return null;
-                                    map.Compress(true);
-                                    yield return null;
-                                    map.Apply(true, true);
-                                    yield return null;
-                                    success = true;
-                                }
-                                else
-                                    print("*RSS* *ERROR* texture does not exist! " + path);
-                            }
-                            if (success)
                             {
                                 Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
                                 if ((object)oldColor != null)
@@ -1609,41 +1705,10 @@ namespace RealSolarSystem
                         {
                             guiExtra = "Normal Map";
                             path = node.GetValue("SSBump");
-                            //Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSBump"), false);
                             Texture2D map = null;
-                            Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
-                            foreach (Texture2D tex in textures)
-                                if (tex.name.Equals(path))
-                                {
-                                    map = tex;
-                                    break;
-                                }
-                            bool success = true;
+                            bool local = Utils.LoadTexture(path, ref map, loadInfo.compressNormals, true, true);
                             yield return null;
                             if ((object)map == null)
-                            {
-                                print("RSS Loading local texture " + path);
-                                success = false;
-                                path = KSPUtil.ApplicationRootPath + path;
-                                if (File.Exists(path))
-                                {
-                                    
-                                    yield return null;
-                                    //OnGui();
-                                    map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                                    map.LoadImage(System.IO.File.ReadAllBytes(path));
-                                    yield return null;
-                                    if (loadInfo.compressNormals)
-                                        map.Compress(true);
-                                    yield return null;
-                                    map.Apply(true, true);
-                                    success = true;
-                                    yield return null;
-                                }
-                                else
-                                    print("*RSS* *ERROR* texture does not exist! " + path);
-                            }
-                            if (success)
                             {
                                 Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
                                 if (oldBump != null)
@@ -1689,25 +1754,11 @@ namespace RealSolarSystem
                         }
                         if (node.HasValue("SSRamp"))
                         {
-                            Texture2D map = GameDatabase.Instance.GetTexture(node.GetValue("SSRamp"), false);
-                            bool localLoad = false;
-                            if (map == null)
+                            Texture2D map = null;
+                            bool localLoad = Utils.LoadTexture(node.GetValue("SSRamp"), ref map, true, true, true);
+                            if ((object)map != null)
                             {
-                                if (File.Exists(KSPUtil.ApplicationRootPath + node.GetValue("SSRamp")))
-                                {
-                                    map.LoadImage(System.IO.File.ReadAllBytes(node.GetValue("SSRamp")));
-                                    map.Compress(true);
-                                    map.Apply(true, true);
-                                    localLoad = true;
-                                }
-                            }
-                            if (map != null)
-                            {
-                                if (t.gameObject.renderer.material.GetTexture("_rimColorRamp") != null)
-                                    t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
-                                else
-                                    if (localLoad)
-                                        DestroyImmediate(map);
+                                t.gameObject.renderer.material.SetTexture("_rimColorRamp", map);
                             }
                             else
                                 print("*RSS* *ERROR* texture does not exist! " + node.GetValue("SSRamp"));
@@ -1956,14 +2007,14 @@ namespace RealSolarSystem
             print("*RSS* Modifying bodies");
             //OnGui();
             int nodeCount = loadInfo.node.nodes.Count - (loadInfo.node.HasNode("LaunchSites") ? 1 : 0);
-            for(int i = 0; i < loadInfo.node.nodes.Count; i++)
+            for (int i = 0; i < loadInfo.node.nodes.Count; i++)
             {
                 ConfigNode node = loadInfo.node.nodes[i];
                 foreach (CelestialBody body in FlightGlobals.fetch.bodies) //Resources.FindObjectsOfTypeAll(typeof(CelestialBody))) //in FlightGlobals.fetch.bodies)
                 {
                     if (body.name.Equals(node.name))
                     {
-                        guiMajor = "Editing Body: " + node.name + "   (" + (i+1) + "/" + nodeCount + ")";
+                        guiMajor = "Editing Body: " + node.name + "   (" + (i + 1) + "/" + nodeCount + ")";
                         double origRadius = body.Radius;
                         var retval = LoadCB(node, body);
                         while (retval.MoveNext()) yield return retval.Current;
@@ -1979,7 +2030,7 @@ namespace RealSolarSystem
             }
             yield return null;
             var retval2 = LoadFinishOrbits();
-			while(retval2.MoveNext()) yield return retval2.Current;
+            while (retval2.MoveNext()) yield return retval2.Current;
             yield return null;
             Resources.UnloadUnusedAssets();
             yield return null;
@@ -2023,4 +2074,3 @@ namespace RealSolarSystem
     }
 
 }
-
