@@ -51,7 +51,7 @@ namespace RealSolarSystem
         public static bool LoadTexture(string path, ref Texture2D map, bool compress, bool upload, bool unreadable)
         {
             map = null;
-
+            print("RSS searching for texture " + path);
             // first try in GDB
             Texture2D[] textures = Resources.FindObjectsOfTypeAll(typeof(Texture2D)) as Texture2D[];
             foreach (Texture2D tex in textures)

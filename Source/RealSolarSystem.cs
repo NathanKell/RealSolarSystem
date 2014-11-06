@@ -1683,7 +1683,7 @@ namespace RealSolarSystem
                             guiExtra = "Color map";
                             Texture2D map = null;
                             bool local = Utils.LoadTexture(path, ref map, true, true, true);
-                            if ((object)map == null)
+                            if ((object)map != null)
                             {
                                 Texture oldColor = t.gameObject.renderer.material.GetTexture("_MainTex");
                                 if ((object)oldColor != null)
@@ -1708,7 +1708,7 @@ namespace RealSolarSystem
                             Texture2D map = null;
                             bool local = Utils.LoadTexture(path, ref map, loadInfo.compressNormals, true, true);
                             yield return null;
-                            if ((object)map == null)
+                            if ((object)map != null)
                             {
                                 Texture oldBump = t.gameObject.renderer.material.GetTexture("_BumpMap");
                                 if (oldBump != null)
