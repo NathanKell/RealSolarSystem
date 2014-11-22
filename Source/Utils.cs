@@ -68,13 +68,28 @@ namespace RealSolarSystem
                 path = KSPUtil.ApplicationRootPath + path;
                 if (File.Exists(path))
                 {
-                    map = new Texture2D(4, 4, TextureFormat.RGB24, true);
-                    map.LoadImage(System.IO.File.ReadAllBytes(path));
-                    if(compress)
-                        map.Compress(true);
-                    if(upload)
-                        map.Apply(true, unreadable);
-                    return true;
+                    try
+                    {
+                        map = new Texture2D(4, 4, TextureFormat.RGB24, true);
+                        if (path.ToLower().Contains(".dds"))
+                        {
+                            GameDatabase.TextureInfo tInfo = DDSLoader.DatabaseLoaderTexture_DDS.LoadDDS(path, !unreadable, path.Contains("NRM"), -1, upload);
+                            map = tInfo.texture;
+                        }
+                        else
+                        {
+                            map.LoadImage(System.IO.File.ReadAllBytes(path));
+                            if (compress)
+                                map.Compress(true);
+                            if (upload)
+                                map.Apply(true, unreadable);
+                        }
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Log("*RSS* *ERROR* failed to load " + path);
+                    }
                 }
                 else
                     print("*RSS* *ERROR* texture does not exist! " + path);
