@@ -10,6 +10,50 @@ namespace RealSolarSystem
 {
     public class Utils : MonoBehaviour
     {
+        public static AnimationCurve LoadAnimationCurve(ConfigNode node)
+        {
+            string[] curve = node.GetValues("key");
+            return LoadAnimationCurve(curve);
+        }
+
+        public static AnimationCurve LoadAnimationCurve(string[] curveData)
+        {
+            char[] cParams = new char[] { ' ', ',', ';', '\t' };
+            AnimationCurve animationCurve = new AnimationCurve();
+            try
+            {
+                for (int i = 0; i < curveData.Length; i++)
+                {
+                    string[] keyTmp = curveData[i].Split(cParams, StringSplitOptions.RemoveEmptyEntries);
+                    if (keyTmp.Length == 4)
+                    {
+                        Keyframe key = new Keyframe();
+                        key.time = float.Parse(keyTmp[0]);
+                        key.value = float.Parse(keyTmp[1]);
+                        key.inTangent = float.Parse(keyTmp[2]);
+                        key.outTangent = float.Parse(keyTmp[3]);
+                        animationCurve.AddKey(key);
+                    }
+                    else if (keyTmp.Length == 2)
+                    {
+                        Keyframe key = new Keyframe();
+                        key.time = float.Parse(keyTmp[0]);
+                        key.value = float.Parse(keyTmp[1]);
+                        animationCurve.AddKey(key);
+                    }
+                    else
+                    {
+                        MonoBehaviour.print("*RSS* Invalid animationCurve data: animationCurve data must have exactly two or four parameters!");
+                    }
+                }
+                return animationCurve;
+            }
+            catch (Exception e)
+            {
+                print("Caught exception while parsing animationcurve: " + e.Message);
+                return null;
+            }
+        }
         public static void ScaleVerts(Mesh mesh, float scaleFactor)
         {
             ProfileTimer.Push("ScaleVerts");
@@ -88,7 +132,7 @@ namespace RealSolarSystem
                     }
                     catch (Exception e)
                     {
-                        Debug.Log("*RSS* *ERROR* failed to load " + path);
+                        Debug.Log("*RSS* *ERROR* failed to load " + path + " with exception " + e.Message);
                     }
                 }
                 else

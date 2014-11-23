@@ -150,6 +150,25 @@ namespace RealSolarSystem {
                 } else {
                     print("*RSS* LightShifter: Couldn't find DynamicAmbientLight");
                 }
+                Sun sun = Sun.Instance;
+                if (sun != null)
+                {
+                    if (RSSSettings.HasValue("dumpBrightnessCurve"))
+                    {
+                        print("**DUMP** Sun AU: " + sun.AU);
+                        for (int i = 0; i < sun.brightnessCurve.keys.Length; i++)
+                        {
+                            Keyframe k = sun.brightnessCurve.keys[i];
+                            print("Key " + k.time + ", " + k.value + ", " + k.inTangent + "," + k.outTangent + " : mode " + k.tangentMode);
+                        }
+                    }
+                    if (RSSSettings.HasNode("sunBrightnessCurve"))
+                    {
+                        AnimationCurve newCurve = Utils.LoadAnimationCurve(RSSSettings.GetNode("sunBrightnessCurve"));
+                    }
+                    RSSSettings.TryGetValue("sunAU", ref sun.AU);
+                    
+                }
             }
         }
     }

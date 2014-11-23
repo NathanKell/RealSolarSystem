@@ -10,7 +10,7 @@ namespace RealSolarSystem
 {
     // Checks to make sure useLegacyAtmosphere didn't get munged with
     // Could become a general place to prevent RSS changes from being reverted when our back is turned.
-    [KSPAddon(KSPAddon.Startup.Flight, false)]
+    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class RSSWatchDog : MonoBehaviour
     {
         ConfigNode RSSSettings = null;
@@ -24,6 +24,8 @@ namespace RealSolarSystem
                 isCompatible = false;
                 return;
             }
+            if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER))
+                return;
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
 
@@ -47,6 +49,8 @@ namespace RealSolarSystem
         public void Update()
         {
             if (!isCompatible)
+                return;
+            if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER))
                 return;
 
             if(!useKeypressClip && updateCount > 22)
@@ -113,6 +117,8 @@ namespace RealSolarSystem
         public void FixedUpdate()
         {
             if (!isCompatible)
+                return;
+            if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER))
                 return;
 
             if (!dumpOrbits)
