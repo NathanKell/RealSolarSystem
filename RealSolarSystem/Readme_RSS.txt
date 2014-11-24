@@ -9,12 +9,14 @@ Supreme thanks to regex for code, and dimonnomid and SpacedInvader for incredibl
 License: CC-BY-NC-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source) and stupid_chris (ConfigNodeExtensions, licensed CC-BY-NC-SA). Used with permission.
 Includes artwork by dimonnomid and SpacedInvader.
+Includes biomes by Felger
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
 Also included:
 Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
 Custom Biomes by Trueborn. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/66256
-Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
+DDSLoader by Sarbian. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/96729
+A configuration for Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
 
 
 INSTALLATION:
@@ -46,6 +48,15 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.3
+*Added many new biomes from Felger (Luna, Mars/Deimos/Phobos, Venus, Jupiter and its moons, Saturn, Uranus
+*Includes DDSLoader from Sarbian, and full DDS support.
+*Allows specifying textures via GameDatabase rather than via direct loading (remove GameData/ prefix and remove extension, and make sure the image you are referencing is not under a PluginData folder)
+*Update loading to include AppRoot when loading locally (thanks TriggerAu)
+*Log on not finding LaunchSites.
+*Add support for VertexPlanet and for useHeightMap in LandClass (thanks Starwaster)
+*Support more light-shifting (can now modify Sun.AU and Sun.brightnessCurve)
+
 v8.2.1
 *Fix typo in camera clipping that made the ground flicker (at least it wasn't another loader bug).
 *Correct version this time in assembly info.
