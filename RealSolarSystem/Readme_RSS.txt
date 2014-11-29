@@ -49,7 +49,7 @@ Pluto is represented by Vall
 ===========================
 Changelog
 v8.3
-*Added many new biomes from Felger (Luna, Mars/Deimos/Phobos, Venus, Jupiter and its moons, Saturn, Uranus
+*Added many new biomes from Felger (Luna, Mars/Deimos/Phobos, Venus, Jupiter and its moons, Saturn and Titan, Uranus, Pluto.
 *Includes DDSLoader from Sarbian, and full DDS support.
 *Allows specifying textures via GameDatabase rather than via direct loading (remove GameData/ prefix and remove extension, and make sure the image you are referencing is not under a PluginData folder)
 *Update loading to include AppRoot when loading locally (thanks TriggerAu)
