@@ -524,7 +524,6 @@ namespace RealSolarSystem
                 {
                     if (body.referenceBody != null)
                     {
-                        print("Computing params for " + body.name);
                         body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
                         body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
                         if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
@@ -544,6 +543,7 @@ namespace RealSolarSystem
                             body.orbit.ObT = Math.Pow(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3.0) / body.orbit.referenceBody.gravParameter, 0.5) * body.orbit.meanAnomaly;
                             body.orbit.ObTAtEpoch = body.orbit.ObT;
                         }
+                        print("Computing params for " + body.name + ". SoI = " + body.sphereOfInfluence);
                     }
                     else
                     {
