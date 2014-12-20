@@ -2003,6 +2003,7 @@ namespace RealSolarSystem
             // GCDISABLE
             //ProfileTimer.Push("RSS_FirstGC");
             Resources.UnloadUnusedAssets();
+            MusicLogic.fetch.audio1.Stop();
             /*initialMemory = GC.GetTotalMemory(true);
             print("*RSS*: Total memory in use before load: " + initialMemory);*/
             //ProfileTimer.Pop("RSS_FirstGC");
@@ -2048,6 +2049,7 @@ namespace RealSolarSystem
             doneRSS = true;
             workingRSS = false;
             InputLockManager.RemoveControlLock("RSSLoad");
+            MusicLogic.fetch.audio1.Play();
         }
         public void Start()
         {
@@ -2071,6 +2073,7 @@ namespace RealSolarSystem
             foreach (PQSMod_CelestialBodyTransform c in Resources.FindObjectsOfTypeAll(typeof(PQSMod_CelestialBodyTransform)))
                 Utils.DumpCBT(c);*/
             showGUI = true;
+            MusicLogic.fetch.audio1.Stop();
             StartCoroutine(LoadRSS());
         }
 
