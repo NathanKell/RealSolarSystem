@@ -6,6 +6,7 @@
 *.user
 *.sln.docstates
 RealSolarSystem/Plugins/PluginData/
+Source/KSPPath.inc
 
 # Build results
 
