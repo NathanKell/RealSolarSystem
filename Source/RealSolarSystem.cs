@@ -1768,10 +1768,6 @@ namespace RealSolarSystem
                             }
                             else
                             {
-                                //OnGui();
-                                // **** No longer exporting and importing
-                                // Now I just do everything except tangents each time. Tangents don't seem necessary to fix, and
-                                // the rest is fast enough...and something in .24/64 broke importing for *some* planets. WEIRD.
                                 char sep = System.IO.Path.DirectorySeparatorChar;
                                 string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
                                             + sep + "PluginData" + sep + t.name;
@@ -1790,15 +1786,8 @@ namespace RealSolarSystem
                                         Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
 
                                         ObjLib.UpdateMeshFromFile(tMesh, filePath);
-                                        //m.mesh.RecalculateBounds();
-                                        // done in UpdateFromFile
-                                        /*m.mesh.RecalculateNormals();
-                                        ObjLib.UpdateTangents(tMesh);*/
                                         m.mesh = tMesh;
                                         m.mesh.RecalculateBounds();
-                                        /*float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
-                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                        rescale = false;*/
                                         print("*RSS* Loaded " + filePath + " and wrapped.");
                                         ProfileTimer.Pop("LoadSSM_" + body.name);
                                         wrap = false;
@@ -1836,7 +1825,7 @@ namespace RealSolarSystem
                                             tMesh.RecalculateNormals();
 
                                             //ProfileTimer.Pop("Recalc Normals");
-                                            //ObjLib.UpdateTangents(tMesh);
+                                            ObjLib.UpdateTangents(tMesh);
                                             //print("*RSS* wrapped.");
                                         }
                                         m.mesh = tMesh;
