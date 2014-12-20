@@ -1769,101 +1769,97 @@ namespace RealSolarSystem
                             else
                             {
                                 //OnGui();
-                                if (sphereVal)
+                                // **** No longer exporting and importing
+                                // Now I just do everything except tangents each time. Tangents don't seem necessary to fix, and
+                                // the rest is fast enough...and something in .24/64 broke importing for *some* planets. WEIRD.
+                                char sep = System.IO.Path.DirectorySeparatorChar;
+                                string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
+                                            + sep + "PluginData" + sep + t.name;
+
+                                filePath += ".obj";
+
+
+                                bool wrap = true;
+                                if (File.Exists(filePath))
                                 {
-                                    Mesh tMesh = new Mesh();
-                                    Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
-                                    float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
-                                    // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
-                                    print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name + ". Vertex Scale " + scaleFactor);
-                                    Utils.ScaleVerts(tMesh, scaleFactor);
-                                    tMesh.RecalculateBounds();
-                                    m.mesh = tMesh;
-                                    yield return null;
-                                    // do normal rescaling below.
-                                }
-                                else
-                                {
-                                    // **** No longer exporting and importing
-                                    // Now I just do everything except tangents each time. Tangents don't seem necessary to fix, and
-                                    // the rest is fast enough...and something in .24/64 broke importing for *some* planets. WEIRD.
-                                    char sep = System.IO.Path.DirectorySeparatorChar;
-                                    string filePath = KSPUtil.ApplicationRootPath + "GameData" + sep + "RealSolarSystem" + sep + "Plugins"
-                                                + sep + "PluginData" + sep + t.name;
-
-                                    filePath += ".obj";
-
-
-                                    bool wrap = true;
-                                    if (File.Exists(filePath))
+                                    try
                                     {
-                                        try
-                                        {
-                                            print("*RSS* loading cached ScaledSpace mesh " + m.name);
-                                            Mesh tMesh = new Mesh();
-                                            Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
+                                        print("*RSS* loading cached ScaledSpace mesh " + m.name);
+                                        ProfileTimer.Push("LoadSSM_" + body.name);
+                                        Mesh tMesh = new Mesh();
+                                        Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
 
-                                            ObjLib.UpdateMeshFromFile(tMesh, filePath);
-                                            //m.mesh.RecalculateBounds();
-                                            // done in UpdateFromFile
-                                            /*m.mesh.RecalculateNormals();
-                                            ObjLib.UpdateTangents(tMesh);*/
-                                            m.mesh = tMesh;
-                                            m.mesh.RecalculateBounds();
-                                            /*float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
-                                            t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
-                                            rescale = false;*/
-                                            print("*RSS* Loaded " + filePath + " and wrapped.");
-                                            ProfileTimer.Pop("LoadSSM_" + body.name);
-                                            wrap = false;
-                                        }
-                                        catch (Exception ex)
-                                        {
-                                            Print("*RSS* Failed to load cached SSM: {0}", ex);
-                                        }
+                                        ObjLib.UpdateMeshFromFile(tMesh, filePath);
+                                        //m.mesh.RecalculateBounds();
+                                        // done in UpdateFromFile
+                                        /*m.mesh.RecalculateNormals();
+                                        ObjLib.UpdateTangents(tMesh);*/
+                                        m.mesh = tMesh;
+                                        m.mesh.RecalculateBounds();
+                                        /*float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
+                                        t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                                        rescale = false;*/
+                                        print("*RSS* Loaded " + filePath + " and wrapped.");
+                                        ProfileTimer.Pop("LoadSSM_" + body.name);
+                                        wrap = false;
                                     }
-
-                                    if (wrap)
+                                    catch (Exception ex)
                                     {
-                                        try
+                                        Print("*RSS* Failed to load cached SSM: {0}", ex);
+                                    }
+                                    yield return null;
+                                }
+                                if (wrap)
+                                {
+                                    try
+                                    {
+                                        ProfileTimer.Push("Wrap time for " + body.name);
+                                        Mesh tMesh = new Mesh();
+                                        Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
+                                        if (sphereVal)
+                                        {
+                                            float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
+                                            // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
+                                            print("*RSS* using Jool scaledspace mesh (spherical) for body " + body.pqsController.name + ". Vertex Scale " + scaleFactor);
+                                            Utils.ScaleVerts(tMesh, scaleFactor);
+                                        }
+                                        else
                                         {
                                             print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " +
                                                   body.pqsController.name);
-                                            ProfileTimer.Push("Wrap time for " + body.name);
-                                            Mesh tMesh = new Mesh();
-                                            Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
-                                            float scaleFactor = (float) (origRadius/(1000*6000*(double) origLocalScale));
-                                                // scale mesh such that it will end up right.
+                                            float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale));
+                                            // scale mesh such that it will end up right.
                                             // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
                                             Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0,
                                                 scaleFactor);
                                             //ProfileTimer.Push("Recalc Normals");
                                             tMesh.RecalculateNormals();
-                                            m.mesh = tMesh;
+
                                             //ProfileTimer.Pop("Recalc Normals");
                                             //ObjLib.UpdateTangents(tMesh);
                                             //print("*RSS* wrapped.");
-                                            try
-                                            {
-                                                ObjLib.MeshToFile(m, filePath);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
-                                            }
-                                            //print("*RSS*: Done wrapping and exporting. Setting scale");
-
-                                            tMesh.RecalculateBounds();
-                                            // do normal rescaling below.
-                                            ProfileTimer.Pop("Wrap time for " + body.name);
+                                        }
+                                        m.mesh = tMesh;
+                                        try
+                                        {
+                                            ObjLib.MeshToFile(m, filePath);
                                         }
                                         catch (Exception e)
                                         {
-                                            print("*RSS* Exception wrapping: " + e.Message);
+                                            print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
                                         }
+                                        //print("*RSS*: Done wrapping and exporting. Setting scale");
+
+                                        tMesh.RecalculateBounds();
+                                        // do normal rescaling below.
+                                        ProfileTimer.Pop("Wrap time for " + body.name);
                                     }
-                                    yield return null;
+                                    catch (Exception e)
+                                    {
+                                        print("*RSS* Exception wrapping: " + e.Message);
+                                    }
                                 }
+                                yield return null;
                                 //OnGui();
                             }
                             atmo = t.FindChild("Atmosphere");
