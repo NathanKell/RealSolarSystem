@@ -60,29 +60,16 @@ namespace RealSolarSystem
                         camNode = node;
                     if (camNode != null)
                     {
-                        float ftmp;
-                        foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
-                        {
-                            //print("VAB camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                            camNode.TryGetValue("VABmaxHeight", ref c.maxHeight);
-                            camNode.TryGetValue("VABmaxDistance", ref c.maxDistance);
-                            camNode.TryGetValue("VABminDistance", ref c.minDistance);
-                        }
-
-                        foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
-                        {
-                            //print("SPH camera " + c.name + " has maxHeight = " + c.maxHeight + ", maxDistance = " + c.maxDistance + ", scrollHeight = " + c.scrollHeight);
-                            camNode.TryGetValue("SPHmaxDistance", ref c.maxDistance);
-                            camNode.TryGetValue("SPHminDistance", ref c.minDistance);
-                        }
-                        if (camNode.HasValue("editorExtentsMult"))
-                            if (float.TryParse(camNode.GetValue("editorExtentsMult"), out ftmp))
-                                EditorLogic.fetch.editorBounds.extents *= ftmp; // thanks, asmi!
+                        float ftmp = 1f;
+                        camNode.TryGetValue("editorMaxDistance", ref EditorBounds.Instance.cameraMaxDistance);
+                        camNode.TryGetValue("editorMinDistance", ref EditorBounds.Instance.cameraMinDistance);
+                        /*if (camNode.TryGetValue("editorExtentsMult", ref ftmp))
+                                EditorBounds.Instance.constructionBounds.extents *= ftmp;*/
                     }
                 }
                 catch (Exception e)
                 {
-                    print("Camera fixing failed: " + e.Message);
+                    print("Editor camera fixing failed: " + e.Message);
                 }
             }
             if(HighLogic.LoadedScene == GameScenes.SPACECENTER) {

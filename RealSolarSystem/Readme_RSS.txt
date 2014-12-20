@@ -48,6 +48,10 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.4
+*Update to 0.90
+*Update DDSLoader to 1.8
+
 v8.3
 *Added many new biomes from Felger (Luna, Mars/Deimos/Phobos, Venus, Jupiter and its moons, Saturn and Titan, Uranus, Pluto.
 *Includes DDSLoader from Sarbian, and full DDS support.
