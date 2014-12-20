@@ -16,6 +16,7 @@ namespace RealSolarSystem
         public bool doWrap = false;
         public bool compressNormals = false;
         public bool spheresOnly = false;
+        public bool orbitCalc = true;
         public bool defaultAtmoScale = true;
         public float SSAtmoScale = 1.0f;
 
@@ -29,6 +30,7 @@ namespace RealSolarSystem
             RSSnode.TryGetValue("wrap", ref doWrap);
             RSSnode.TryGetValue("compressNormals", ref compressNormals);
             RSSnode.TryGetValue("spheresOnly", ref spheresOnly);
+            RSSnode.TryGetValue("orbitCalc", ref orbitCalc);
             RSSnode.TryGetValue("defaultAtmoScale", ref defaultAtmoScale);
             RSSnode.TryGetValue("SSAtmoScale", ref SSAtmoScale);
 
@@ -259,7 +261,7 @@ namespace RealSolarSystem
 
         private IEnumerator<YieldInstruction> LoadCB(ConfigNode node, CelestialBody body)
         {
-            bool updateMass = true;
+            bool updateMass = false;
             //OnGui();
             #region CBChanges
             print("Fixing CB " + node.name + " of radius " + body.Radius);
@@ -272,13 +274,14 @@ namespace RealSolarSystem
 
             node.TryGetValue("bodyName", ref body.bodyName);
             node.TryGetValue("bodyDescription", ref body.bodyDescription);
-            node.TryGetValue("Radius", ref body.Radius);
+            if (node.TryGetValue("Radius", ref body.Radius))
+                updateMass = true;
             print("Radius ratio: " + body.Radius / origRadius);
 
             if (node.TryGetValue("Mass", ref body.Mass))
             {
                 MassToOthers(body);
-                updateMass = false;
+                
             }
             if (node.TryGetValue("GeeASL", ref body.GeeASL))
             {
@@ -510,60 +513,63 @@ namespace RealSolarSystem
         }
         private IEnumerator<YieldInstruction> LoadFinishOrbits()
         {
-            // do final update for all SoIs and hillSpheres and periods
-            guiMajor = "Final orbit pass";
-            //OnGui();
-            print("*RSS* Doing final orbit pass");
-            foreach (CelestialBody body in FlightGlobals.fetch.bodies)
+            if (loadInfo.orbitCalc)
             {
-                guiMinor = body.name;
-                guiExtra = "Orbital params";
-                yield return null;
-                // this used to be in a try, seems unnecessary
-                if (body.orbitDriver != null)
+                // do final update for all SoIs and hillSpheres and periods
+                guiMajor = "Final orbit pass";
+                //OnGui();
+                print("*RSS* Doing final orbit pass");
+                foreach (CelestialBody body in FlightGlobals.fetch.bodies)
                 {
-                    if (body.referenceBody != null)
+                    guiMinor = body.name;
+                    guiExtra = "Orbital params";
+                    yield return null;
+                    // this used to be in a try, seems unnecessary
+                    if (body.orbitDriver != null)
                     {
-                        body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
-                        body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
-                        if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
-                            body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
-
-                        body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
-                        if (body.orbit.eccentricity <= 1.0)
+                        if (body.referenceBody != null)
                         {
-                            body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
-                            body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / (Math.PI * 2);
-                            body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
+                            body.hillSphere = body.orbit.semiMajorAxis * (1.0 - body.orbit.eccentricity) * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 1 / 3);
+                            body.sphereOfInfluence = body.orbit.semiMajorAxis * Math.Pow(body.Mass / body.orbit.referenceBody.Mass, 0.4);
+                            if (body.sphereOfInfluence < body.Radius * 1.5 || body.sphereOfInfluence < body.Radius + 20000.0)
+                                body.sphereOfInfluence = Math.Max(body.Radius * 1.5, body.Radius + 20000.0); // sanity check
+
+                            body.orbit.period = 2 * Math.PI * Math.Sqrt(Math.Pow(body.orbit.semiMajorAxis, 2) / 6.674E-11 * body.orbit.semiMajorAxis / (body.Mass + body.referenceBody.Mass));
+                            if (body.orbit.eccentricity <= 1.0)
+                            {
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
+                                body.orbit.orbitPercent = body.orbit.meanAnomalyAtEpoch / (Math.PI * 2);
+                                body.orbit.ObTAtEpoch = body.orbit.orbitPercent * body.orbit.period;
+                            }
+                            else
+                            {
+                                // ignores this body's own mass for this one...
+                                body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
+                                body.orbit.ObT = Math.Pow(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3.0) / body.orbit.referenceBody.gravParameter, 0.5) * body.orbit.meanAnomaly;
+                                body.orbit.ObTAtEpoch = body.orbit.ObT;
+                            }
+                            print("Computing params for " + body.name + ". SoI = " + body.sphereOfInfluence);
                         }
                         else
                         {
-                            // ignores this body's own mass for this one...
-                            body.orbit.meanAnomaly = body.orbit.meanAnomalyAtEpoch;
-                            body.orbit.ObT = Math.Pow(Math.Pow(Math.Abs(body.orbit.semiMajorAxis), 3.0) / body.orbit.referenceBody.gravParameter, 0.5) * body.orbit.meanAnomaly;
-                            body.orbit.ObTAtEpoch = body.orbit.ObT;
+                            body.sphereOfInfluence = double.PositiveInfinity;
+                            body.hillSphere = double.PositiveInfinity;
                         }
-                        print("Computing params for " + body.name + ". SoI = " + body.sphereOfInfluence);
+                        // doesn't seem needed - body.orbitDriver.QueuedUpdate = true;
                     }
-                    else
+                    yield return null;
+                    guiExtra = "CBUpdate";
+                    yield return null;
+                    try
                     {
-                        body.sphereOfInfluence = double.PositiveInfinity;
-                        body.hillSphere = double.PositiveInfinity;
+                        body.CBUpdate();
                     }
-                    // doesn't seem needed - body.orbitDriver.QueuedUpdate = true;
+                    catch (Exception e)
+                    {
+                        print("CBUpdate for " + body.name + " failed: " + e.Message);
+                    }
+                    yield return null;
                 }
-                yield return null;
-                guiExtra = "CBUpdate";
-                yield return null;
-                try
-                {
-                    body.CBUpdate();
-                }
-                catch (Exception e)
-                {
-                    print("CBUpdate for " + body.name + " failed: " + e.Message);
-                }
-                yield return null;
             }
         }
         private IEnumerator<YieldInstruction> LoadPQS(ConfigNode node, CelestialBody body, double origRadius)
