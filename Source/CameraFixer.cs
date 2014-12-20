@@ -60,7 +60,7 @@ namespace RealSolarSystem
                         camNode = node;
                     if (camNode != null)
                     {
-                        float ftmp = 1f;
+                        //float ftmp = 1f;
                         camNode.TryGetValue("editorMaxDistance", ref EditorBounds.Instance.cameraMaxDistance);
                         camNode.TryGetValue("editorMinDistance", ref EditorBounds.Instance.cameraMinDistance);
                         /*if (camNode.TryGetValue("editorExtentsMult", ref ftmp))
