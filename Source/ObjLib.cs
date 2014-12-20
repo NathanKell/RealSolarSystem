@@ -14,55 +14,75 @@ namespace RealSolarSystem
         public static void UpdateMeshFromFile(Mesh mesh, string filename, float scaleFactor = 1.0f)
         {
             ProfileTimer.Push("UpdateMeshFromFile");
-            StreamReader stream = File.OpenText(filename);
-            stream.ReadLine();
-            string curLine = stream.ReadLine();
-            char[] splitIdentifier = { ' ' };
-            string[] brokenString;
-            int v = 0; // first vertex
-            int t = 0; // first tangent
-            int n = 0; // first normal
-            // borrowed from mesh-reading code.
-            Vector3[] vertices = new Vector3[mesh.vertexCount];
-            Vector3[] normals = new Vector3[mesh.normals.Length];
-            Vector4[] tangents = new Vector4[mesh.tangents.Length];
-
-            //bool log = filename.Contains("un.obj");
-            //if(log) MonoBehaviour.print("*RSSOBJ* Loading " + filename);
-            while (curLine != null)
+            List<Vector3> vertices = new List<Vector3>();
+            /*List<Vector3> normals = new List<Vector3>();
+            List<Vector4> tangents = new List<Vector4>();
+            List<Vector2> uv = new List<Vector2>();*/
+            using (StreamReader stream = File.OpenText(filename))
             {
-                curLine = curLine.Trim();                           //Trim the current line
-                brokenString = curLine.Split(splitIdentifier, 50);      //Split the line into an array, separating the original line by blank spaces
-                //if(log) MonoBehaviour.print(curLine);
-                switch (brokenString[0])
+                stream.ReadLine();
+                string curLine = stream.ReadLine();
+                char[] splitIdentifier = { ' ' };
+                string[] brokenString;
+                /*int v = 0; // first vertex
+                int t = 0; // first tangent
+                int n = 0; // first normal*/
+                // borrowed from mesh-reading code.
+                /*vertices = new Vector3[mesh.vertexCount];
+                normals = new Vector3[mesh.normals.Length];
+                tangents = new Vector4[mesh.tangents.Length];
+                uv = new Vector2[mesh.uv.Length];*/
+
+                //bool log = filename.Contains("un.obj");
+                //if(log) MonoBehaviour.print("*RSSOBJ* Loading " + filename);
+                while (curLine != null)
                 {
-                    case "v":
-                        vertices[v] = new Vector3(System.Convert.ToSingle(brokenString[1]) * scaleFactor, System.Convert.ToSingle(brokenString[2]) * scaleFactor,
-                                                        System.Convert.ToSingle(brokenString[3]) * scaleFactor);
-                        //if (log) MonoBehaviour.print("v " + Utils.Vec3ToString(vertices[v]));
-                        v++;
-                        break;
-                    case "vn":
-                        normals[n] = new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
-                                                        System.Convert.ToSingle(brokenString[3]));
-                        n++;
-                        break;
-                    case "t":
-                        tangents[t] = new Vector4(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
-                                                        System.Convert.ToSingle(brokenString[3]), System.Convert.ToSingle(brokenString[4]));
-                        t++;
-                        break;
-                }
-                curLine = stream.ReadLine();
-                if (curLine != null)
-                {
-                    curLine = curLine.Replace("  ", " ");
+                    curLine = curLine.Trim();                           //Trim the current line
+                    brokenString = curLine.Split(splitIdentifier, 50);      //Split the line into an array, separating the original line by blank spaces
+                    //if(log) MonoBehaviour.print(curLine);
+                    switch (brokenString[0])
+                    {
+                        case "v":
+                            vertices.Add(new Vector3(System.Convert.ToSingle(brokenString[1]) * scaleFactor, System.Convert.ToSingle(brokenString[2]) * scaleFactor,
+                                System.Convert.ToSingle(brokenString[3]) * scaleFactor));
+                            break;
+                        /*case "vn":
+                            normals.Add(new Vector3(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                                System.Convert.ToSingle(brokenString[3])));
+                            n++;
+                            break;
+                        case "t":
+                            tangents.Add(new Vector4(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2]),
+                                System.Convert.ToSingle(brokenString[3]), System.Convert.ToSingle(brokenString[4])));
+                            t++;
+                            break;
+                        case "vt":
+                            uv.Add(new Vector2(System.Convert.ToSingle(brokenString[1]), System.Convert.ToSingle(brokenString[2])));
+                            break;*/
+                    }
+                    curLine = stream.ReadLine();
+                    if (curLine != null)
+                    {
+                        curLine = curLine.Replace("  ", " ");
+                    }
                 }
             }
-            mesh.vertices = vertices;
-            //mesh.normals = normals;
+            mesh.vertices = vertices.ToArray();
+
+            /*var f2name = filename + ".tst";
+            using (var sw = new StreamWriter(f2name, false))
+            {
+                foreach (var vertex in vertices)
+                {
+                    sw.WriteLine("v {0} {1} {2}", vertex.x, vertex.y, vertex.z);
+                }
+            }*/
+
+            //mesh.normals = normals.ToArray();
+            //mesh.tangents = tangents.ToArray();
+            /*mesh.uv = uv.ToArray();*/
             mesh.RecalculateNormals();
-            mesh.tangents = tangents;
+            //mesh.RecalculateBounds();
             ProfileTimer.Pop("UpdateMeshFromFile");
         }
         // based on noontz's code here: http://forum.unity3d.com/threads/38984-How-to-Calculate-Mesh-Tangents
@@ -164,6 +184,14 @@ namespace RealSolarSystem
         public static string MeshToString(MeshFilter mf)
         {
             Mesh m = mf.mesh;
+
+            MonoBehaviour.print(string.Format("About to save {0}: {1} verts, {2} normals, {3} tangents, {4} uvs",
+                Path.GetFileNameWithoutExtension(mf.name),
+                m.vertices.Length,
+                m.normals.Length,
+                m.tangents.Length,
+                m.uv.Length));
+
             Material[] mats = mf.renderer.sharedMaterials;
 
             StringBuilder sb = new StringBuilder();
@@ -211,6 +239,9 @@ namespace RealSolarSystem
         public static void MeshToFile(MeshFilter mf, string filename)
         {
             ProfileTimer.Pop("Mesh to file");
+            var dirInfo = Path.GetDirectoryName(filename);
+            if (!Directory.Exists(dirInfo))
+                Directory.CreateDirectory(dirInfo);
             using (StreamWriter sw = new StreamWriter(filename))
             {
                 sw.Write(MeshToString(mf));

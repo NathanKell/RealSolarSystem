@@ -1612,6 +1612,12 @@ namespace RealSolarSystem
             //OnGui();
             #endregion
         }
+
+        public static void Print(string msg, params object[] args)
+        {
+            MonoBehaviour.print(string.Format(msg, args));
+        }
+
         private IEnumerator<YieldInstruction> LoadScaledSpace(ConfigNode node, CelestialBody body, double origRadius)
         {
             #region ScaledSpace
@@ -1787,38 +1793,74 @@ namespace RealSolarSystem
 
                                     filePath += ".obj";
 
-                                    try
+
+                                    bool wrap = true;
+                                    if (File.Exists(filePath))
                                     {
-                                        print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " + body.pqsController.name);
-                                        ProfileTimer.Push("Wrap time for " + body.name);
-                                        Mesh tMesh = new Mesh();
-                                        Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
-                                        float scaleFactor = (float)(origRadius / (1000 * 6000 * (double)origLocalScale)); // scale mesh such that it will end up right.
-                                        // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
-                                        Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0, scaleFactor);
-                                        //ProfileTimer.Push("Recalc Normals");
-                                        tMesh.RecalculateNormals();
-                                        //ProfileTimer.Pop("Recalc Normals");
-                                        //ObjLib.UpdateTangents(tMesh);
-                                        //print("*RSS* wrapped.");
-                                        /*try
+                                        try
                                         {
-                                            ObjLib.MeshToFile(m, filePath);
+                                            print("*RSS* loading cached ScaledSpace mesh " + m.name);
+                                            Mesh tMesh = new Mesh();
+                                            Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
+
+                                            ObjLib.UpdateMeshFromFile(tMesh, filePath);
+                                            //m.mesh.RecalculateBounds();
+                                            // done in UpdateFromFile
+                                            /*m.mesh.RecalculateNormals();
+                                            ObjLib.UpdateTangents(tMesh);*/
+                                            m.mesh = tMesh;
+                                            m.mesh.RecalculateBounds();
+                                            /*float scaleFactor = (float)(body.Radius / 6000000.0 * SSTScale);
+                                            t.localScale = new Vector3(scaleFactor, scaleFactor, scaleFactor);
+                                            rescale = false;*/
+                                            print("*RSS* Loaded " + filePath + " and wrapped.");
+                                            ProfileTimer.Pop("LoadSSM_" + body.name);
+                                            wrap = false;
+                                        }
+                                        catch (Exception ex)
+                                        {
+                                            Print("*RSS* Failed to load cached SSM: {0}", ex);
+                                        }
+                                    }
+
+                                    if (wrap)
+                                    {
+                                        try
+                                        {
+                                            print("*RSS* wrapping ScaledSpace mesh " + m.name + " to PQS " +
+                                                  body.pqsController.name);
+                                            ProfileTimer.Push("Wrap time for " + body.name);
+                                            Mesh tMesh = new Mesh();
+                                            Utils.CopyMesh(loadInfo.joolMesh.mesh, tMesh);
+                                            float scaleFactor = (float) (origRadius/(1000*6000*(double) origLocalScale));
+                                                // scale mesh such that it will end up right.
+                                            // (need to scale it such that in the end localScale will = origLocalScale * radius/origRadius)
+                                            Utils.MatchVerts(tMesh, body.pqsController, body.ocean ? body.Radius : 0.0,
+                                                scaleFactor);
+                                            //ProfileTimer.Push("Recalc Normals");
+                                            tMesh.RecalculateNormals();
+                                            m.mesh = tMesh;
+                                            //ProfileTimer.Pop("Recalc Normals");
+                                            //ObjLib.UpdateTangents(tMesh);
+                                            //print("*RSS* wrapped.");
+                                            try
+                                            {
+                                                ObjLib.MeshToFile(m, filePath);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
+                                            }
+                                            //print("*RSS*: Done wrapping and exporting. Setting scale");
+
+                                            tMesh.RecalculateBounds();
+                                            // do normal rescaling below.
+                                            ProfileTimer.Pop("Wrap time for " + body.name);
                                         }
                                         catch (Exception e)
                                         {
-                                            print("*RSS* Exception saving wrapped mesh " + filePath + ": " + e.Message);
-                                        }*/
-                                        //print("*RSS*: Done wrapping and exporting. Setting scale");
-
-                                        tMesh.RecalculateBounds();
-                                        m.mesh = tMesh;
-                                        // do normal rescaling below.
-                                        ProfileTimer.Pop("Wrap time for " + body.name);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        print("*RSS* Exception wrapping: " + e.Message);
+                                            print("*RSS* Exception wrapping: " + e.Message);
+                                        }
                                     }
                                     yield return null;
                                 }
