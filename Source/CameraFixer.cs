@@ -17,7 +17,7 @@ namespace RealSolarSystem
         public static bool ready = false;
         public void Start()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
+            if (!CompatibilityChecker.IsCompatible())
             {
                 isCompatible = false;
                 return;
@@ -113,7 +113,7 @@ namespace RealSolarSystem
         public static bool shouldCameraBeReset = true;
         public void Start()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
+            if (!CompatibilityChecker.IsCompatible())
             {
                 isCompatible = false;
                 return;

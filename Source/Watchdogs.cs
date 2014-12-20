@@ -19,7 +19,7 @@ namespace RealSolarSystem
         protected bool isCompatible = true;
         public void Start()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
+            if (!CompatibilityChecker.IsCompatible())
             {
                 isCompatible = false;
                 return;

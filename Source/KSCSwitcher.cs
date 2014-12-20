@@ -31,7 +31,7 @@ namespace RealSolarSystem {
 
 		public void Start() {
             showWindow = false;
-            if (!CompatibilityChecker.IsAllCompatible())
+            if (!CompatibilityChecker.IsCompatible())
             {
                 isCompatible = false;
                 return;
@@ -520,7 +520,7 @@ namespace RealSolarSystem {
 	[KSPAddon(KSPAddon.Startup.MainMenu, false)]
 	public class ScenarioSpawn : MonoBehaviour {
 		void Start() {
-            if (CompatibilityChecker.IsAllCompatible())
+            if (CompatibilityChecker.IsCompatible())
             {
                 if ((object)(KSCLoader.instance) == null)
                     KSCLoader.instance = new KSCLoader();

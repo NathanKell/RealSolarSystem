@@ -155,7 +155,7 @@ namespace RealSolarSystem
 
         public void Awake()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
+            if (!CompatibilityChecker.IsCompatible())
             {
                 isCompatible = false;
                 return;
@@ -174,7 +174,7 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (!CompatibilityChecker.IsAllCompatible())
+            if (!CompatibilityChecker.IsCompatible())
             {
                 isCompatible = false;
                 return;
