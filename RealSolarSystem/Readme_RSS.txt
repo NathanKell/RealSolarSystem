@@ -49,8 +49,11 @@ Pluto is represented by Vall
 ===========================
 Changelog
 v8.4
-*Update to 0.90
-*Update DDSLoader to 1.8
+*Update to 0.90.
+*Update DDSLoader to 1.8.
+*Fix caching (startup times will be much lower. NOTE: YOU MUST DELETE CACHE ON CHANGIN RSS CONFIG).
+*Restart main theme when RSS finishes loading (so you have an audio cue).
+*Update Custom Biomes to my proprietary v1.7.1.
 
 v8.3
 *Added many new biomes from Felger (Luna, Mars/Deimos/Phobos, Venus, Jupiter and its moons, Saturn and Titan, Uranus, Pluto.
