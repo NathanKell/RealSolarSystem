@@ -53,24 +53,7 @@ namespace RealSolarSystem
             }
             if (HighLogic.LoadedSceneIsEditor)
             {
-                try
-                {
-                    ConfigNode camNode = null;
-                    foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
-                        camNode = node;
-                    if (camNode != null)
-                    {
-                        //float ftmp = 1f;
-                        camNode.TryGetValue("editorMaxDistance", ref EditorBounds.Instance.cameraMaxDistance);
-                        camNode.TryGetValue("editorMinDistance", ref EditorBounds.Instance.cameraMinDistance);
-                        /*if (camNode.TryGetValue("editorExtentsMult", ref ftmp))
-                                EditorBounds.Instance.constructionBounds.extents *= ftmp;*/
-                    }
-                }
-                catch (Exception e)
-                {
-                    print("Editor camera fixing failed: " + e.Message);
-                }
+                StartCoroutine(EditorBoundsFixer());
             }
             if(HighLogic.LoadedScene == GameScenes.SPACECENTER) {
                 PQSCity ksc = null;
@@ -102,6 +85,45 @@ namespace RealSolarSystem
                     cam.ResetCamera();
                     Debug.Log("*RSS* fixed the Space Center camera.");
                 }
+            }
+        }
+        private IEnumerator<YieldInstruction> EditorBoundsFixer()
+        {
+            ConfigNode camNode = null;
+            foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                camNode = node;
+            if (camNode != null)
+            {
+                while ((object)EditorBounds.Instance == null)
+                    yield return null;
+                if ((object)(EditorBounds.Instance) != null)
+                {
+                    float ftmp = 1f;
+                    camNode.TryGetValue("editorMaxDistance", ref EditorBounds.Instance.cameraMaxDistance);
+                    camNode.TryGetValue("editorMinDistance", ref EditorBounds.Instance.cameraMinDistance);
+                    if (camNode.TryGetValue("editorExtentsMult", ref ftmp))
+                    {
+                        EditorBounds.Instance.constructionBounds.extents *= ftmp;
+                        EditorBounds.Instance.cameraOffsetBounds.extents *= ftmp;
+                    }
+                    foreach (VABCamera c in Resources.FindObjectsOfTypeAll(typeof(VABCamera)))
+                    {
+                        camNode.TryGetValue("camMaxHeight", ref c.maxHeight);
+                        c.maxDistance = EditorBounds.Instance.cameraMaxDistance;
+                        c.minDistance = EditorBounds.Instance.cameraMinDistance;
+                    }
+
+                    foreach (SPHCamera c in Resources.FindObjectsOfTypeAll(typeof(SPHCamera)))
+                    {
+                        camNode.TryGetValue("camMaxHeight", ref c.maxHeight);
+                        c.maxDistance = EditorBounds.Instance.cameraMaxDistance;
+                        c.minDistance = EditorBounds.Instance.cameraMinDistance;
+                    }
+                    print("Editor camera set to " + EditorBounds.Instance.cameraMinDistance + "/" + EditorBounds.Instance.cameraMaxDistance
+                        + ", bounds " + EditorBounds.Instance.constructionBounds.ToString() + "/" + EditorBounds.Instance.cameraOffsetBounds.ToString());
+                }
+                else
+                    print("Editor camera: no editor bounds instance");
             }
         }
     }
