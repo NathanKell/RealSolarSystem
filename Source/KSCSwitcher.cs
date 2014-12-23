@@ -239,6 +239,9 @@ namespace RealSolarSystem {
                     
                     hasChanged = true;
                     mod.OnSetup();
+                    mod.OnPostSetup();
+                    SpaceCenter.Instance.transform.localPosition = mod.transform.localPosition;
+                    SpaceCenter.Instance.transform.localRotation = mod.transform.localRotation;
                 }
 
                 // KSC Flat area
@@ -504,7 +507,7 @@ namespace RealSolarSystem {
 							// found a site, load it
 							ConfigNode site = Sites.getSiteByName(l.lastSite);
 				            if(site == null) { return; }
-							KSCSwitcher.setSite(site);
+							//KSCSwitcher.setSite(site);
 							Debug.Log("*RSS* set the initial launch site to " + l.lastSite);
 						}
 					}
