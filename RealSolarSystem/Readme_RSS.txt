@@ -48,6 +48,12 @@ Pluto is represented by Vall
 
 ===========================
 Changelog
+v8.5
+*Fix Venus/Mars colors not showing up right (well, work around it...) NOTE YOU NEED THE DDS TEXTURES FOR THIS TO WORK.
+*Fix editor extents/camera fixing
+*Fix KSCSwitcher with a workaround. Each time you start KSP, the first time you load your save, you wll need to switch to a different site and then switch back. After that, it works fine.
+*Updated CustomBiomes, flipped biome textures for correct bioming.
+
 v8.4
 *Update to 0.90.
 *Update DDSLoader to 1.8.
