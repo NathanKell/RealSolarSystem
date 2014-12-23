@@ -1333,6 +1333,9 @@ namespace RealSolarSystem
                                         if (modNode.HasValue("order"))
                                             if (int.TryParse(modNode.GetValue("order"), out itmp))
                                                 mod.order = itmp;
+                                        if (modNode.HasValue("enabled"))
+                                            if (bool.TryParse(modNode.GetValue("enabled"), out btmp))
+                                                mod.enabled = mod.modEnabled = btmp;
 
                                         if (modNode.HasValue("vertexColorMap"))
                                         {
@@ -1343,7 +1346,8 @@ namespace RealSolarSystem
                                             {
                                                 map.LoadImage(System.IO.File.ReadAllBytes(KSPUtil.ApplicationRootPath + modNode.GetValue("vertexColorMap")));
                                                 yield return null;
-                                                mod.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
+                                                //DestroyImmediate(mod.vertexColorMap);
+                                                //mod.vertexColorMap = ScriptableObject.CreateInstance<MapSO>();
                                                 mod.vertexColorMap.CreateMap(MapSO.MapDepth.RGB, map);
                                                 if (localLoad)
                                                 {
@@ -1554,9 +1558,21 @@ namespace RealSolarSystem
                                     if (mName.Equals("PQSLandControl"))
                                     {
                                         List<PQSLandControl> modList = p.transform.GetComponentsInChildren<PQSLandControl>(true).ToList();
+                                        /*while(modList.Count > 0)
+                                        {
+                                            PQSLandControl m = modList[0];
+                                            if (m.heightMap != null)
+                                                DestroyImmediate(m.heightMap);
+                                            m.modEnabled = false;
+                                            m.enabled = false;
+                                            modList.RemoveAt(0);
+                                            DestroyImmediate(m);
+                                        }*/
                                         foreach (PQSLandControl m in modList)
                                         {
                                             m.modEnabled = false;
+                                            m.enabled = false;
+                                            m.OnSetup();
                                         }
                                     }
                                     else
@@ -1574,6 +1590,7 @@ namespace RealSolarSystem
                                         }
                                         print("Generic disable: " + mName + " with idx: " + idx + "; doAll: " + doAll);
                                         int cur = 0;
+                                        int i = 0;
                                         foreach (var m in mods)
                                         {
                                             if (modNode.name.Equals(m.GetType().Name))
