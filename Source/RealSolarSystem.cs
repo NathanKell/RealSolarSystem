@@ -333,7 +333,11 @@ namespace RealSolarSystem
                     AnimationCurve temperatureCurve = Utils.LoadAnimationCurve(TCnode);
                     if (temperatureCurve != null)
                     {
-                        body.temperatureCurve = temperatureCurve;
+						body.temperatureCurve = temperatureCurve;
+						// Following two lines corrects situations where planets without atmosphere's have these two fields zeroed out
+						// Maybe think about making these configurable in the planet's config node? yes? no? meh?
+						body.atmoshpereTemperatureMultiplier = 1f;
+						body.altitudeMultiplier = 1f;
                         print("*RSS* found and loaded temperatureCurve data for " + body.name);
                     }
                 }
