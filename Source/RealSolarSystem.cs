@@ -1872,8 +1872,8 @@ namespace RealSolarSystem
                                 yield return null;
                                 //OnGui();
                             }
-                            atmo = t.FindChild("Atmosphere");
                         }
+                        atmo = t.FindChild("Atmosphere");
                         //OnGui();
                         if (rescale)
                         {
