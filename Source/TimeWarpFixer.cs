@@ -25,7 +25,7 @@ namespace RealSolarSystem
 
         public void Update()
         {
-            if (!isCompatible || ScaledSpace.Instance == null)
+            if (!isCompatible)
                 return;
 
             // Fix Timewarp
