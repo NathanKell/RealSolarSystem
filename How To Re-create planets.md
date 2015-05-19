@@ -1,6 +1,6 @@
 I recommend doing this task in an advanced feature text editor meant for code. For example, I used Notepad++.
 
-You will need CustomBiomes, KSCSwitcher, Kopernicus, RealSolarSystem, and RSSTextures.
+You will need Kopernicus ( from [Thomas's fork](https://github.com/ThomasKerman/Kopernicus/tree/development) ) as well as RealSolarSystem from 0.90, including its CustomBiomes and RSSTextures additions.
 
 Review the most recent version (currently https://github.com/KSP-RO/RealSolarSystem) and select a planet that does not yet have a configuration.
 
