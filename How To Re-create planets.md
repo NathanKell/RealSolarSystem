@@ -4,7 +4,7 @@ You will need Kopernicus ( from [Thomas's fork](https://github.com/ThomasKerman/
 
 Review the most recent version (currently https://github.com/KSP-RO/RealSolarSystem) and select a planet that does not yet have a configuration.
 
-Planets without atmospheres are more straight forwar to convert over, and the current Moon configuration can be used as a guide. For planets with atmospheres, Mars or Earth can be used for guidance.
+Planets without atmospheres are more straightforward to convert over, and the current Moon configuration can be used as a guide. For planets with atmospheres, Mars or Earth can be used for guidance.
 
 You can literally copy and paste a similar planet or body as a starting point. For example, to create Mercury you could copy the current Moon configuration from 'Body' and including all of the PQS sections.
 
@@ -16,16 +16,14 @@ Often the RealSolarSystem.cfg will show modifications of 'CelestialBodySciencePa
 
 The ScaledVersion Material section needs to be changed to use the appropriate textures for the planet you are recreating.
 
-Just as for ScaledVersion the correct textures need to be used for the PQS. Also the RealSolarSystem.cfg must be referenced to change the deformity, octave, persistence, etc. values.
-
-Finally, a section needs to be added to 'Finalize' for the body you have created. You can copy the Mars version for now.
+Just as for ScaledVersion the correct textures need to be used for the PQS. The old RealSolarSystem.cfg will tell you what PQSMods are modified or added, add those in the PQS node with their stats from the old cfg but with the names Kopernicus wants (generally remove PQSMod_ from the front). Note that RSS would only list changes to values; you may need to reference [this dump](https://www.dropbox.com/s/x95wxmnbd7metxs/Components.zip?dl=0) of KSP stock planet data to find the existing values. If the RealSolarSystem.cfg lists mods to disable, you need to add node for the body you're adding to the Finalize node at the end of the system file; examine how one is added for the Moon to see how to use it to dsiable PQSMods or make final changes.
 
 I highly recommend doing each of the steps above one at a time then testing them ensure they will work as expected. I also recommend setting aside a copy of your config outside of KSP each time before you move onto the next step, so that you have a good known working version to go back to incase you run into trouble. Using this method it will remain clear which steps are complete and what remains to be changed.
 
 Good luck, creator of worlds!
 
 
-And for bodies with atmospheres, the pressures need to be converted from atmospheres (or Bars?) to kPa and temperatures from Celcius to Kelvin. NathanKell suggested using Excel to do this and I found that quite successful. 
+And for bodies with atmospheres, the pressures need to be converted from atmospheres to kPa and temperatures from Celcius to Kelvin. In addition the heights are given in meters now, not km. NathanKell suggested using Excel to do this and I found that quite successful. 
 
 Pressure tables:
 Kilometers needs to be converted to meters ( * 1000). Pressures need to be converted ( * 101.325) and the two values after that tell the curve how to fit between the points. Those values need to be converted by ( * 101.325 / 1000)
