@@ -39,6 +39,7 @@ v10.0
 * Added a bunch of new bodies (thanks to stratochief, grayduster, and Thomas P. for the help in conversion and body-adding).
 * All names are real now.
 * Added six new moons of Saturn (Enceladus, Tethys, Iapetus, Dione, Rhea, Mimas.
+* Added rings to Saturn
 * Added Neptune and its moon Triton.
 
 
