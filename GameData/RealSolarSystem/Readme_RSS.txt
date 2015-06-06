@@ -1,5 +1,6 @@
 Real Solar System
 NathanKell
+Github: https://github.com/KSP-RO/RealSolarSystem
 This mod will convert the Kerbol System into the (Real) Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
