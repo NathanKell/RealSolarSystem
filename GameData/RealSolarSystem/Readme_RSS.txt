@@ -4,50 +4,43 @@ This mod will convert the Kerbol System into the (Real) Solar System, rescaling,
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
-Supreme thanks to regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS. RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions.
+Supreme thanks to all who helped make RSS possible! regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS. RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions. Thanks to stratochief and grayduster and Thomas P. for wonderful help in converting to Kopernicus and adding the new bodies--with their help RSS has entered a new era!
 
 License: CC-BY-NC-SA
-Includes code by Majiir (CompatibilityChecker, licensed as per source) and stupid_chris (ConfigNodeExtensions, licensed CC-BY-NC-SA). Used with permission.
+Includes code by Majiir (CompatibilityChecker, licensed as per source).
 Includes artwork by dimonnomid and SpacedInvader.
 Includes biomes by Felger
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
 Also included:
 Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
-Custom Biomes by Trueborn. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/66256
-DDSLoader by Sarbian. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/96729
 A configuration for Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
 
 
 INSTALLATION:
-Extract to KSP/GameData.
+Extract to KSP/GameData. You should have one dll (Module Manager) in the root of GameData, and two folders: Kopernicus and RealSolarSystem. However, you are NOT DONE YET.
 
 TEXTURE INSTALLATION
-Now, you must select a texture resolution. You may download a premade pack (8192, 4096, or 2048), or pick and choose. Any planets which do not have textures will not have their coloration, features, etc., changed, although they will be made larger.
-You can get the textures from: https://nabaal.net/files/ksp/nathankell/RealSolarSystem/Textures/
+Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution texutres.
+You can get the textures from: https://github.com/KSP-RO/RSS-Textures
+Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repo itself).
+NOTE: the path is NOT the same as the old (RSS v8 and below) path. The old folder was RSSTextures. The new folder is RSS-Textures.
 
-NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
-List of planets:
-Mercury is represented by Moho
-Venus is represented by Eve
-Earth is represented by Kerbin
-Moon is represented by Mun
-Mars is represented by Duna
-Phobos is represented by Bop
-Deimos is represented by Gilly
-Jupiter is represented by Jool
-Io is represented by Pol
-Europa is represented by Eeloo
-Ganymede is represented by Tylo
-Callisto is represented by Ike
-Saturn is represented by Dres
-Titan is represented by Laythe
-Uranus is represented by Minmus
-Pluto is represented by Vall
+FINAL NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
 ===========================
 Changelog
+v10.0
+(note: v9 was never released)
+* Switched to Kopernicus.
+* Stripped RSS plugin of anything but warp-changing and the atmosphere GUI and camera clipping.
+* Added a bunch of new bodies (thanks to stratochief, grayduster, and Thomas P. for the help in conversion and body-adding).
+* All names are real now.
+* Added six new moons of Saturn (Enceladus, Tethys, Iapetus, Dione, Rhea, Mimas.
+* Added Neptune and its moon Triton.
+
+
 v8.6.1
 * Removed clip value, things shouldn't flicker as badly.
 
