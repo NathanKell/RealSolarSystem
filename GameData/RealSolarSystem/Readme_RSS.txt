@@ -15,6 +15,7 @@ Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propu
 
 Also included:
 Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
+Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/114649
 A configuration for Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
 
 
