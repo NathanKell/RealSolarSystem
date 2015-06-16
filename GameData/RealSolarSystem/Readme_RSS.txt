@@ -1,7 +1,7 @@
 Real Solar System
 NathanKell
 Github: https://github.com/KSP-RO/RealSolarSystem
-This mod will convert the Kerbol System into the (Real) Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
+This mod will convert the Kerbol System into the (Real) Solar System.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
@@ -9,8 +9,8 @@ Supreme thanks to all who helped make RSS possible! regex for code, and dimonnom
 
 License: CC-BY-NC-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source).
-Includes artwork by dimonnomid and SpacedInvader.
-Includes biomes by Felger
+Includes artwork by dimonnomid and SpacedInvader and Dr. Walther in addition to NathanKell.
+Includes biomes by Felger.
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
 Also included:
@@ -23,7 +23,8 @@ INSTALLATION:
 Extract to KSP/GameData. You should have one dll (Module Manager) in the root of GameData, and two folders: Kopernicus and RealSolarSystem. However, you are NOT DONE YET.
 
 TEXTURE INSTALLATION
-Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution texutres.
+Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution texutres. Note that 8192 is dangerous: it will not work at all on Mac OSX, and you may easily run out of memory on Windows. It's really only safe for Linux, although if you run Windows KSP in OpenGL mode it might work.
+
 You can get the textures from: https://github.com/KSP-RO/RSS-Textures
 Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repo itself).
 NOTE: the path is NOT the same as the old (RSS v8 and below) path. The old folder was RSSTextures. The new folder is RSS-Textures.
