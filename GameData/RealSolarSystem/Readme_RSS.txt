@@ -34,13 +34,15 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 Changelog
 v10.0
 (note: v9 was never released)
+* **Utterly savebreaking.**
 * Switched to Kopernicus.
 * Stripped RSS plugin of anything but warp-changing and the atmosphere GUI and camera clipping.
 * Added a bunch of new bodies (thanks to stratochief, grayduster, and Thomas P. for the help in conversion and body-adding).
 * All names are real now.
-* Added six new moons of Saturn (Enceladus, Tethys, Iapetus, Dione, Rhea, Mimas.
-* Added rings to Saturn
+* Added six new moons of Saturn (Enceladus, Tethys, Iapetus, Dione, Rhea, Mimas).
+* Added rings to Saturn.
 * Added Neptune and its moon Triton.
+* Gas giant atmospheres changed such that altitude 0 = 1000 atmospheres.
 
 
 v8.6.1
