@@ -34,6 +34,13 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.0.1
+* Fixed atmosphere shader on Neptune.
+* Fixed Titan to properly grab its heightmap.
+* Fixed Titan surface coloration.
+* Fixed atmosphere colors.
+* Fixed versioning for CKAN.
+
 v10.0
 (note: v9 was never released)
 * **Utterly savebreaking.**
