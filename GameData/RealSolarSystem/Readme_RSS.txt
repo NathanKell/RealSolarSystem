@@ -34,6 +34,10 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.0.2
+* Recompile for KSP 1.0.4
+* Default to not load if missing and to not log if missing (needs latest Kopernicus).
+
 v10.0.1
 * Fixed atmosphere shader on Neptune.
 * Fixed Titan to properly grab its heightmap.
