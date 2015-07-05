@@ -37,6 +37,7 @@ Changelog
 v10.1
 * Actually set atmospheric properties.
 * Update FAR compatibility for atmospheres.
+* Include physics patch on FIRST (will be overridden by anything else) to make reentries survivable etc. Also tunes down AeroFX so ascents don't look so flamey.
 
 v10.0.2
 * Recompile for KSP 1.0.4
