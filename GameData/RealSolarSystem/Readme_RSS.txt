@@ -34,6 +34,10 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.1
+* Actually set atmospheric properties.
+* Update FAR compatibility for atmospheres.
+
 v10.0.2
 * Recompile for KSP 1.0.4
 * Default to not load if missing and to not log if missing (needs latest Kopernicus).
