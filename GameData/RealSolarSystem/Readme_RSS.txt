@@ -40,7 +40,7 @@ v10.2
 * Remove unneeded, bad solar power curve.
 * Apply some fixes to stock contracts.
 * Fix typos in some biomes.
-* New biome map for Earth by KellanHiggins! Thanks!
+* New biome map for Earth by KellanHiggins! Thanks! You **must** update that biome texture, by downloading the RSS textures pack v10.2 or by just grabbing that texture.
 * Add ocean data for Better Buoyancy compatibility.
 * Fix Saturn biomes not having the correct names/colors.
 
