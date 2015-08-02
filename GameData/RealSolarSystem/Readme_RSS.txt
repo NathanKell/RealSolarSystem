@@ -34,6 +34,16 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.2
+* Refine AeroFX patching (when RO not around).
+* Fix to not use "the" in the name of anything but the Moon.
+* Remove unneeded, bad solar power curve.
+* Apply some fixes to stock contracts.
+* Fix typos in some biomes.
+* New biome map for Earth by KellanHiggins! Thanks! You **must** update that biome texture, by downloading the RSS textures pack v10.2 or by just grabbing that texture.
+* Add ocean data for Better Buoyancy compatibility.
+* Fix Saturn biomes not having the correct names/colors.
+
 v10.1
 * Actually set atmospheric properties.
 * Update FAR compatibility for atmospheres.
