@@ -34,6 +34,16 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.3
+* RSS itself now contains groundstation definitions for RemoteTech, with the full networks appearing when RealismOverhaul is installed (via NEEDS--the files are here). Thanks Peppie, regex!
+* Patch AntennaRange antenna ranges, if that's installed. Thanks Kerbas-ad-astra!
+* Update CustomAsteroids config. Thanks Ascraeus1!
+* Various compatability patches thanks to Sigma88.
+* Fix some typos in body descriptions, biomes. Thanks Trollception et al!
+* Fix Mars scaled space fades. Thanks Raidernick!
+* Fix science altitude thresholds. Thanks Laie!
+* Update to Kopernicus 0.4
+
 v10.2
 * Refine AeroFX patching (when RO not around).
 * Fix to not use "the" in the name of anything but the Moon.
