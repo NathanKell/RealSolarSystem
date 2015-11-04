@@ -34,6 +34,10 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.3.1
+* Un-revert reversion of Earth biomes.
+* Slightly re-increase launch site comm range, to about that of a Comm16.
+
 v10.3
 * RSS itself now contains groundstation definitions for RemoteTech, with the full networks appearing when RealismOverhaul is installed (via NEEDS--the files are here). Thanks Peppie, regex!
 * Patch AntennaRange antenna ranges, if that's installed. Thanks Kerbas-ad-astra!
