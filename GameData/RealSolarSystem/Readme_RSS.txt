@@ -34,6 +34,12 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.4
+* Update for KSP 1.0.5.
+* Update for Kopernicus 0.5 (thanks Thomas).
+* Correct rotation of KSC (at Cape Canaveral).
+* Colors for different classes of tracking stations (thanks PhineasFreak).
+
 v10.3.1
 * Un-revert reversion of Earth biomes.
 * Slightly re-increase launch site comm range, to about that of a Comm16.
