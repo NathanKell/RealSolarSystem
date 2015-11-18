@@ -34,6 +34,11 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.4.1
+* Update physics modifiers from current RO settings.
+* Update metadata.
+* Update to Kopernicus 0.5.2.
+
 v10.4
 * Update for KSP 1.0.5.
 * Update for Kopernicus 0.5 (thanks Thomas).
