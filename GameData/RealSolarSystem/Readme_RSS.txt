@@ -34,6 +34,31 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.4.1
+* Update physics modifiers from current RO settings.
+* Update metadata.
+* Update to Kopernicus 0.5.2.
+
+v10.4
+* Update for KSP 1.0.5.
+* Update for Kopernicus 0.5 (thanks Thomas).
+* Correct rotation of KSC (at Cape Canaveral).
+* Colors for different classes of tracking stations (thanks PhineasFreak).
+
+v10.3.1
+* Un-revert reversion of Earth biomes.
+* Slightly re-increase launch site comm range, to about that of a Comm16.
+
+v10.3
+* RSS itself now contains groundstation definitions for RemoteTech, with the full networks appearing when RealismOverhaul is installed (via NEEDS--the files are here). Thanks Peppie, regex!
+* Patch AntennaRange antenna ranges, if that's installed. Thanks Kerbas-ad-astra!
+* Update CustomAsteroids config. Thanks Ascraeus1!
+* Various compatability patches thanks to Sigma88.
+* Fix some typos in body descriptions, biomes. Thanks Trollception et al!
+* Fix Mars scaled space fades. Thanks Raidernick!
+* Fix science altitude thresholds. Thanks Laie!
+* Update to Kopernicus 0.4
+
 v10.2
 * Refine AeroFX patching (when RO not around).
 * Fix to not use "the" in the name of anything but the Moon.
