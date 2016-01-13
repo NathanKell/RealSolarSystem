@@ -148,6 +148,6 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Mac crap
-.DS_Store
+*.DS_Store
 BoulderCo/CityLights/Textures/detaildark.png
 BoulderCo/CityLights/Textures/detaillight.png
