@@ -5,7 +5,7 @@
 *.suo
 *.user
 *.sln.docstates
-RealSolarSystem/Plugins/PluginData/
+Source/KSPPath.inc
 
 # Build results
 
@@ -27,7 +27,6 @@ build/
 *_p.c
 *.ilk
 *.meta
-*.obj
 *.pch
 *.pdb
 *.pgc
@@ -149,6 +148,6 @@ Desktop.ini
 $RECYCLE.BIN/
 
 # Mac crap
-.DS_Store
+*.DS_Store
 BoulderCo/CityLights/Textures/detaildark.png
 BoulderCo/CityLights/Textures/detaillight.png

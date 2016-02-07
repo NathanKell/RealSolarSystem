@@ -14,15 +14,18 @@ namespace RealSolarSystem
         public double lastTime = 0;
         public double currentTime = 0;
         public static bool fixedTimeWarp = false;
+        protected bool isCompatible = true;
 
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+                isCompatible = false;
             fixedTimeWarp = false;
         }
 
         public void Update()
         {
-            if (ScaledSpace.Instance == null)
+            if (!isCompatible)
                 return;
 
             // Fix Timewarp
@@ -30,7 +33,7 @@ namespace RealSolarSystem
             {
                 fixedTimeWarp = true;
                 ConfigNode twNode = null;
-                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                     twNode = node.GetNode("timeWarpRates");
                 float ftmp;
                 if (twNode != null)

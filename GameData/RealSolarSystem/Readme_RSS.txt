@@ -1,51 +1,170 @@
 Real Solar System
 NathanKell
-This mod will convert the Kerbol System into the (Real) Solar System, rescaling, moving, and changing KSP's planets, moons, etc. to match our own.
+Github: https://github.com/KSP-RO/RealSolarSystem
+This mod will convert the Kerbol System into the (Real) Solar System.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
-Supreme thanks to regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS. RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions.
+Supreme thanks to all who helped make RSS possible! regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS. RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions. Thanks to stratochief and grayduster and Thomas P. for wonderful help in converting to Kopernicus and adding the new bodies--with their help RSS has entered a new era!
 
 License: CC-BY-NC-SA
-Includes code by Majiir (CompatibilityChecker, licensed as per source) and stupid_chris (ConfigNodeExtensions, licensed CC-BY-NC-SA). Used with permission.
-Includes artwork by dimonnomid and SpacedInvader.
+Includes code by Majiir (CompatibilityChecker, licensed as per source).
+Includes artwork by dimonnomid and SpacedInvader and Dr. Walther in addition to NathanKell.
+Includes biomes by Felger.
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
 Also included:
 Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
-Custom Biomes by Trueborn. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/66256
-Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
+Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/114649
+A configuration for Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
 
 
 INSTALLATION:
-Extract to KSP/GameData.
+Extract to KSP/GameData. You should have one dll (Module Manager) in the root of GameData, and two folders: Kopernicus and RealSolarSystem. However, you are NOT DONE YET.
 
 TEXTURE INSTALLATION
-Now, you must select a texture resolution. You may download a premade pack (8192, 4096, or 2048), or pick and choose. Any planets which do not have textures will not have their coloration, features, etc., changed, although they will be made larger.
-You can get the textures from: https://nabaal.net/files/ksp/nathankell/RealSolarSystem/Textures/
+Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution texutres. Note that 8192 is dangerous: it will not work at all on Mac OSX, and you may easily run out of memory on Windows. It's really only safe for Linux, although if you run Windows KSP in OpenGL mode it might work.
 
-NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
+You can get the textures from: https://github.com/KSP-RO/RSS-Textures
+Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repo itself).
+NOTE: the path is NOT the same as the old (RSS v8 and below) path. The old folder was RSSTextures. The new folder is RSS-Textures.
 
-List of planets:
-Mercury is represented by Moho
-Venus is represented by Eve
-Earth is represented by Kerbin
-Moon is represented by Mun
-Mars is represented by Duna
-Phobos is represented by Bop
-Deimos is represented by Gilly
-Jupiter is represented by Jool
-Io is represented by Pol
-Europa is represented by Eeloo
-Ganymede is represented by Tylo
-Callisto is represented by Ike
-Saturn is represented by Dres
-Titan is represented by Laythe
-Uranus is represented by Minmus
-Pluto is represented by Vall
+
+FINAL NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
 ===========================
 Changelog
+v10.4.1
+* Update physics modifiers from current RO settings.
+* Update metadata.
+* Update to Kopernicus 0.5.2.
+
+v10.4
+* Update for KSP 1.0.5.
+* Update for Kopernicus 0.5 (thanks Thomas).
+* Correct rotation of KSC (at Cape Canaveral).
+* Colors for different classes of tracking stations (thanks PhineasFreak).
+
+v10.3.1
+* Un-revert reversion of Earth biomes.
+* Slightly re-increase launch site comm range, to about that of a Comm16.
+
+v10.3
+* RSS itself now contains groundstation definitions for RemoteTech, with the full networks appearing when RealismOverhaul is installed (via NEEDS--the files are here). Thanks Peppie, regex!
+* Patch AntennaRange antenna ranges, if that's installed. Thanks Kerbas-ad-astra!
+* Update CustomAsteroids config. Thanks Ascraeus1!
+* Various compatability patches thanks to Sigma88.
+* Fix some typos in body descriptions, biomes. Thanks Trollception et al!
+* Fix Mars scaled space fades. Thanks Raidernick!
+* Fix science altitude thresholds. Thanks Laie!
+* Update to Kopernicus 0.4
+
+v10.2
+* Refine AeroFX patching (when RO not around).
+* Fix to not use "the" in the name of anything but the Moon.
+* Remove unneeded, bad solar power curve.
+* Apply some fixes to stock contracts.
+* Fix typos in some biomes.
+* New biome map for Earth by KellanHiggins! Thanks! You **must** update that biome texture, by downloading the RSS textures pack v10.2 or by just grabbing that texture.
+* Add ocean data for Better Buoyancy compatibility.
+* Fix Saturn biomes not having the correct names/colors.
+
+v10.1
+* Actually set atmospheric properties.
+* Update FAR compatibility for atmospheres.
+* Include physics patch on FIRST (will be overridden by anything else) to make reentries survivable etc. Also tunes down AeroFX so ascents don't look so flamey.
+
+v10.0.2
+* Recompile for KSP 1.0.4
+* Default to not load if missing and to not log if missing (needs latest Kopernicus).
+
+v10.0.1
+* Fixed atmosphere shader on Neptune.
+* Fixed Titan to properly grab its heightmap.
+* Fixed Titan surface coloration.
+* Fixed atmosphere colors.
+* Fixed versioning for CKAN.
+
+v10.0
+(note: v9 was never released)
+* **Utterly savebreaking.**
+* Switched to Kopernicus.
+* Stripped RSS plugin of anything but warp-changing and the atmosphere GUI and camera clipping.
+* Added a bunch of new bodies (thanks to stratochief, grayduster, and Thomas P. for the help in conversion and body-adding).
+* All names are real now.
+* Added six new moons of Saturn (Enceladus, Tethys, Iapetus, Dione, Rhea, Mimas).
+* Added rings to Saturn.
+* Added Neptune and its moon Triton.
+* Gas giant atmospheres changed such that altitude 0 = 1000 atmospheres.
+
+
+v8.6.1
+* Removed clip value, things shouldn't flicker as badly.
+
+v8.6
+* Fixed Ganymede normal map being flipped (either redownload your texture pack or just get the fixed Ganymede normal map, it's the same for all packs) -- thanks sashan!
+* Starwaster: fix temperature and pressure issues on some bodies due to multipliers not being reset.
+* Removed keypress-based camera clipping changes. There's a GUI for that, after all...
+* Fixed camera clipping range loading.
+* Fixed finding AtmosphereFromGround (was only running if the body had a PQS--Jool does not).
+* Added a :FOR[RSSConfig] tag, so people can :NEEDS off that, rather than RealSolarSystem (:NEEDS[RealSolarSystem] will return true no matter what config for RSS one has, even if it's just to prettify the atmosphers like in a visual pack).
+* Update to Module Manager 2.5.12 and DDS Loader 1.9
+
+v8.5
+*Fix Venus/Mars colors not showing up right (well, work around it...) NOTE YOU NEED THE DDS TEXTURES FOR THIS TO WORK.
+*Fix editor extents/camera fixing
+*Fix KSCSwitcher with a workaround. Each time you start KSP, the first time you load your save, you wll need to switch to a different site and then switch back. After that, it works fine.
+*Updated CustomBiomes, flipped biome textures for correct bioming.
+
+v8.4
+*Update to 0.90.
+*Update DDSLoader to 1.8.
+*Fix caching (startup times will be much lower. NOTE: YOU MUST DELETE CACHE ON CHANGIN RSS CONFIG).
+*Restart main theme when RSS finishes loading (so you have an audio cue).
+*Update Custom Biomes to my proprietary v1.7.1.
+
+v8.3
+*Added many new biomes from Felger (Luna, Mars/Deimos/Phobos, Venus, Jupiter and its moons, Saturn and Titan, Uranus, Pluto.
+*Includes DDSLoader from Sarbian, and full DDS support.
+*Allows specifying textures via GameDatabase rather than via direct loading (remove GameData/ prefix and remove extension, and make sure the image you are referencing is not under a PluginData folder)
+*Update loading to include AppRoot when loading locally (thanks TriggerAu)
+*Log on not finding LaunchSites.
+*Add support for VertexPlanet and for useHeightMap in LandClass (thanks Starwaster)
+*Support more light-shifting (can now modify Sun.AU and Sun.brightnessCurve)
+
+v8.2.1
+*Fix typo in camera clipping that made the ground flicker (at least it wasn't another loader bug).
+*Correct version this time in assembly info.
+
+v8.2
+*Finally fixed (I trust) all remaining issues from the loader rewrite
+*Borrowed some PQSMod values from 6.4x Kerbin (kudos to Raptor831 et al)
+
+v8.1.2
+*Fixed normal map loading
+*Added ability to set both far and near clip planes in cfg, added cfg support for camScaledSpace (camScaledSpaceNearClip like cam01FarClip in cfg)
+*Water now no longer disappears when close (by setting cam01NearClip to 1)
+
+v8.1.1
+*Fixed stupidity where I deleted textures after loading them.
+
+v8.1
+*Completely revised loading system to use coroutines, added GUI. RSS will now load at the main menu, over a period of time to allow garbage collection to run. RAM usage should no longer spike as badly. Many thanks to stupid_chris for getting me set up with coroutines, and to Sarbian for help fixing some remaining issues. While loading may take slightly longer, you should be able to use more textures/parts, and you now get a handy GUI to track status.
+*Support calling textures from GameDatabase for the scaled space textures (SSColor, SSBump). This allows use combined with Sarbian's DDSLoader.
+*Added FOR[] for the LaunchSites MM patch
+*Updated to Custom Biomes 1.6.7
+
+v8.0
+*Update to ModuleManager v2.5.0.
+*Update to KSP 0.25.
+*Removed some useless checks.
+
+v7.4 \/
+*Upgrade to ModuleManager 2.4.5.
+*metaphor: add pressure/temperature curves for Jupiter.
+*eggrobin: improve curves for solar panel power, Earth pressure and temperature.
+*Use compatibility info, now.
+
 v7.3 \/
 *Added LightShifter (ported by regex, based on Alternis Kerbol source). You can now adjust light. See wiki for details.
 *Update to Custom Biomes 1.6.6

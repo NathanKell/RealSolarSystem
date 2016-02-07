@@ -12,6 +12,7 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class AFGEditor : MonoBehaviour
     {
+        protected bool isCompatible = true;
         private static Rect windowPosition = new Rect(64, 64, 320, 640);
         private static GUIStyle windowStyle = null;
         private AtmosphereFromGround afg = null;
@@ -96,6 +97,8 @@ namespace RealSolarSystem
         }
         public void Update()
         {
+            if (!isCompatible)
+                return;
             if (counter < 5)
             {
                 counter += TimeWarp.fixedDeltaTime;
@@ -152,11 +155,16 @@ namespace RealSolarSystem
 
         public void Awake()
         {
+            if (!CompatibilityChecker.IsCompatible())
+            {
+                isCompatible = false;
+                return;
+            }
             RenderingManager.AddToPostDrawQueue(0, OnDraw);
         }
         private void OnDraw()
         {
-            if (GUIOpen)
+            if (isCompatible && GUIOpen)
             {
                 //print("[AFG Editor] OnDraw");
                 if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null)
@@ -166,6 +174,11 @@ namespace RealSolarSystem
 
         public void Start()
         {
+            if (!CompatibilityChecker.IsCompatible())
+            {
+                isCompatible = false;
+                return;
+            }
             if (afg == null)
                 afg = findAFG();
             //print("[AFGEditor] Start()");
