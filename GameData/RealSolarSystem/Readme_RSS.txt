@@ -34,6 +34,20 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.5
+* Fixes to Russian launch sites thanks to Niemand303.
+* Planetshine configs thanks to valerian.
+* Support non-RP-0 science thanks to Kerbas-ad-astra and GregRoxMun.
+* Rings fix thanks to Sigma88.
+* Some fixes to Deimos and Phobs thanks to KillAshley and GregroxMun.
+* Add back missing MSFN ground stations (as of 1963).
+* North Korean launch site thanks to eggrobin.
+* Fix issues with some biomes that had crept in on the transition to 1.0.
+* Update atmospheric bodies' atmospheres and temperature curves thanks to OhioBob. **NOTE Earth's atmosphere now ends at 140km!**
+* Refine Earth PQS/scaled space transititon to attempt to improve RVE integration.
+* Titan fixes from GregroxMun.
+* Atmosphere color/ramp fixes from GregroxMun.
+
 v10.4.1
 * Update physics modifiers from current RO settings.
 * Update metadata.
