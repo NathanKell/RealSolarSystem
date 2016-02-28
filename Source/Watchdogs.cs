@@ -41,7 +41,7 @@ namespace RealSolarSystem
             }
         }
 
-        public void FixedUpdate()
+        public void Update()
         {
             if (!isCompatible)
                 return;
@@ -50,7 +50,7 @@ namespace RealSolarSystem
 
             if (watchdogRun)
                 return;
-            delayCounter += TimeWarp.fixedDeltaTime;
+            delayCounter += Time.deltaTime;
 
             if(delayCounter < initialDelay)
                 return;
@@ -90,10 +90,16 @@ namespace RealSolarSystem
                     if (RSSSettings.HasNode(bodyName))
                         RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
                 }
-                if (farClip > 0)
-                    cam.farClipPlane = farClip;
                 if (nearClip > 0)
+                {
                     cam.nearClipPlane = nearClip;
+                    Debug.Log("[RealSolarSystem]: Watchdog: Setting camera " + cam.name + " near clip to " + nearClip + " so camera now has " + cam.nearClipPlane);
+                }
+                if (farClip > 0)
+                {
+                    cam.farClipPlane = farClip;
+                    Debug.Log("[RealSolarSystem]: Watchdog: Setting camera " + cam.name + " far clip to " + farClip + " so camera now has " + cam.farClipPlane);
+                }
             }
         }
 
