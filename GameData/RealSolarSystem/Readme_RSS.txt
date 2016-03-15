@@ -5,12 +5,12 @@ This mod will convert the Kerbol System into the (Real) Solar System.
 
 Thanks to asmi for kicking me into to doing this and offering so much help along the way; to ferram for aeronautics and orbital help (and FAR, which is essential), and for countless time spent helping others get the most from this mod (and me the most from my modding); to ZRM for many ideas and info; to yargnit and MedievalNerd for playtesting extraordinaire; to everyone else who offered suggestions, code, help, cool screenshots...
 
-Supreme thanks to all who helped make RSS possible! regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS. RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions. Thanks to stratochief and grayduster and Thomas P. for wonderful help in converting to Kopernicus and adding the new bodies--with their help RSS has entered a new era!
+Supreme thanks to all who helped make RSS possible! regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS, and KillAshley for making RSS so much better (and prettier!). RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions. Thanks to stratochief and grayduster and Thomas P. for wonderful help in converting to Kopernicus and adding the new bodies--with their help RSS has entered a new era!
 
 License: CC-BY-NC-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source).
-Includes artwork by dimonnomid and SpacedInvader and Dr. Walther in addition to NathanKell.
-Includes biomes by Felger.
+Includes artwork by dimonnomid and SpacedInvader and Dr. Walther and KillAshley in addition to NathanKell.
+Includes biomes by Felger and grayduster and KillAshley.
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
 Also included:
@@ -34,6 +34,21 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.6
+* **Massive improvement pass by KillAshley! Make sure you get the RSS-Textures update too. Note: includes Pluto and Charon!**
+* Fix issue with Earth's sidereal rotation period not being correct (thanks eggrobin).
+* Added organized cache files to local RSS folder for all bodies
+* Removed RSSKopernicus.cfg; Separated & organized body cfgs one body per cfg and added RSSKopernicusSettings.cfg that holds remaining global values.
+* Enforced fixed flightGolbalsIdex to all bodies to ensure future save-game compatibility
+* Tweaked various planets PQS maxLevel to adjust for terrain pixelation vs detail
+* Added detailed PQSMaterials to create detailed surface textures to overhauled bodies
+* Added & Edited PQSMods to allow for more varied (less flat) terrain
+* Added higher fidelity normal maps
+* Added new heightmaps for certain bodies to improve terrain based off lack of credible data
+* Adjusted scaledspace atmospheric rims to a more suitable coloring & strength
+* Implemented Charon
+* Added Pluto & Charon height & color maps made from current information mixed with procedurally generated terrain
+
 v10.5
 * Fixes to Russian launch sites thanks to Niemand303.
 * Planetshine configs thanks to valerian.
