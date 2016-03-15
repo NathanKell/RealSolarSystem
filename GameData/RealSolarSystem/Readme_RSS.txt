@@ -35,8 +35,9 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 ===========================
 Changelog
 v10.6
-* **Massive improvement pass by KillAshley! Make sure you get the RSS-Textures update too. Note: includes Pluto and Charon!**
 * Fix issue with Earth's sidereal rotation period not being correct (thanks eggrobin).
+* Tweak hypersonic convection up slightly.
+* **Massive improvement pass by KillAshley! Make sure you get the RSS-Textures update too! Updates:**
 * Added organized cache files to local RSS folder for all bodies
 * Removed RSSKopernicus.cfg; Separated & organized body cfgs one body per cfg and added RSSKopernicusSettings.cfg that holds remaining global values.
 * Enforced fixed flightGolbalsIdex to all bodies to ensure future save-game compatibility
