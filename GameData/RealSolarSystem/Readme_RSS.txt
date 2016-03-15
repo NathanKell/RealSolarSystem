@@ -34,6 +34,9 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.6.1
+* Hotfix for body indices. If you already loaded a save with 10.6, apologies.
+
 v10.6
 * Fix issue with Earth's sidereal rotation period not being correct (thanks eggrobin).
 * Tweak hypersonic convection up slightly.
