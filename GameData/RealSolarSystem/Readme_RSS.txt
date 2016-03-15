@@ -10,7 +10,7 @@ Supreme thanks to all who helped make RSS possible! regex for code, and dimonnom
 License: CC-BY-NC-SA
 Includes code by Majiir (CompatibilityChecker, licensed as per source).
 Includes artwork by dimonnomid and SpacedInvader and Dr. Walther and KillAshley in addition to NathanKell.
-Includes biomes by Felger and grayduster and KillAshley.
+Includes biomes by Felger and grayduster and KellanHiggins and KillAshley.
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
 Also included:
