@@ -34,6 +34,9 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v10.6.2
+* Fix packaging error (RSSKopernicus.cfg file was still included; it should not be.)
+
 v10.6.1
 * Hotfix for body indices. If you already loaded a save with 10.6, apologies.
 
