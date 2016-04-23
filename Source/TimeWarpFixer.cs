@@ -21,6 +21,8 @@ namespace RealSolarSystem
             if (!CompatibilityChecker.IsCompatible())
                 isCompatible = false;
             fixedTimeWarp = false;
+
+            GameSettings.KERBIN_TIME = false;
         }
 
         public void Update()
