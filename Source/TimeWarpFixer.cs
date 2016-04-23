@@ -23,6 +23,7 @@ namespace RealSolarSystem
             fixedTimeWarp = false;
 
             GameSettings.KERBIN_TIME = false;
+            PQSCache.PresetList.SetPreset(PQSCache.PresetList.presets.Count - 1);
         }
 
         public void Update()
