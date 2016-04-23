@@ -34,6 +34,12 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v11.0.0
+* Update for KSP 1.1.
+* Default to on demand off (x64!)
+* Interoperate with Texture Replacer (helmetless on Earth).
+* Force High preset for PQS.
+
 v10.6.2
 * Fix packaging error (RSSKopernicus.cfg file was still included; it should not be.)
 
