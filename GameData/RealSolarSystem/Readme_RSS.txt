@@ -39,6 +39,9 @@ v11.0.0
 * Default to on demand off (x64!)
 * Interoperate with Texture Replacer (helmetless on Earth).
 * Force High preset for PQS.
+* Use the full set of temperature curves from OhioBob now that KSP properly supports seasonal temperature changes.
+* Thanks to Sigma88, RSS supports SigmaBinary for Pluto/Charon if SigmaBinary is installed.
+* PQS Material fixes for 1.1 from KillAshley.
 
 v10.6.2
 * Fix packaging error (RSSKopernicus.cfg file was still included; it should not be.)
