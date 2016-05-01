@@ -34,6 +34,15 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v11.1.0
+* Update for KSP 1.1.2
+* Fix a typo in an atmosphere curve preventing Sigma compatibility.
+* Support for Pluton and Charon to use SigmaBinary if installed (thanks Sigma88).
+* Further KillAshley material optimizations.
+* Kopernicus Asteroid support thanks to PhineasFreak.
+* Launch site fixes thanks to Specimen Spiff.
+* Fix an issue with KSPAVC.
+
 v11.0.0
 * Update for KSP 1.1.
 * Default to on demand off (x64!)
