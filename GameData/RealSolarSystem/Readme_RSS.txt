@@ -34,6 +34,16 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v11.2.0
+* Fix for some missing stock textures.
+* Tweaks to Mars PQS.
+* Fix a typo in Tanegashima's launch site definition.
+* Fix Pluto having two atmosphere nodes.
+* Tweak temperature of Earth's upper atmosphere.
+* Make Saturn oblate (thanks Sigma88).
+* We forgot to enable some temperature curves (thanks OhioBob).
+* Tweak upper atmosphere of Venus slightly (thanks OhioBob).
+
 v11.1.0
 * Update for KSP 1.1.2
 * Fix a typo in an atmosphere curve preventing Sigma compatibility.
