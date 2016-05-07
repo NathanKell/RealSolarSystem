@@ -34,6 +34,37 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v11.2.0
+* Fix for some missing stock textures.
+* Tweaks to Mars PQS.
+* Fix a typo in Tanegashima's launch site definition.
+* Fix Pluto having two atmosphere nodes.
+* Tweak temperature of Earth's upper atmosphere.
+* Make Saturn oblate (thanks Sigma88).
+* We forgot to enable some temperature curves (thanks OhioBob).
+* Tweak upper atmosphere of Venus slightly (thanks OhioBob).
+
+v11.1.0
+* Update for KSP 1.1.2
+* Fix a typo in an atmosphere curve preventing Sigma compatibility.
+* Support for Pluton and Charon to use SigmaBinary if installed (thanks Sigma88).
+* Further KillAshley material optimizations.
+* Kopernicus Asteroid support thanks to PhineasFreak.
+* Launch site fixes thanks to Specimen Spiff.
+* Fix an issue with KSPAVC.
+
+v11.0.0
+* Update for KSP 1.1.
+* Default to on demand off (x64!)
+* Interoperate with Texture Replacer (helmetless on Earth).
+* Force High preset for PQS.
+* Use the full set of temperature curves from OhioBob now that KSP properly supports seasonal temperature changes.
+* Thanks to Sigma88, RSS supports SigmaBinary for Pluto/Charon if SigmaBinary is installed.
+* PQS Material fixes for 1.1 from KillAshley.
+
+v10.6.2
+* Fix packaging error (RSSKopernicus.cfg file was still included; it should not be.)
+
 v10.6.1
 * Hotfix for body indices. If you already loaded a save with 10.6, apologies.
 
