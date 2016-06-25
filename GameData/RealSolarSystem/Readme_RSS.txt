@@ -34,6 +34,17 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v11.3.0
+* Basic resource support thanks to Kerbas-ad-astra.
+* Fix an issue with Boca thanks to BevoLJ.
+* Improved oblateness thanks to Sigma88.
+* Fix some rotations thanks to Sigma88.
+* Fix more launch sites thanks to miki-g.
+* Atmosphere improvements thanks to OhioBob.
+* Fix an issue with Mars PQS thanks to Sigma88.
+* Set navball to change surf<->orbit at the Karman line (requires KSP 1.1.3).
+* Change inverse rotation threshold for Earth to 145km.
+
 v11.2.0
 * Fix for some missing stock textures.
 * Tweaks to Mars PQS.
