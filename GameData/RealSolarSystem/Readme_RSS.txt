@@ -34,6 +34,9 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v11.4.0
+* Recompile and repackage for KSP 1.1.3.
+
 v11.3.0
 * Basic resource support thanks to Kerbas-ad-astra.
 * Fix an issue with Boca thanks to BevoLJ.
