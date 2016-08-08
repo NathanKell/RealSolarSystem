@@ -21,11 +21,14 @@ namespace RealSolarSystem
             if (!CompatibilityChecker.IsCompatible())
                 isCompatible = false;
             fixedTimeWarp = false;
+
+            GameSettings.KERBIN_TIME = false;
+            PQSCache.PresetList.SetPreset(PQSCache.PresetList.presets.Count - 1);
         }
 
         public void Update()
         {
-            if (!isCompatible || ScaledSpace.Instance == null)
+            if (!isCompatible)
                 return;
 
             // Fix Timewarp
@@ -33,7 +36,7 @@ namespace RealSolarSystem
             {
                 fixedTimeWarp = true;
                 ConfigNode twNode = null;
-                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEMSETTINGS"))
+                foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                     twNode = node.GetNode("timeWarpRates");
                 float ftmp;
                 if (twNode != null)

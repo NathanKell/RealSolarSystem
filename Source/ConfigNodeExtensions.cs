@@ -7,6 +7,8 @@ using UnityEngine;
  * redistribute the work, but you must give attribution to the original author (me) and you cannot sell your derivatives.
  * For more information contact me on the forum. */
 
+// This is the ConfigNodeExtensions class.
+
 namespace RealSolarSystem
 {
     public static class ConfigNodeExtensions
