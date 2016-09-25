@@ -1,14 +1,3 @@
-Sun
-{
-	central body
-	FinalFrontier
-	{
-		ribbon path = Nereid/FinalFrontier/Ribbons
-		ribbon group = Sun
-		base prestige = 0
-	}
-}
-
 Mercury
 {
 	gas giant = false
