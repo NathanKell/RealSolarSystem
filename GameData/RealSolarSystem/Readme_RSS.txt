@@ -15,7 +15,7 @@ Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propu
 
 Also included:
 Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
-Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/114649
+Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/140580
 A configuration for Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
 
 
@@ -34,6 +34,20 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v12.0
+* HUGE THANK YOU to everyone involved! I was away and I come back to...many great changes and a pretty much ready-to-release update!
+* Recompile for KSP 1.2.2, include latest MM and Kopernicus.
+* Sigma88: Remove an unneeded compatibility setting.
+* Raidernick: Fix Earth SMA (fixes orbital shift over time with wrong period).
+* SirKeplan: More reasonable timewarp limits on Phobos and Deimos.
+* Kerbas-ad-astra: Ribbon support.
+* ThreePounds: Fix some Chinese launch sites, add Wenchang.
+* Kerbas-ad-astra: Add atmospheric composition to Pluto.
+* Miki-g: Venus warp limits fixed.
+* Kerbas-ad-astra: Support (with Custom Barn Kit) updating the stock DSN ranges.
+* PhineasFreak: Rework RT patching for current RemoteTech.
+* Leudaimon: Fix launch site orientations for all sites.
+
 v11.4.0
 * Recompile and repackage for KSP 1.1.3.
 
