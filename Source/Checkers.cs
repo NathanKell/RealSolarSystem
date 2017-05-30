@@ -41,7 +41,7 @@ namespace RealSolarSystem
 
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
 
-    class CompatibilityChecker : MonoBehaviour
+    internal class CompatibilityChecker : MonoBehaviour
     {
         public static bool IsCompatible()
         {
@@ -81,7 +81,7 @@ namespace RealSolarSystem
         }
 
         // Version of the compatibility checker itself.
-        static int _version = 5;
+        private static int _version = 5;
 
         public void Start()
         {
@@ -199,7 +199,7 @@ namespace RealSolarSystem
             return IsCompatible() && IsUnityCompatible();
         }
 
-        static IEnumerable<Type> getAllTypes()
+        private static IEnumerable<Type> getAllTypes()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
