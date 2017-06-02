@@ -81,7 +81,8 @@ namespace RealSolarSystem
         }
 
         // Version of the compatibility checker itself.
-        private static int _version = 5;
+
+        private static int _version = 6;
 
         public void Start()
         {
