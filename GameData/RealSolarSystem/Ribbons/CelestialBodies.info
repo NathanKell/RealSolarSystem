@@ -72,6 +72,27 @@ Deimos
 	}
 }
 
+Ceres
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Ceres
+		base prestige = 4300
+	}
+}
+Vesta
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Vesta
+		base prestige = 4400
+	}
+}
+
 Jupiter
 {
 	gas giant = true
@@ -212,6 +233,56 @@ Uranus
 		ribbon path = RealSolarSystem/Ribbons
 		ribbon group = Uranus
 		base prestige = 7000
+	}
+}
+Miranda
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Miranda
+		base prestige = 7100
+	}
+}
+Ariel
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Ariel
+		base prestige = 7200
+	}
+}
+Umbriel
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Umbriel
+		base prestige = 7300
+	}
+}
+Titania
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Titania
+		base prestige = 7400
+	}
+}
+Oberon
+{
+	gas giant = false
+	FinalFrontier
+	{
+		ribbon path = RealSolarSystem/Ribbons
+		ribbon group = Oberon
+		base prestige = 7500
 	}
 }
 
