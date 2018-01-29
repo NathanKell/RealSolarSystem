@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Linq;
 using UnityEngine;
-using KSP;
-using System.IO;
 
 namespace RealSolarSystem
 {
@@ -160,15 +157,14 @@ namespace RealSolarSystem
                 isCompatible = false;
                 return;
             }
-            RenderingManager.AddToPostDrawQueue(0, OnDraw);
         }
-        private void OnDraw()
+        private void OnGUI()
         {
             if (isCompatible && GUIOpen)
             {
                 //print("[AFG Editor] OnDraw");
                 if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null)
-                    windowPosition = GUI.Window(69105, windowPosition, ShowGUI, "Wavelength Parameters", windowStyle);
+                    windowPosition = GUILayout.Window(69105, windowPosition, ShowGUI, "Wavelength Parameters", windowStyle);
             }
         }
 
