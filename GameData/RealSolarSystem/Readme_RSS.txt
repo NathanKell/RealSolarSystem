@@ -1,4 +1,4 @@
-Real Solar System
+﻿Real Solar System
 NathanKell
 Github: https://github.com/KSP-RO/RealSolarSystem
 This mod will convert the Kerbol System into the (Real) Solar System.
@@ -34,6 +34,34 @@ FINAL NOTE: You really should play with the recommended mods. See the Realism Ov
 
 ===========================
 Changelog
+v13.0
+Release in the absence of NathanKell, coordinated by Raidernick.
+This release moves on to KSP 1.3.1, and adds seven new celestial bodies.
+
+Special thanks to:
+- Bornholio for both individual contributions to testing and for coordinating testing through the Golden Spreadsheet;
+- awang for promptly upgrading many RO mods, including RSS, following KSP releases.
+Changes, in the order of pull requests:
+* soundnfury, in #103: changed the longitude of the ascending node from the unintentional arbitrary value of 0 to another
+  arbitrary value (any fixed value is arbitrary, since this value precesses with a period of about 18.6 years).
+  This has no effect for users of Principia.
+* Kerbas-ad-astra, in #104: some antenna upgrade patches.
+* PhineasFreak, in #108: Kopernicus compatibility fixes.
+* leudaimon, in #110: added downrange tracking stations for Kourou launches, namely Galliot, Natal, Ascension, and Libreville;
+  renamed Malindi.
+* rsparkyc, in #112: worked around #111, workaround reverted since the underlying Principia issue mockingbirdnest/Principia#1413
+  was fixed in Chasles (reverted in #120).
+* Pap, in #113: reworked biomes and science, added Ceres, Vesta, and five moons of Herschel (Ariel, Miranda, Oberon, Titania,
+  and Umbriel).
+* ppboyle, in #115: fixed the Sohae Satellite Launching Station (서해위성발사장) which was underground.
+* Kerbas-ad-astra, in #116: added ribbons for the bodies added in #113.
+* Benew, in #119: fixed a typo in a biome name on the Moon.
+* eggrobin, in #120: reverted #112.
+* awang, in #121: Upgraded to 1.3.1.
+* Kerbas-ad-astra, in #123: fixed an error in the ResourceTypo of Jupiter's resources.
+* PhineasFreak, in #125: fixed the atmospheric pressure of Triton, which was off by an order of magnitude (#118).
+* PhineasFreak, in #130: fixed ocean buoyancy.
+
 v12.0
 * HUGE THANK YOU to everyone involved! I was away and I come back to...many great changes and a pretty much ready-to-release update!
 * Recompile for KSP 1.2.2, include latest MM and Kopernicus.
