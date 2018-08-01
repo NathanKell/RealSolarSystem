@@ -82,7 +82,7 @@ namespace RealSolarSystem
 
         // Version of the compatibility checker itself.
 
-        private static int _version = 6;
+        static int _version = 6;
 
         public void Start()
         {
@@ -200,7 +200,7 @@ namespace RealSolarSystem
             return IsCompatible() && IsUnityCompatible();
         }
 
-        private static IEnumerable<Type> getAllTypes()
+        static IEnumerable<Type> getAllTypes()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {

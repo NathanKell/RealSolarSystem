@@ -9,10 +9,10 @@ namespace RealSolarSystem
     public class AFGEditor : MonoBehaviour
     {
         protected bool isCompatible = true;
-        private static Rect windowPosition = new Rect(64, 64, 320, 640);
-        private static GUIStyle windowStyle = null;
-        private AtmosphereFromGround afg = null;
-        private Boolean GUIOpen;
+        static Rect windowPosition = new Rect(64, 64, 320, 640);
+        static GUIStyle windowStyle = null;
+        AtmosphereFromGround afg = null;
+        Boolean GUIOpen;
 
         double counter = 0;
 
@@ -29,7 +29,6 @@ namespace RealSolarSystem
             
             public CameraWrapper()
             {
-                //layerCullDistances = new List<string>();
                 depth = farClipPlane = nearClipPlane = camName = "";
             }
             
@@ -89,7 +88,7 @@ namespace RealSolarSystem
                     try
                     {
                         CameraWrapper thisCam = new CameraWrapper();
-                        thisCam.camName = cam.name.ToString();
+                        thisCam.camName = cam.name;
                         thisCam.depth = cam.depth.ToString();
                         thisCam.farClipPlane += cam.farClipPlane.ToString();
                         thisCam.nearClipPlane += cam.nearClipPlane.ToString();
@@ -116,7 +115,7 @@ namespace RealSolarSystem
                 return;
             }
         }
-        private void OnGUI()
+        void OnGUI()
         {
             if (isCompatible && GUIOpen)
             {
@@ -156,7 +155,7 @@ namespace RealSolarSystem
             return afg;
         }
 
-        private void ShowGUI(int windowID)
+        void ShowGUI(int windowID)
         {
             GUILayout.BeginVertical();
             scrollPos = GUILayout.BeginScrollView(scrollPos);
