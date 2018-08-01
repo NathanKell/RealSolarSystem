@@ -6,12 +6,12 @@ namespace RealSolarSystem
 {
     // From Starwaster
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-    public class AFGEditor : MonoBehaviour
+    public class RealSolarSystemEditor : MonoBehaviour
     {
         protected bool isCompatible = true;
         static Rect windowPosition = new Rect(64, 64, 320, 640);
         static GUIStyle windowStyle = null;
-        AtmosphereFromGround afg = null;
+
         Boolean GUIOpen;
 
         double counter = 0;
@@ -119,7 +119,6 @@ namespace RealSolarSystem
         {
             if (isCompatible && GUIOpen)
             {
-                //print("[AFG Editor] OnDraw");
                 if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null)
                     windowPosition = GUILayout.Window(69105, windowPosition, ShowGUI, "RealSolarSystem Parameters", windowStyle);
             }
@@ -132,27 +131,9 @@ namespace RealSolarSystem
                 isCompatible = false;
                 return;
             }
-            if (afg == null)
-                afg = findAFG();
-            //print("[AFGEditor] Start()");
+
             windowStyle = new GUIStyle(HighLogic.Skin.window);
             windowStyle.stretchHeight = true;
-        }
-
-        public AtmosphereFromGround findAFG()
-        {
-
-            CelestialBody mainBody = FlightGlobals.getMainBody();
-
-            foreach (AtmosphereFromGround afgt in Resources.FindObjectsOfTypeAll(typeof(AtmosphereFromGround)))
-            {
-                if (afgt.planet == mainBody)
-                {
-                    afg = afgt;
-                    //print("[AFG Editor] Found Atmosphere");
-                }
-            }
-            return afg;
         }
 
         void ShowGUI(int windowID)
