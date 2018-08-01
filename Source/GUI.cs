@@ -60,11 +60,11 @@ namespace RealSolarSystem
                         }
                     }
                     if (notFound)
-                        Debug.Log("*RSSGUI* Could not find camera " + camName + " when applying settings.");
+                        Debug.Log("[RealSolarSystem]: Could not find camera " + camName + " when applying settings!");
                 }
                 catch (Exception e)
                 {
-                    Debug.Log("*RSSGUI* Error applying to camera " + camName + ": exception " + e.Message);
+                    Debug.Log("[RealSolarSystem]: Error applying to camera " + camName + ": exception " + e.Message);
                 }
             }
         }
@@ -97,7 +97,7 @@ namespace RealSolarSystem
                     }
                     catch (Exception e)
                     {
-                        Debug.Log("*RSSGUI* Exception getting camera " + cam.name + "\n" + e);
+                        Debug.Log("[RealSolarSystem]: Exception getting camera " + cam.name + "\n" + e);
                     }
                 }
             }
@@ -121,7 +121,7 @@ namespace RealSolarSystem
             {
                 //print("[AFG Editor] OnDraw");
                 if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null)
-                    windowPosition = GUILayout.Window(69105, windowPosition, ShowGUI, "Wavelength Parameters", windowStyle);
+                    windowPosition = GUILayout.Window(69105, windowPosition, ShowGUI, "RealSolarSystem Parameters", windowStyle);
             }
         }
 
