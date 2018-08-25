@@ -60,7 +60,7 @@ namespace RealSolarSystem
             // Even if you don't lock down functionality, you should return true if your users
             // can expect a future update to be available.
             //
-            return Versioning.version_major == 1 && Versioning.version_minor == 3;
+            return Versioning.version_major == 1 && Versioning.version_minor == 4;
 
             /*-----------------------------------------------*\
             | IMPLEMENTERS SHOULD NOT EDIT BEYOND THIS POINT! |
@@ -82,7 +82,7 @@ namespace RealSolarSystem
 
         // Version of the compatibility checker itself.
 
-        private static int _version = 6;
+        static int _version = 6;
 
         public void Start()
         {
@@ -200,7 +200,7 @@ namespace RealSolarSystem
             return IsCompatible() && IsUnityCompatible();
         }
 
-        private static IEnumerable<Type> getAllTypes()
+        static IEnumerable<Type> getAllTypes()
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
