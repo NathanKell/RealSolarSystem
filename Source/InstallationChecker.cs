@@ -12,7 +12,7 @@ namespace RealSolarSystem
         {
             try
             {
-                string szTextureFolderPath = "GameData" + Path.AltDirectorySeparatorChar + "RSS_Textures";
+                string szTextureFolderPath = "GameData" + Path.AltDirectorySeparatorChar + "RSS-Textures";
 
                 const string szUserMessage = "The texture pack for RealSolarSystem is missing from your installation\n\nDownload it from the official GitHub KSP-RO repository.";
 
