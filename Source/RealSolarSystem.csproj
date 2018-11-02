@@ -36,6 +36,7 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="CommNetFixer.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="InstallationChecker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
