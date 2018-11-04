@@ -2,8 +2,9 @@ using UnityEngine;
 
 namespace RealSolarSystem
 {
-    // Checks to make sure useLegacyAtmosphere didn't get munged with
-    // Could become a general place to prevent RSS changes from being reverted when our back is turned.
+    // The RSS watchdog is a general place to prevent RSS changes 
+    // from being reverted by other mods when our back is turned.
+
     [KSPAddon(KSPAddon.Startup.EveryScene, false)]
     public class RSSWatchDog : MonoBehaviour
     {
