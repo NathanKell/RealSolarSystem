@@ -4,11 +4,11 @@ using UnityEngine;
 
 namespace RealSolarSystem
 {
-    [KSPAddon (KSPAddon.Startup.SpaceCentre, false)]
+    [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
 
     public class RSSCommNetSettings : MonoBehaviour
     {
-        void Start ()
+        void Start()
         {
             try
             {
@@ -20,9 +20,13 @@ namespace RealSolarSystem
                 HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierAtm = 1.0f;
                 HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierVac = 1.0f;
             }
-            catch (Exception e)
+            catch (Exception exceptionStack)
             {
-                Debug.Log("[RealSolarSystem]: RSSCommNetSettings.Start() caught an exception: " + e);
+                Debug.Log("[RealSolarSystem]: RSSCommNetSettings.Start() caught an exception: " + exceptionStack);
+            }
+            finally
+            {
+                Destroy(this);
             }
         }
     }

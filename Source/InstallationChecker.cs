@@ -51,9 +51,13 @@ namespace RealSolarSystem
                     );
                 }
             }
-            catch (Exception e)
+            catch (Exception exceptionStack)
             {
-                Debug.Log ("[RealSolarSystem]: RSSInstallationCheck.Start() caught an exception: " + e);
+                Debug.Log ("[RealSolarSystem]: RSSInstallationCheck.Start() caught an exception: " + exceptionStack);
+            }
+            finally
+            {
+                Destroy (this);
             }
         }
 

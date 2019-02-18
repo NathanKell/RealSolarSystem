@@ -30,12 +30,12 @@ namespace RealSolarSystem
             public string farClipPlane;
             public string nearClipPlane;
             public string camName;
-            
+
             public CameraWrapper()
             {
                 depth = farClipPlane = nearClipPlane = camName = "";
             }
-            
+
             public void Apply()
             {
                 Camera[] cameras = Camera.allCameras;
@@ -72,9 +72,9 @@ namespace RealSolarSystem
                         Debug.Log("[RealSolarSystem]: Could not find camera " + camName + " when applying settings!");
                     }
                 }
-                catch (Exception e)
+                catch (Exception exceptionStack)
                 {
-                    Debug.Log("[RealSolarSystem]: Error applying to camera " + camName + ": exception " + e.Message);
+                    Debug.Log("[RealSolarSystem]: Error applying to camera " + camName + ": exception " + exceptionStack.Message);
                 }
             }
         }
@@ -100,18 +100,21 @@ namespace RealSolarSystem
                 {
                     try
                     {
-                        var thisCam = new CameraWrapper();
+                        var thisCam = new CameraWrapper
+                        {
+                            camName = cam.name,
 
-                        thisCam.camName = cam.name;
-                        thisCam.depth = cam.depth.ToString();
+                            depth = cam.depth.ToString()
+                        };
+
                         thisCam.farClipPlane += cam.farClipPlane.ToString();
                         thisCam.nearClipPlane += cam.nearClipPlane.ToString();
 
                         cams.Add(thisCam);
                     }
-                    catch (Exception e)
+                    catch (Exception exceptionStack)
                     {
-                        Debug.Log("[RealSolarSystem]: Exception getting camera " + cam.name + "\n" + e);
+                        Debug.Log("[RealSolarSystem]: Exception getting camera " + cam.name + "\n" + exceptionStack);
                     }
                 }
             }

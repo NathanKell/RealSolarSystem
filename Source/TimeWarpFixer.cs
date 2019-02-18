@@ -35,6 +35,8 @@ namespace RealSolarSystem
                 foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                     twNode = node.GetNode("timeWarpRates");
 
+                Debug.Log("[RealSolarSystem]: Setting TimeWarp rates...");
+
                 float ftmp;
 
                 if (twNode != null)

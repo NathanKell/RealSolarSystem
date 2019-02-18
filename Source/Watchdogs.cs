@@ -5,7 +5,7 @@ namespace RealSolarSystem
     // The RSS watchdog is a general place to prevent RSS changes
     // from being reverted by other mods when our back is turned.
 
-    [KSPAddon(KSPAddon.Startup.EveryScene, false)]
+    [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
 
     public class RSSWatchDog : MonoBehaviour
     {
@@ -23,9 +23,6 @@ namespace RealSolarSystem
                 isCompatible = false;
                 return;
             }
-
-            if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER))
-                return;
 
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
@@ -45,18 +42,17 @@ namespace RealSolarSystem
         {
             if (!isCompatible)
                 return;
-            if (!(HighLogic.LoadedSceneIsFlight || HighLogic.LoadedScene == GameScenes.SPACECENTER))
-                return;
 
             if (watchdogRun)
                 return;
+
             delayCounter += Time.deltaTime;
 
             if(delayCounter < initialDelay)
                 return;
 
             watchdogRun = true;
-            
+
             Camera[] cameras = Camera.allCameras;
             string bodyName = FlightGlobals.getMainBody().name;
 
@@ -121,6 +117,7 @@ namespace RealSolarSystem
         public void OnVesselSOIChanged(GameEvents.HostedFromToAction<Vessel, CelestialBody> evt)
         {
             watchdogRun = false;
+
             delayCounter = 0;
         }
     }
