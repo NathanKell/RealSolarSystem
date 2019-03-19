@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RealSolarSystem
 {
-    [KSPAddon(KSPAddon.Startup.SpaceCentre, false)]
+    [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
 
     public class RSSCommNetSettings : MonoBehaviour
     {
