@@ -15,6 +15,7 @@ namespace RealSolarSystem
 
         bool watchdogRun = false;
         protected bool isCompatible = true;
+        protected bool isSuborbital = false;
 
         public void Start()
         {
@@ -28,6 +29,7 @@ namespace RealSolarSystem
                 RSSSettings = node;
 
             GameEvents.onVesselSOIChanged.Add(OnVesselSOIChanged);
+            GameEvents.onVesselSituationChange.Add(OnVesselSituationChanged);
         }
 
         public void OnDestroy()
@@ -35,6 +37,7 @@ namespace RealSolarSystem
             if (isCompatible)
             {
                 GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
+                GameEvents.onVesselSituationChange.Remove(OnVesselSituationChanged);
             }
         }
 
@@ -119,6 +122,23 @@ namespace RealSolarSystem
             watchdogRun = false;
 
             delayCounter = 0;
+        }
+
+        private void OnVesselSituationChanged(GameEvents.HostedFromToAction<Vessel, Vessel.Situations> data)
+        {
+            Vessel curVessel = data.host;
+            if (!curVessel.mainBody.isHomeWorld || !curVessel.isActiveVessel) return;
+
+            if (data.from == Vessel.Situations.FLYING && data.to == Vessel.Situations.SUB_ORBITAL)
+            {
+                isSuborbital = true;
+            }
+            else if (isSuborbital && data.to == Vessel.Situations.FLYING)
+            {
+                isSuborbital = false;
+                Debug.Log("[RealSolarSystem]: Calling StartUpSphere() to prevent missing PQ tiles");
+                curVessel.mainBody.pqsController.StartUpSphere();
+            }
         }
     }
 }
