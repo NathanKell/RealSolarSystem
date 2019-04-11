@@ -13,27 +13,70 @@ Includes artwork by dimonnomid and SpacedInvader and Dr. Walther and KillAshley 
 Includes biomes by Felger and grayduster and KellanHiggins and KillAshley.
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
 
-Also included:
-Module Manager (by sarbian, swamp_ig, and ialdabaoth). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/55219
-Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/140580
-A configuration for Custom Asteriods by Starstrider42. See thread for details, license, and source: http://forum.kerbalspaceprogram.com/threads/80483
-
+DEPENDENCIES:
+CustomBarnKit (by sarbian). See GitHub repository for details, license, and source: https://github.com/sarbian/CustomBarnKit
+KSCSwitcher (by regex, NathanKell, and jbengtson). See GitHub repository for details, license, and source: https://github.com/KSP-RO/KSCSwitcher
+Kopernicus (by teknoman, bryce, Thomas P., and NathanKell). See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=181547
+Module Manager (by sarbian, swamp_ig, and ialdabaoth). See KSP forum thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=50533
 
 INSTALLATION:
-Extract to KSP/GameData. You should have one dll (Module Manager) in the root of GameData, and two folders: Kopernicus and RealSolarSystem. However, you are NOT DONE YET.
+Install the above dependencies, as per the instructions of each one, to KSP/GameData.
+Extract RealSolarSystem to KSP/GameData. You should now have one .dll (Module Manager) in the root of GameData, and two folders: Kopernicus and RealSolarSystem. However, you are NOT DONE YET.
 
-TEXTURE INSTALLATION
-Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution texutres. Note that 8192 is dangerous: it will not work at all on Mac OSX, and you may easily run out of memory on Windows. It's really only safe for Linux, although if you run Windows KSP in OpenGL mode it might work.
+TEXTURE INSTALLATION:
+Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution textures. Note that 8192 is dangerous, since you may easily run out of memory.
 
 You can get the textures from: https://github.com/KSP-RO/RSS-Textures
-Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repo itself).
-NOTE: the path is NOT the same as the old (RSS v8 and below) path. The old folder was RSSTextures. The new folder is RSS-Textures.
+Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repository itself).
+NOTE: the path is NOT the same as the old (RSS v8 and below) path. The old folder was "RSSTextures". The new folder is "RSS-Textures".
 
+SUGGESTED MODS:
+RealSolarSystem ships with configurations for many other mods:
 
-FINAL NOTE: You really should play with the recommended mods. See the Realism Overhaul thread for details.
+- Custom Asteroids by Starstrider42. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=72785
+- Ferram Aerospace Research by ferram4. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=19321
+- Not In My BackYard by magico13, and LinuxGuruGamer. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=178484
+- PlanetShine by Valerian, and Papa_Joe. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?/showtopic=173138
+- RemoteTech by Peppie23, and the Remote Technologies Group. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=139167
+- SCANSat by damny, and DMagic. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=72679
+- TextureReplacer by shaw. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=96851
+
+FINAL NOTES:
+You really should play with the recommended mods. See the Realism Overhaul thread for details.
 
 ===========================
 Changelog
+
+v16.0
+* Updated for KSP 1.6.1.
+* Added recovery zone support for the NIMBY (Not In My BackYard) mod (courtesy of Kerbas-ad-astra - PR #155).
+* Added the Mahia launch site in New Zealand (courtesy of leudaimon - PR #157).
+* Added an installation checker to verify that the required RSS textures are installed upon game startup.
+* Added support for CommNet stations mirroring the existing ones by RemoteTech.
+* Enabled the "On Demand" feature of Kopernicus for up to 35% reduction of memory requirements (courtesy of pap1723 - Commit b1b8507).
+* Fixed the incorrect latitude of the MSFN Indian Ocean Ship tracking station (courtesy of Kerbas-ad-astra - PR #150).
+* Fixed the missing surface tiles on sub-orbital flights (courtesy of siimav - PR #159).
+* Fixed the incorrect thermal radiation properties of Venus, Jupiter, Saturn, Uranus and Neptune. Vessels will now explode less when
+  in close proximity to these bodies (courtesy of Starwaster - PR #162).
+* Fixed the Mars atmosphere fade effect.
+* Fixed the Titan atmosphere color and fade effect.
+* Removed a lot of non-working stock KSP PQS mods.
+* Removed the stock KSP launch sites (managed for RSS by KSCSwitcher).
+* Removed the compatibility patches for AntennaRange, Better Buoyancy and TextureReplacerReplaced, as these mods are now deprecated
+  and/or not maintained.
+
+v14.0
+* Updated for KSP 1.4.5.
+* Added a patch to fix the density and size of the asteroids.
+* Cleaned up the RSS source to remove obsolete code.
+
+v13.1
+* Update custom asteroids compatibility for 1.3+.
+* Fix earth terrain noise in prep for changes to ksp 1.4.x, still works in 1.3.1.
+* Fixed the problem with the normal maps for Ceres and Vesta, requires update of rss textures pack.
+
+Thanks to Starstrider42, Kerbas-ad-astra and PhineasFreak for these fixes.
+
 v13.0
 Release in the absence of NathanKell, coordinated by Raidernick.
 This release moves on to KSP 1.3.1, and adds seven new celestial bodies.
@@ -377,7 +420,7 @@ v6    \/
 v5.6  \/
 *Fixed wavelenght color parsing to take four arguments (colors are RGBA after all)
 *Added compatibility patches for VisualEnhancements and (thanks, jrandom!) SCANSat
- 
+
 v5.5  \/
 *Fixed for KSP 0.23
 
