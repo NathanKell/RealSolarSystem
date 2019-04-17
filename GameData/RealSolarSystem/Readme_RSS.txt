@@ -26,9 +26,9 @@ Extract RealSolarSystem to KSP/GameData. You should now have one .dll (Module Ma
 TEXTURE INSTALLATION:
 Now, you must select a texture resolution. Download a premade pack (8192, 4096, or 2048) and then, if desired, selectively replace with different-resolution textures. Note that 8192 is dangerous, since you may easily run out of memory.
 
-You can get the textures from: https://github.com/KSP-RO/RSS-Textures
+You can get the textures from: https://github.com/KSP-RO/ScaledRSS-Textures
 Go to the releases page and grab one of the resolution packs, then (optionally) get replacements from the repository itself).
-NOTE: the path is NOT the same as the old (RSS v8 and below) path. The old folder was "RSSTextures". The new folder is "RSS-Textures".
+NOTE: The folder is "RSS-Textures"
 
 SUGGESTED MODS:
 RealSolarSystem ships with configurations for many other mods:
@@ -46,6 +46,10 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+
+v16.1
+* Fixed the issue where KSP log stated there was no preset high for PQS (Thanks to PhineasFreak for telling me how to fix - Issue #167)
+* When KSP is reading biome maps, there are imperfections for some reason. There will by 1+ pixel readings of a different color than something identified in the file. In this situation, it defaults to the first biome in the list. Re-ordered the biomes so that the most common biome is listed first to stop something like Olympus Mons showing in many places on Mars. (thanks to Faptown - Issue #163)
 
 v16.0
 * Updated for KSP 1.6.1.
