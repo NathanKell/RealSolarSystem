@@ -47,6 +47,9 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 ===========================
 Changelog
 
+v16.2 HOTFIX
+* Wrong Assembly Version was included in file, needed a recompile with the proper information
+
 v16.1
 * Fixed the issue where KSP log stated there was no preset high for PQS (Thanks to PhineasFreak for telling me how to fix - Issue #167)
 * When KSP is reading biome maps, there are imperfections for some reason. There will by 1+ pixel readings of a different color than something identified in the file. In this situation, it defaults to the first biome in the list. Re-ordered the biomes so that the most common biome is listed first to stop something like Olympus Mons showing in many places on Mars. (thanks to Faptown - Issue #163)
