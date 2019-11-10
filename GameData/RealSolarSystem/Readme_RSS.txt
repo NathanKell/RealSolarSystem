@@ -46,6 +46,11 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v16.4
+* Recompiled for KSP 1.8.1
+
+v16.3
+* Recompiled for KSP 1.7.2
 
 v16.2 HOTFIX
 * Wrong Assembly Version was included in file, needed a recompile with the proper information
