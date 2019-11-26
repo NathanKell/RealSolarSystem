@@ -10,7 +10,6 @@ namespace RealSolarSystem
 
     public class RealSolarSystemEditor : MonoBehaviour
     {
-        protected bool isCompatible = true;
         static Rect windowPosition = new Rect(64, 64, 320, 640);
         static GUIStyle windowStyle = null;
 
@@ -81,9 +80,6 @@ namespace RealSolarSystem
 
         public void Update()
         {
-            if (!isCompatible)
-                return;
-
             if (counter < 5)
             {
                 counter += TimeWarp.fixedDeltaTime;
@@ -125,19 +121,10 @@ namespace RealSolarSystem
             }
         }
 
-        public void Awake()
-        {
-            if (!CompatibilityChecker.IsCompatible())
-            {
-                isCompatible = false;
-
-                return;
-            }
-        }
 
         void OnGUI()
         {
-            if (isCompatible && GUIOpen)
+            if (GUIOpen)
             {
                 if (HighLogic.LoadedSceneIsFlight && FlightGlobals.ActiveVessel != null)
                     windowPosition = GUILayout.Window(69105, windowPosition, ShowGUI, "RealSolarSystem Parameters", windowStyle);
@@ -146,13 +133,6 @@ namespace RealSolarSystem
 
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
-            {
-                isCompatible = false;
-
-                return;
-            }
-
             windowStyle = new GUIStyle(HighLogic.Skin.window);
             windowStyle.stretchHeight = true;
         }

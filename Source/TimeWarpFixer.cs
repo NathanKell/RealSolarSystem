@@ -9,11 +9,9 @@ namespace RealSolarSystem
         public double lastTime = 0;
         public double currentTime = 0;
         public static bool fixedTimeWarp = false;
-        protected bool isCompatible = true;
 
         public void Start()
         {
-            isCompatible &= CompatibilityChecker.IsCompatible ();
             fixedTimeWarp = false;
 
             GameSettings.KERBIN_TIME = false;
@@ -22,8 +20,6 @@ namespace RealSolarSystem
 
         public void Update()
         {
-            if (!isCompatible)
-                return;
 
             // Update the TimeWarp rates.
 

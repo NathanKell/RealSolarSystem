@@ -14,16 +14,10 @@ namespace RealSolarSystem
         const double initialDelay = 1; // 1 second wait before cam fixing
 
         bool watchdogRun = false;
-        protected bool isCompatible = true;
         protected bool isSuborbital = false;
 
         public void Start()
         {
-            if (!CompatibilityChecker.IsCompatible())
-            {
-                isCompatible = false;
-                return;
-            }
 
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
@@ -34,18 +28,12 @@ namespace RealSolarSystem
 
         public void OnDestroy()
         {
-            if (isCompatible)
-            {
-                GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
-                GameEvents.onVesselSituationChange.Remove(OnVesselSituationChanged);
-            }
+            GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
+            GameEvents.onVesselSituationChange.Remove(OnVesselSituationChanged);
         }
 
         public void Update()
         {
-            if (!isCompatible)
-                return;
-
             if (watchdogRun)
                 return;
 

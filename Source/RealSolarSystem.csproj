@@ -40,8 +40,8 @@
     <Compile Include="GUI.cs" />
     <Compile Include="InstallationChecker.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RSSRunwayFix.cs" />
     <Compile Include="TimeWarpFixer.cs" />
-    <Compile Include="VersionChecker.cs" />
     <Compile Include="Watchdogs.cs" />
   </ItemGroup>
   <ItemGroup>
