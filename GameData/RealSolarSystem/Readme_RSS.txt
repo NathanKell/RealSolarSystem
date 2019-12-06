@@ -46,6 +46,15 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v16.5
+* Recompiled for KSP 1.8.1
+
+v16.4
+* Integrated the RSS Runway fix from @whale2
+* Removed Version Checker
+
+v16.3
+* Recompiled for KSP 1.7.X
 
 v16.2 HOTFIX
 * Wrong Assembly Version was included in file, needed a recompile with the proper information
