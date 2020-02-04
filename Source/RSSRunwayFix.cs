@@ -1,24 +1,18 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using System.Diagnostics;
-using System.Linq;
 
 namespace RealSolarSystem
 {
 	[KSPAddon(KSPAddon.Startup.Flight, false)]
 
-	public class RSSRunwayFix: MonoBehaviour
+	public class RSSRunwayFix : MonoBehaviour
 	{
 		private bool hold = false;
 
-		[KSPField(isPersistant = true)] 
-		public bool debug = true;
-		
-		[KSPField(isPersistant = true)]
+		public bool debug = false;
+
 		public float holdThreshold = 2700;
-		
 		public float holdThresholdSqr;
 
 		public float originalThreshold = 0;
@@ -43,7 +37,19 @@ namespace RealSolarSystem
 		public void Start() {
 			
 			printDebug("Start");
-			
+
+			foreach (ConfigNode n in GameDatabase.Instance.GetConfigNodes("RSSRUNWAYFIX"))
+			{
+				if (bool.TryParse(n.GetValue("debug"), out bool bTemp))
+				{
+					debug = bTemp;
+				}
+				if (float.TryParse(n.GetValue("debug"), out float fTemp))
+				{
+					holdThreshold = fTemp;
+				}
+			}
+
 			GameEvents.onVesselGoOffRails.Add (onVesselGoOffRails);
 			GameEvents.onVesselGoOnRails.Add (onVesselGoOnRails);
 			GameEvents.onVesselSwitching.Add (onVesselSwitching);
@@ -58,7 +64,7 @@ namespace RealSolarSystem
 			GameEvents.onVesselGoOnRails.Remove (onVesselGoOnRails);
 			GameEvents.onVesselSwitching.Remove (onVesselSwitching);
 			GameEvents.onVesselSituationChange.Remove(onVesselSituationChange);
-			
+
 			//GameEvents.onFloatingOriginShift.Remove(onFloatingOriginShift);
 		}
 
@@ -68,7 +74,7 @@ namespace RealSolarSystem
 			{
 				return;
 			}
-			printDebug($"RSSRWF: v0: {v0}, v1: {v1}, threshold: {FloatingOrigin.fetch.threshold}");
+			if (debug) printDebug($"RSSRWF: v0: {v0}, v1: {v1}, threshold: {FloatingOrigin.fetch.threshold}");
 		}
 
 		public void onVesselGoOnRails(Vessel v)
@@ -85,7 +91,7 @@ namespace RealSolarSystem
 			originalThreshold = FloatingOrigin.fetch.threshold;
 			originalThresholdSqr = FloatingOrigin.fetch.thresholdSqr;
 
-			printDebug($"original threshold={originalThreshold}");
+			if (debug) printDebug($"original threshold={originalThreshold}");
 			holdThresholdSqr = holdThreshold * holdThreshold;
 
 			GameObject end09 = GameObject.Find(collidersToFix[0]);
@@ -125,7 +131,6 @@ namespace RealSolarSystem
 			{
 				return;
 			}
-
 			
 			hold = data.to == Vessel.Situations.LANDED;
 			printDebug($"vessel: {data.host.vesselName}, situation: {data.to}, hold: {hold}");
@@ -149,10 +154,10 @@ namespace RealSolarSystem
 
 		private IEnumerator restoreThreshold()
 		{
-			printDebug($"in coro; hold={hold}, waiting={waiting}, alt={FlightGlobals.ActiveVessel.radarAltitude}");
+			if (debug) printDebug($"in coro; hold={hold}, waiting={waiting}, alt={FlightGlobals.ActiveVessel.radarAltitude}");
 			while (!hold && !waiting &&  FlightGlobals.ActiveVessel.radarAltitude < 10)
 			{
-				printDebug($"radar alt: {FlightGlobals.ActiveVessel.radarAltitude}, waiting 5 sec");
+				if (debug) printDebug($"radar alt: {FlightGlobals.ActiveVessel.radarAltitude}, waiting 5 sec");
 				waiting = true;
 				yield return new WaitForSeconds(5);
 				waiting = false;
@@ -161,8 +166,8 @@ namespace RealSolarSystem
 
 			// Check again as situation could have changed
 			if (!hold && FloatingOrigin.fetch.threshold > originalThreshold && originalThreshold > 0) {
-				printDebug($"Restoring original thresholds ({FloatingOrigin.fetch.threshold} > {originalThreshold}), "+
-				           $"alt={FlightGlobals.ActiveVessel.radarAltitude}");
+				if (debug) printDebug($"Restoring original thresholds ({FloatingOrigin.fetch.threshold} > {originalThreshold}), "+
+									  $"alt={FlightGlobals.ActiveVessel.radarAltitude}");
 				FloatingOrigin.fetch.threshold = originalThreshold;
 				FloatingOrigin.fetch.thresholdSqr = originalThresholdSqr;
 			}
@@ -183,8 +188,7 @@ namespace RealSolarSystem
 			{
 				if (rwy)
 				{
-					printDebug(
-						$"rwy=false; threshold={FloatingOrigin.fetch.threshold}, original threshold={originalThreshold}");
+					if (debug) printDebug($"rwy=false; threshold={FloatingOrigin.fetch.threshold}, original threshold={originalThreshold}");
 					rwy = false;
 				}
 				
@@ -196,7 +200,7 @@ namespace RealSolarSystem
 			
 			if (!rwy)
 			{
-				printDebug($"rwy=true; threshold={FloatingOrigin.fetch.threshold}, original threshold={originalThreshold}");
+				if (debug) printDebug($"rwy=true; threshold={FloatingOrigin.fetch.threshold}, original threshold={originalThreshold}");
 				rwy = true;
 			}
 
@@ -226,7 +230,7 @@ namespace RealSolarSystem
 			}
 			
 			string colliderName = raycastHit.collider.gameObject.name;
-			//printDebug($"hit collider: {colliderName}");
+			//if (debug) printDebug($"hit collider: {colliderName}");
 			if (colliderName != "runway_collider")
 			{
 				return false;
@@ -237,12 +241,12 @@ namespace RealSolarSystem
 
 		internal void printDebug(String message) {
 
-			if (!debug)
-				return;
-			StackTrace trace = new StackTrace ();
+			if (!debug) return;
+
+			var trace = new System.Diagnostics.StackTrace();
 			String caller = trace.GetFrame(1).GetMethod ().Name;
 			int line = trace.GetFrame (1).GetFileLineNumber ();
-			print ("RSSSteamRoller: " + caller + ":" + line + ": " + message);
+			Debug.Log($"[RealSolarSystem] {caller}:{line}: {message}");
 		}
 
 		private void disableColliders()
@@ -252,22 +256,22 @@ namespace RealSolarSystem
 				GameObject o = GameObject.Find(c);
 				if (o == null)
 				{
-					printDebug($"Object {c} not found, skipping");
+					if (debug) printDebug($"Object {c} not found, skipping");
 					continue;
 				}
 				if (!o.activeInHierarchy)
 				{
-					printDebug($"{o.name} is not active, skipping");
+					if (debug) printDebug($"{o.name} is not active, skipping");
 					continue;
 				}
 
 				MeshCollider cl = o.GetComponentInChildren<MeshCollider>();
 				if (cl == null)
 				{
-					printDebug($"No mesh collider in {c}");
+					if (debug) printDebug($"No mesh collider in {c}");
 					continue;
 				}
-				printDebug($"disabling {cl.name}");
+				if (debug) printDebug($"disabling {cl.name}");
 				cl.enabled = false;
 			}
 		}
