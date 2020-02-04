@@ -2,8 +2,8 @@
   "NAME": "RealSolarSystem",
   "URL": "https://raw.githubusercontent.com/KSP-RO/RealSolarSystem/master/RealSolarSystem/RealSolarSystem.version",
   "VERSION": {
-    "MAJOR": 16,
-    "MINOR": 5,
+    "MAJOR": 18,
+    "MINOR": 0,
     "PATCH": 0
   },
   "KSP_VERSION_MIN": {
