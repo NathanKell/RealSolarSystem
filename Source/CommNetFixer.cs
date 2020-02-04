@@ -5,10 +5,9 @@ using UnityEngine;
 namespace RealSolarSystem
 {
     [KSPAddon(KSPAddon.Startup.SpaceCentre, true)]
-
     public class RSSCommNetSettings : MonoBehaviour
     {
-        void Start()
+        public void Start()
         {
             try
             {
@@ -18,7 +17,7 @@ namespace RealSolarSystem
                 float occlusionMultiplierInAtm = 1.0f;
                 float occlusionMultiplierInVac = 1.0f;
 
-                Debug.Log("[RealSolarSystem]: Checking for custom CommNet settings...");
+                Debug.Log("[RealSolarSystem] Checking for custom CommNet settings...");
 
                 foreach (ConfigNode RSSSettings in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 {
@@ -32,7 +31,7 @@ namespace RealSolarSystem
                 {
                     //  Set the default CommNet parameters for RealSolarSystem.
 
-                    Debug.Log("[RealSolarSystem]: Updating the CommNet settings...");
+                    Debug.Log("[RealSolarSystem] Updating the CommNet settings...");
 
                     HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().enableGroundStations = enableExtraGroundStations;
                     HighLogic.CurrentGame.Parameters.CustomParams<CommNetParams>().occlusionMultiplierAtm = occlusionMultiplierInAtm;
@@ -41,7 +40,7 @@ namespace RealSolarSystem
             }
             catch (Exception exceptionStack)
             {
-                Debug.Log("[RealSolarSystem]: RSSCommNetSettings.Start() caught an exception: " + exceptionStack);
+                Debug.Log("[RealSolarSystem] RSSCommNetSettings.Start() caught an exception: " + exceptionStack);
             }
             finally
             {

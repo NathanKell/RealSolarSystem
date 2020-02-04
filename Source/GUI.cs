@@ -5,9 +5,7 @@ using UnityEngine;
 namespace RealSolarSystem
 {
     // From Starwaster.
-
     [KSPAddon(KSPAddon.Startup.Flight, false)]
-
     public class RealSolarSystemEditor : MonoBehaviour
     {
         static Rect windowPosition = new Rect(64, 64, 320, 640);
@@ -39,8 +37,6 @@ namespace RealSolarSystem
             {
                 Camera[] cameras = Camera.allCameras;
 
-                float ftmp;
-
                 try
                 {
                     bool notFound = true;
@@ -49,7 +45,7 @@ namespace RealSolarSystem
                     {
                         if (camName.Equals(cam.name))
                         {
-                            if (float.TryParse(depth, out ftmp))
+                            if (float.TryParse(depth, out float ftmp))
                                 cam.depth = ftmp;
 
                             if (float.TryParse(farClipPlane, out ftmp))
@@ -68,12 +64,12 @@ namespace RealSolarSystem
 
                     if (notFound)
                     {
-                        Debug.Log("[RealSolarSystem]: Could not find camera " + camName + " when applying settings!");
+                        Debug.Log($"[RealSolarSystem] Could not find camera {camName} when applying settings!");
                     }
                 }
                 catch (Exception exceptionStack)
                 {
-                    Debug.Log("[RealSolarSystem]: Error applying to camera " + camName + ": exception " + exceptionStack.Message);
+                    Debug.Log($"[RealSolarSystem] Error applying to camera {camName}: exception {exceptionStack.Message}");
                 }
             }
         }
@@ -110,7 +106,7 @@ namespace RealSolarSystem
                     }
                     catch (Exception exceptionStack)
                     {
-                        Debug.Log("[RealSolarSystem]: Exception getting camera " + cam.name + "\n" + exceptionStack);
+                        Debug.Log($"[RealSolarSystem] Exception getting camera {cam.name}\n{exceptionStack}");
                     }
                 }
             }
@@ -121,8 +117,7 @@ namespace RealSolarSystem
             }
         }
 
-
-        void OnGUI()
+        public void OnGUI()
         {
             if (GUIOpen)
             {
@@ -137,7 +132,7 @@ namespace RealSolarSystem
             windowStyle.stretchHeight = true;
         }
 
-        void ShowGUI(int windowID)
+        private void ShowGUI(int windowID)
         {
             GUILayout.BeginVertical();
 

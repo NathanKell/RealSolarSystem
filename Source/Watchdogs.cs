@@ -6,7 +6,6 @@ namespace RealSolarSystem
     // from being reverted by other mods when our back is turned.
 
     [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
-
     public class RSSWatchDog : MonoBehaviour
     {
         ConfigNode RSSSettings = null;
@@ -18,7 +17,6 @@ namespace RealSolarSystem
 
         public void Start()
         {
-
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
                 RSSSettings = node;
 
@@ -93,14 +91,14 @@ namespace RealSolarSystem
                 {
                     cam.nearClipPlane = nearClip;
 
-                    Debug.Log("[RealSolarSystem]: Watchdog: Setting camera " + cam.name + " near clip to " + nearClip + " so camera now has " + cam.nearClipPlane);
+                    Debug.Log($"[RealSolarSystem] Watchdog: Setting camera {cam.name} near clip to {nearClip} so camera now has {cam.nearClipPlane}");
                 }
 
                 if (farClip > 0)
                 {
                     cam.farClipPlane = farClip;
 
-                    Debug.Log("[RealSolarSystem]: Watchdog: Setting camera " + cam.name + " far clip to " + farClip + " so camera now has " + cam.farClipPlane);
+                    Debug.Log($"[RealSolarSystem] Watchdog: Setting camera {cam.name} far clip to {farClip} so camera now has {cam.farClipPlane}");
                 }
             }
         }
@@ -108,7 +106,6 @@ namespace RealSolarSystem
         public void OnVesselSOIChanged(GameEvents.HostedFromToAction<Vessel, CelestialBody> evt)
         {
             watchdogRun = false;
-
             delayCounter = 0;
         }
 
@@ -124,7 +121,7 @@ namespace RealSolarSystem
             else if (isSuborbital && data.to == Vessel.Situations.FLYING)
             {
                 isSuborbital = false;
-                Debug.Log("[RealSolarSystem]: Calling StartUpSphere() to prevent missing PQ tiles");
+                Debug.Log("[RealSolarSystem] Calling StartUpSphere() to prevent missing PQ tiles");
                 curVessel.mainBody.pqsController.StartUpSphere();
             }
         }

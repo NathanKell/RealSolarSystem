@@ -5,10 +5,9 @@ using UnityEngine;
 namespace RealSolarSystem
 {
     [KSPAddon(KSPAddon.Startup.Instantly, true)]
-
     class RSSInstallationCheck : MonoBehaviour
     {
-        void Start ()
+        public void Start ()
         {
             try
             {
@@ -18,7 +17,7 @@ namespace RealSolarSystem
 
                 if (!Directory.Exists (szTextureFolderPath))
                 {
-                    Debug.Log ("[RealSolarSystem]: No texture pack detected!");
+                    Debug.Log ("[RealSolarSystem] No texture pack detected!");
 
                     PopupDialog.SpawnPopupDialog
                     (
@@ -53,7 +52,7 @@ namespace RealSolarSystem
             }
             catch (Exception exceptionStack)
             {
-                Debug.Log ("[RealSolarSystem]: RSSInstallationCheck.Start() caught an exception: " + exceptionStack);
+                Debug.Log("[RealSolarSystem] RSSInstallationCheck.Start() caught an exception: " + exceptionStack);
             }
             finally
             {
