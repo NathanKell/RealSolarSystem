@@ -46,8 +46,12 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
-v16.5
+v18.0
 * Recompiled for KSP 1.8.1
+* png textures to dds, @jrodrigv
+* Implement settings for Runway Fix and disable debug info by default, @siimav 
+* Match KSC grass color, @Standecco
+* Additional tracking stations for RealAntennas @RCrockford
 
 v16.4
 * Integrated the RSS Runway fix from @whale2
