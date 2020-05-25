@@ -2,32 +2,30 @@ using UnityEngine;
 
 namespace RealSolarSystem
 {
-    // The RSS watchdog is a general place to prevent RSS changes
-    // from being reverted by other mods when our back is turned.
-
+    /// <summary>
+    /// The RSS watchdog is a general place to prevent RSS changes
+    /// from being reverted by other mods when our back is turned.
+    /// </summary>
     [KSPAddon(KSPAddon.Startup.FlightAndKSC, false)]
     public class RSSWatchDog : MonoBehaviour
     {
-        ConfigNode RSSSettings = null;
-        double delayCounter = 0;
-        const double initialDelay = 1; // 1 second wait before cam fixing
+        private const double initialDelay = 1; // 1 second wait before cam fixing
 
-        bool watchdogRun = false;
-        protected bool isSuborbital = false;
+        private ConfigNode rssSettings = null;
+        private double delayCounter = 0;
+        private bool watchdogRun = false;
 
         public void Start()
         {
             foreach (ConfigNode node in GameDatabase.Instance.GetConfigNodes("REALSOLARSYSTEM"))
-                RSSSettings = node;
+                rssSettings = node;
 
             GameEvents.onVesselSOIChanged.Add(OnVesselSOIChanged);
-            GameEvents.onVesselSituationChange.Add(OnVesselSituationChanged);
         }
 
         public void OnDestroy()
         {
             GameEvents.onVesselSOIChanged.Remove(OnVesselSOIChanged);
-            GameEvents.onVesselSituationChange.Remove(OnVesselSituationChanged);
         }
 
         public void Update()
@@ -52,39 +50,39 @@ namespace RealSolarSystem
 
                 if (cam.name.Equals("Camera 00"))
                 {
-                    RSSSettings.TryGetValue("cam00FarClip", ref farClip);
+                    rssSettings.TryGetValue("cam00FarClip", ref farClip);
 
-                    if (RSSSettings.HasNode(bodyName))
-                        RSSSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
+                    if (rssSettings.HasNode(bodyName))
+                        rssSettings.GetNode(bodyName).TryGetValue("cam00FarClip", ref farClip);
 
-                    RSSSettings.TryGetValue("cam00NearClip", ref nearClip);
+                    rssSettings.TryGetValue("cam00NearClip", ref nearClip);
 
-                    if (RSSSettings.HasNode(bodyName))
-                        RSSSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
+                    if (rssSettings.HasNode(bodyName))
+                        rssSettings.GetNode(bodyName).TryGetValue("cam00NearClip", ref nearClip);
                 }
                 else if (cam.name.Equals("Camera 01"))
                 {
-                    RSSSettings.TryGetValue("cam01FarClip", ref farClip);
+                    rssSettings.TryGetValue("cam01FarClip", ref farClip);
 
-                    if (RSSSettings.HasNode(bodyName))
-                        RSSSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
+                    if (rssSettings.HasNode(bodyName))
+                        rssSettings.GetNode(bodyName).TryGetValue("cam01FarClip", ref farClip);
 
-                    RSSSettings.TryGetValue("cam01NearClip", ref nearClip);
+                    rssSettings.TryGetValue("cam01NearClip", ref nearClip);
 
-                    if (RSSSettings.HasNode(bodyName))
-                        RSSSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
+                    if (rssSettings.HasNode(bodyName))
+                        rssSettings.GetNode(bodyName).TryGetValue("cam01NearClip", ref nearClip);
                 }
                 else if (cam.name.Equals("Camera ScaledSpace"))
                 {
-                    RSSSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
+                    rssSettings.TryGetValue("camScaledSpaceFarClip", ref farClip);
 
-                    if (RSSSettings.HasNode(bodyName))
-                        RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
+                    if (rssSettings.HasNode(bodyName))
+                        rssSettings.GetNode(bodyName).TryGetValue("camScaledSpaceFarClip", ref farClip);
 
-                    RSSSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                    rssSettings.TryGetValue("camScaledSpaceNearClip", ref nearClip);
 
-                    if (RSSSettings.HasNode(bodyName))
-                        RSSSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
+                    if (rssSettings.HasNode(bodyName))
+                        rssSettings.GetNode(bodyName).TryGetValue("camScaledSpaceNearClip", ref nearClip);
                 }
 
                 if (nearClip > 0)
@@ -107,23 +105,6 @@ namespace RealSolarSystem
         {
             watchdogRun = false;
             delayCounter = 0;
-        }
-
-        private void OnVesselSituationChanged(GameEvents.HostedFromToAction<Vessel, Vessel.Situations> data)
-        {
-            Vessel curVessel = data.host;
-            if (!curVessel.mainBody.isHomeWorld || !curVessel.isActiveVessel) return;
-
-            if (data.from == Vessel.Situations.FLYING && data.to == Vessel.Situations.SUB_ORBITAL)
-            {
-                isSuborbital = true;
-            }
-            else if (isSuborbital && data.to == Vessel.Situations.FLYING)
-            {
-                isSuborbital = false;
-                Debug.Log("[RealSolarSystem] Calling StartUpSphere() to prevent missing PQ tiles");
-                curVessel.mainBody.pqsController.StartUpSphere();
-            }
         }
     }
 }
