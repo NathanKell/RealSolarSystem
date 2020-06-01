@@ -8,7 +8,6 @@ Thanks to asmi for kicking me into to doing this and offering so much help along
 Supreme thanks to all who helped make RSS possible! regex for code, and dimonnomid and SpacedInvader for incredible art for RSS, and pingopete for his work on RSS - EVE interoperability and atmosphere work for RSS, and KillAshley for making RSS so much better (and prettier!). RSS would not look or perform the way it does (or have gotten released!) without their amazing contributions. Thanks to stratochief and grayduster and Thomas P. for wonderful help in converting to Kopernicus and adding the new bodies--with their help RSS has entered a new era!
 
 License: CC-BY-NC-SA
-Includes code by Majiir (CompatibilityChecker, licensed as per source).
 Includes artwork by dimonnomid and SpacedInvader and Dr. Walther and KillAshley in addition to NathanKell.
 Includes biomes by Felger and grayduster and KellanHiggins and KillAshley.
 Some planetary imagery is derived from work by Steve Albers and NASA / Jet Propulsion Laboratory, and some from the Celestia Motherlode (itself in the main sourced from JPL). Used by permission of the licenses for non-commercial release.
@@ -46,14 +45,14 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
-v18.1
+v18.1.1
 * Make the dishes that hover over the KSC invisible, @siimav
 * Port 16 bit heightmap PQSMod from Kopernicus to RSS, @RCrockford
 * Add support for more detailed heightmaps included in RSS-Textures v18.2
 * Fix PQS deactivate altitude for bodies, @raidernick
 * Change PQS fade in and out values to match RSSVE deactivate values for these bodies, @raidernick
 * Add better-looking terrain textures for Earth (thanks to @Gameslinx for letting us use the textures from Beyond Home), @RCrockford
-* Add better-looking terrain textures for the Moon (thanks to KSRSS developers for for letting us use their textures), @siimav
+* Add better-looking terrain textures for the Moon (thanks to KSRSS developers for letting us use their textures), @siimav
 * Regenerated ribbon images to clean up some fuzzy edges, @Kerbas-ad-astra
 * Add zh-cn localization, @tinygrox
 * Update the thermal and aerofx fade in speeds to be more realisitic, so that flame effects do not appear at mach 3, @raidernick
