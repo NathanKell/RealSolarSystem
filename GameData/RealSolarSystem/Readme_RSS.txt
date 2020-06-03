@@ -45,7 +45,7 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
-v18.1.1
+v18.1.2
 * Make the dishes that hover over the KSC invisible, @siimav
 * Port 16 bit heightmap PQSMod from Kopernicus to RSS, @RCrockford
 * Add support for more detailed heightmaps included in RSS-Textures v18.2
@@ -61,6 +61,7 @@ v18.1.1
 * Fix many launch site PQS heights/smoothing, @raidernick
 * Add White Sands and Vostochny launch sites, @raidernick
 * Add Bermuda MSFN station for RA, @RCrockford
+* Ensure that the file extensions for all dds files are in lowercase, @siimav
 
 v18.0
 * Recompiled for KSP 1.8.1
