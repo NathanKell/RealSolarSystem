@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -36,8 +35,8 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.18.1.2")]
-[assembly: AssemblyFileVersion("0.18.1.2")]
+[assembly: AssemblyVersion("0.18.1.3")]
+[assembly: AssemblyFileVersion("0.18.1.3")]
 
 [assembly: KSPAssemblyDependency("Kopernicus", 1, 0)]
 [assembly: KSPAssemblyDependency("Kopernicus.Parser", 1, 0)]
