@@ -45,14 +45,16 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
-v18.1.2
+v18.1.3
 * Make the dishes that hover over the KSC invisible, @siimav
 * Port 16 bit heightmap PQSMod from Kopernicus to RSS, @RCrockford
-* Add support for more detailed heightmaps included in RSS-Textures v18.2
+* Add support for more detailed heightmaps included in RSS-Textures v18.3
+* Add better coast smoothing for Earth, @RCrockford, @siimav
 * Fix PQS deactivate altitude for bodies, @raidernick
 * Change PQS fade in and out values to match RSSVE deactivate values for these bodies, @raidernick
-* Add better-looking terrain textures for Earth (thanks to @Gameslinx for letting us use the textures from Beyond Home), @RCrockford
-* Add better-looking terrain textures for the Moon (thanks to KSRSS developers for letting us use their textures), @siimav
+* Add better-looking terrain textures for all bodies, @RCrockford, @siimav, @Standecco
+    - Thanks to @Gameslinx for letting us use the textures from Beyond Home
+    - Thanks to KSRSS developers for letting us use their textures
 * Regenerated ribbon images to clean up some fuzzy edges, @Kerbas-ad-astra
 * Add zh-cn localization, @tinygrox
 * Update the thermal and aerofx fade in speeds to be more realisitic, so that flame effects do not appear at mach 3, @raidernick
@@ -62,6 +64,8 @@ v18.1.2
 * Add White Sands and Vostochny launch sites, @raidernick
 * Add Bermuda MSFN station for RA, @RCrockford
 * Ensure that the file extensions for all dds files are in lowercase, @siimav
+* Fix SCANsat MM patches, @Capkirk123
+* Add config for Kerbal Wind, @RCrockford
 
 v18.0
 * Recompiled for KSP 1.8.1
