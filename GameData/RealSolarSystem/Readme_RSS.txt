@@ -45,6 +45,14 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v18.1.4
+* Fix the Icy Lunar surface, @siimav
+* Create RationalResources.cfg, @DRVeyl
+* Add space low altitude (#229), @RCrockford
+* Add Mahia LaunchSiteTrackingStation (#230), @RCrockford
+* Fix some vesta biome colors (#221), @lpgagnon
+
+Changelog
 v18.1.3
 * Make the dishes that hover over the KSC invisible, @siimav
 * Port 16 bit heightmap PQSMod from Kopernicus to RSS, @RCrockford
