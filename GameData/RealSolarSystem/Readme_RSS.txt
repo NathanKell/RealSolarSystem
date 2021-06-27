@@ -36,8 +36,6 @@ RealSolarSystem ships with configurations for many other mods:
 - Ferram Aerospace Research by ferram4. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=19321
 - Not In My BackYard by magico13, and LinuxGuruGamer. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=178484
 - PlanetShine by Valerian, and Papa_Joe. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?/showtopic=173138
-- RemoteTech by Peppie23, and the Remote Technologies Group. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=139167
-- SCANSat by damny, and DMagic. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=72679
 - TextureReplacer by shaw. See thread for details, license, and source: https://forum.kerbalspaceprogram.com/index.php?showtopic=96851
 
 FINAL NOTES:
@@ -45,6 +43,11 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v18.1.5
+* Support KSCSwitcher's dynamic grass color (#242), @Standecco
+* Use 3D orbits when Kopernicus supports this, @siimav
+* Add Churchill Rocket Research Range launch site (#218) @lpgagnon
+
 v18.1.4
 * Fix the Icy Lunar surface, @siimav
 * Create RationalResources.cfg, @DRVeyl
