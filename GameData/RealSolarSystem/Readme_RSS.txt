@@ -43,6 +43,13 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v18.2.0
+* Fix wrong atmospheric pressure being shown in CelestialBody KBApp @NathanKell
+* Set default surface/orbital navball transition altitude for all bodies @al2me6
+* French body names by @eggrobin in #244
+* Fix the bad tangent in Venus pressureCurve @siimav
+* Add comets to Custom Asteroids config by @Starstrider42 in #226
+
 v18.1.5
 * Support KSCSwitcher's dynamic grass color (#242), @Standecco
 * Use 3D orbits when Kopernicus supports this, @siimav
