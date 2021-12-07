@@ -43,8 +43,12 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v18.4.0
+* Fix clip planes for OpenGL, @siimav
+
+Changelog
 v18.3.0
-* Fix too low clip plane value which caused artifacts to appear near the horizon, @siimav 
+* Fix too low clip plane value which caused artifacts to appear near the horizon, @siimav
 * Fix KSC runway becoming bumpy if KK is installed, @NathanKell
 
 v18.2.0
