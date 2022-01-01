@@ -43,6 +43,10 @@ You really should play with the recommended mods. See the Realism Overhaul threa
 
 ===========================
 Changelog
+v18.5.0
+* Add Russian localization, @eggrobin
+
+Changelog
 v18.4.0
 * Fix clip planes for OpenGL, @siimav
 
