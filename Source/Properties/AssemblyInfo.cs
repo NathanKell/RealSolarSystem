@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿#define CIBUILD_disabled
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 // General Information about an assembly is controlled through the following 
@@ -10,7 +11,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("RealSolarSystem")]
-[assembly: AssemblyCopyright("Copyright © 2014 - 2021, KSP-RO Team")]
+[assembly: AssemblyCopyright("Copyright © 2014 - 2022, KSP-RO Team")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -35,8 +36,13 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
+#if CIBUILD
+[assembly: AssemblyVersion("@MAJOR@.@MINOR@.@PATCH.@BUILD@")]
+[assembly: AssemblyFileVersion("@MAJOR@.@MINOR@.@PATCH.@BUILD@")]
+#else
 [assembly: AssemblyVersion("18.5.0.0")]
 [assembly: AssemblyFileVersion("18.5.0.0")]
+#endif
 
 [assembly: KSPAssemblyDependency("Kopernicus", 1, 0)]
 [assembly: KSPAssemblyDependency("Kopernicus.Parser", 1, 0)]
