@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 namespace RealSolarSystem
@@ -7,7 +6,7 @@ namespace RealSolarSystem
     [KSPAddon(KSPAddon.Startup.Flight, false)]
     public class RSSRunwayFix : MonoBehaviour
     {
-        private bool hold = false;
+        internal bool hold = false;
 
         public bool debug = false;
 
@@ -20,7 +19,8 @@ namespace RealSolarSystem
         private int layerMask = 1<<15;
 
         private int frameSkip = 0;
-        private bool rwy = false;
+        internal bool isOnRunway = false;
+        internal string lastHitColliderName;
 
         private bool waiting = false;
         private IEnumerator waitCoro = null;
@@ -32,7 +32,18 @@ namespace RealSolarSystem
         {
             "End09", "Section4", "Section3", "Section2", "Section1", "End27"
         };
-        
+
+        public static RSSRunwayFix Instance { get; private set; } = null;
+
+        public void Awake()
+        {
+            if (Instance != null)
+            {
+                Destroy(Instance);
+            }
+            Instance = this;
+        }
+
         public void Start()
         {
             PrintDebug("Start");
@@ -188,10 +199,10 @@ namespace RealSolarSystem
             
             if (!CheckRunway())
             {
-                if (rwy)
+                if (isOnRunway)
                 {
                     if (debug) PrintDebug($"rwy=false; threshold={FloatingOrigin.fetch.threshold}, original threshold={originalThreshold}");
-                    rwy = false;
+                    isOnRunway = false;
                 }
                 
                 return;
@@ -200,10 +211,10 @@ namespace RealSolarSystem
             FloatingOrigin.fetch.threshold = holdThreshold;
             FloatingOrigin.fetch.thresholdSqr = holdThresholdSqr;
             
-            if (!rwy)
+            if (!isOnRunway)
             {
                 if (debug) PrintDebug($"rwy=true; threshold={FloatingOrigin.fetch.threshold}, original threshold={originalThreshold}");
-                rwy = true;
+                isOnRunway = true;
             }
 
             FloatingOrigin.SetSafeToEngage(false);
@@ -230,9 +241,9 @@ namespace RealSolarSystem
                 return false;
             }
             
-            string colliderName = raycastHit.collider.gameObject.name;
+            lastHitColliderName = raycastHit.collider.gameObject.name;
             //if (debug) printDebug($"hit collider: {colliderName}");
-            if (colliderName != "runway_collider")
+            if (lastHitColliderName != "runway_collider")
             {
                 return false;
             }

@@ -138,8 +138,26 @@ namespace RealSolarSystem
 
             scrollPos = GUILayout.BeginScrollView(scrollPos);
 
+            GUILayout.Label("RSSRunwayFix");
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("isOnRunway: ");
+            GUILayout.Label(RSSRunwayFix.Instance.isOnRunway.ToString(), GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("hold: ");
+            GUILayout.Label(RSSRunwayFix.Instance.hold.ToString(), GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            GUILayout.Label("lastHitCollider: ");
+            GUILayout.Label(RSSRunwayFix.Instance.lastHitColliderName, GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
             if (cams != null)
             {
+                GUILayout.Label("--------------");
                 GUILayout.BeginHorizontal();
                 GUILayout.Label("CAMERA EDITOR");
                 GUILayout.EndHorizontal();
