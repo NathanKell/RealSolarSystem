@@ -5,10 +5,7 @@ abstract: >-
   Resizes and rearranges the Kerbal system to more closely resemble the Solar
   System
 author:
-  - NathanKell
-  - eggrobin
-  - raidernick
-  - PhineasFreak
+  - KSP-RO Team
 $kref: '#/ckan/github/KSP-RO/RealSolarSystem'
 $vref: '#/ckan/ksp-avc'
 x_netkan_force_v: true
@@ -33,6 +30,7 @@ recommends:
   - name: KSCSwitcher
   - name: RSSDateTimeFormatter
   - name: RSSVE-Textures
+  - name: Parallax
 install:
   - find: RealSolarSystem
     install_to: GameData
