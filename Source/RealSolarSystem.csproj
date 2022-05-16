@@ -51,6 +51,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RSSRunwayFix.cs" />
     <Compile Include="TimeWarpFixer.cs" />
+    <Compile Include="VesselGroundPositionEnhancer.cs" />
     <Compile Include="Watchdogs.cs" />
   </ItemGroup>
   <ItemGroup>
