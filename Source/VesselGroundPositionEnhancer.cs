@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using UnityEngine;
+using System.Collections;
 using static Vessel;
 
 namespace RealSolarSystem
@@ -38,17 +39,29 @@ namespace RealSolarSystem
 
         private void OnVesselGoOffRails(Vessel v)
         {
-            if (v.Landed && !v.Splashed && v.situation != Situations.PRELAUNCH)
+            if (v.Landed && !v.Splashed)
             {
-                v.skipGroundPositioning = false;
-                var sw = System.Diagnostics.Stopwatch.StartNew();
-                v.CheckGroundCollision();
-                Debug.Log($"[RSS-VGPE] CheckGroundCollision() in {sw.ElapsedMilliseconds}ms");
-                sw.Stop();
+                if (v.situation == Situations.PRELAUNCH)
+                {
+                    const int framesToSkip = 100;
+                    foreach (Part p in v.Parts)
+                        if (p.GetComponent<CollisionEnhancer>() is CollisionEnhancer c)
+                            c.framesToSkip = framesToSkip;
+
+                    Debug.Log($"[RSS-VGPE] Vessel going off rails in PRELAUNCH, skipping {framesToSkip} frames on CollisionEnhancer.");
+                }
+                else
+                {
+                    v.skipGroundPositioning = false;
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+                    v.CheckGroundCollision();
+                    Debug.Log($"[RSS-VGPE] CheckGroundCollision() in {sw.ElapsedMilliseconds}ms");
+                    sw.Stop();
+                }
             }
             else
             {
-                Debug.Log("[RSS-VGPE] not landed or is prelaunch");
+                Debug.Log("[RSS-VGPE] not landed");
             }
         }
     }
