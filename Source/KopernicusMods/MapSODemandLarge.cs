@@ -212,6 +212,27 @@ namespace RealSolarSystem
             Debug.Log("[OD] <--- Map " + name + " disabling self. Path = " + Path);
         }
 
+        protected override void ConstructBilinearCoords(double x, double y)
+        {
+            x = Math.Abs(x - Math.Floor(x));
+            y = Math.Abs(y - Math.Floor(y));
+            centerXD = x * _width;
+            minX = (int)Math.Floor(centerXD);
+            maxX = (int)Math.Ceiling(centerXD);
+            midX = (float)centerXD - minX;
+            // X wraps around as it is longitude.
+            if (maxX == _width)
+                maxX = 0;
+            
+            centerYD = y * _height;
+            minY = (int)Math.Floor(centerYD);
+            maxY = (int)Math.Ceiling(centerYD);
+            midY = (float)centerYD - minY;
+            // Y clamps as it is latitude and the poles don't wrap to each other.
+            if (maxY == _height)
+                maxY = _height-1;
+        }
+
         // GetPixelByte
         public override Byte GetPixelByte(Int32 x, Int32 y)
         {
@@ -247,14 +268,8 @@ namespace RealSolarSystem
                 x -= Width;
             }
 
-            if (y < 0)
-            {
-                y = Height - y;
-            }
-            else if (y >= Height)
-            {
-                y -= Height;
-            }
+            y = Math.Max(y, 0);
+            y = Math.Min(y, Height-1);
 
             return Image[PixelIndex(x, y)];
         }
@@ -574,24 +589,22 @@ namespace RealSolarSystem
         // GetPixelHeightAlpha - Float
         public override HeightAlpha GetPixelHeightAlpha(Single x, Single y)
         {
-            if (IsLoaded)
+            if (!IsLoaded)
             {
-                return base.GetPixelHeightAlpha(x, y);
-            }
+                if (OnDemandStorage.OnDemandLogOnMissing)
+                {
+                    Debug.Log("[OD] ERROR: getting pixelHeightAlphaF with unloaded map " + name + " of path " + Path +
+                              ", autoload = " + AutoLoad);
+                }
 
-            if (OnDemandStorage.OnDemandLogOnMissing)
-            {
-                Debug.Log("[OD] ERROR: getting pixelHeightAlphaF with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
-            }
-
-            if (AutoLoad)
-            {
-                Load();
-            }
-            else
-            {
-                return new HeightAlpha(0f, 0f);
+                if (AutoLoad)
+                {
+                    Load();
+                }
+                else
+                {
+                    return new HeightAlpha(0f, 0f);
+                }
             }
 
             return base.GetPixelHeightAlpha(x, y);

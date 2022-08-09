@@ -16,7 +16,8 @@ namespace RealSolarSystem
         public override void OnVertexBuildHeight(PQS.VertexBuildData data)
         {
             // Get the HeightAlpha, not the Float-Value from the Map
-            MapSO.HeightAlpha ha = heightMap.GetPixelHeightAlpha(data.u, data.v);
+            // Clamp the v value to just shy of 1 to avoid sampling issues around the north pole.
+            MapSO.HeightAlpha ha = heightMap.GetPixelHeightAlpha(data.u, Math.Min(data.v, 0.99999));
                 
             // Get the height data from the terrain
             Double height = (ha.height + ha.alpha * (Double)Byte.MaxValue) / (Double)(Byte.MaxValue + 1);
