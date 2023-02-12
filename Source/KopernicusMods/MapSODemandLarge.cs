@@ -47,7 +47,7 @@ namespace RealSolarSystem
             {
                 try
                 {
-                    if (path.ToLower().EndsWith(".dds"))
+                    if (path.EndsWith(".dds", StringComparison.OrdinalIgnoreCase))
                     {
                         // Borrowed from stock KSP 1.0 DDS loader (hi Mike!)
                         // Also borrowed the extra bits from Sarbian.
@@ -141,7 +141,7 @@ namespace RealSolarSystem
                 }
                 catch (Exception ex)
                 {
-                    Debug.Log("[Kopernicus]: failed to load " + path + " with exception " + ex.Message);
+                    Debug.Log($"[Kopernicus]: failed to load {path} with exception {ex}");
                 }
             }
             else
@@ -174,12 +174,12 @@ namespace RealSolarSystem
                 eventMap.Path = Path;
                 Events.OnMapSOLoad.Fire(eventMap);
                 
-                Debug.Log("[OD] ---> Map " + name + " enabling self. Path = " + Path);
+                Debug.Log($"[OD] ---> Map {name} enabling self. Path = {Path}");
                 return;
             }
 
             // Return nothing
-            Debug.Log("[OD] ERROR: Failed to load map " + name + " at path " + Path);
+            Debug.Log($"[OD] ERROR: Failed to load map {name} at path {Path}");
         }
 
         /// <summary>
@@ -209,7 +209,7 @@ namespace RealSolarSystem
             Events.OnMapSOUnload.Fire(eventMap);
 
             // Log
-            Debug.Log("[OD] <--- Map " + name + " disabling self. Path = " + Path);
+            Debug.Log($"[OD] <--- Map {name} disabling self. Path = {Path}");
         }
 
         protected override void ConstructBilinearCoords(double x, double y)
@@ -241,7 +241,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelbyte with unloaded map " + name + " of path " + Path + ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelbyte with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -284,8 +284,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelColD with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelColD with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -310,8 +309,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelColF with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelColF with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -333,8 +331,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelColI with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelColI with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -383,8 +380,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelCol32D with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelCol32D with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -409,8 +405,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelCol32F with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelCol32F with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -432,8 +427,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelCol32I with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelCol32I with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -480,8 +474,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelFloatD with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelFloatD with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -506,8 +499,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelFloatF with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelFloatF with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -529,8 +521,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelFloatI with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelFloatI with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -570,8 +561,7 @@ namespace RealSolarSystem
 
             if (OnDemandStorage.OnDemandLogOnMissing)
             {
-                Debug.Log("[OD] ERROR: getting pixelHeightAlphaD with unloaded map " + name + " of path " + Path +
-                          ", autoload = " + AutoLoad);
+                Debug.Log($"[OD] ERROR: getting pixelHeightAlphaD with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
             }
 
             if (AutoLoad)
@@ -593,8 +583,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelHeightAlphaF with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelHeightAlphaF with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -617,8 +606,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelHeightAlphaI with unloaded map " + name + " of path " +
-                              Path + ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelHeightAlphaI with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -658,8 +646,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting GreyByteI with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting GreyByteI with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -687,8 +674,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting GreyFloat with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting GreyFloat with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -716,8 +702,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: getting pixelByte with unloaded map " + name + " of path " + Path +
-                              ", autoload = " + AutoLoad);
+                    Debug.Log($"[OD] ERROR: getting pixelByte with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -752,8 +737,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: compiling with unloaded map " + name + " of path " + Path + ", autoload = " +
-                              AutoLoad);
+                    Debug.Log($"[OD] ERROR: compiling with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -790,8 +774,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: compiling with unloaded map " + name + " of path " + Path + ", autoload = " +
-                              AutoLoad);
+                    Debug.Log($"[OD] ERROR: compiling with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -828,8 +811,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: compiling with unloaded map " + name + " of path " + Path + ", autoload = " +
-                              AutoLoad);
+                    Debug.Log($"[OD] ERROR: compiling with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -866,8 +848,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: compiling with unloaded map " + name + " of path " + Path + ", autoload = " +
-                              AutoLoad);
+                    Debug.Log($"[OD] ERROR: compiling with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
@@ -903,8 +884,7 @@ namespace RealSolarSystem
             {
                 if (OnDemandStorage.OnDemandLogOnMissing)
                 {
-                    Debug.Log("[OD] ERROR: compiling with unloaded map " + name + " of path " + Path + ", autoload = " +
-                              AutoLoad);
+                    Debug.Log($"[OD] ERROR: compiling with unloaded map {name} of path {Path}, autoload = {AutoLoad}");
                 }
 
                 if (AutoLoad)
