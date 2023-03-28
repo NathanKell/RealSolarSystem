@@ -49,6 +49,14 @@ namespace RealSolarSystem
                         string.Empty
                     );
                 }
+                else
+                {
+                    var fi = new FileInfo(Path.Combine(szTextureFolderPath, "EarthColor.dds"));
+                    if (fi.Exists)
+                    {
+                        Debug.Log($"[RealSolarSystem] EarthColor.dds size: {(fi.Length / 1024d / 1024d):F1}MB");
+                    }
+                }
             }
             catch (Exception exceptionStack)
             {
