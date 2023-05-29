@@ -41,6 +41,10 @@ namespace RealSolarSystem
 
         private static void RememberPreference()
         {
+            FileInfo fi = new FileInfo(PreferenceFilePath);
+            if (!Directory.Exists(fi.Directory.FullName))
+                Directory.CreateDirectory(fi.Directory.FullName);
+
             // create empty file
             File.Create(PreferenceFilePath).Close();
         }
